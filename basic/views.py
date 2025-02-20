@@ -3,7 +3,39 @@ from django.http import Http404
 from .models import Computed
 from django.utils import timezone
 
+
 # Create your views here.
+
+def get_divisor(n):
+    #Returns a divisor of n if it's not prime, else None
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return i
+    return None
+
+def isprime(request, number):
+    #Django view to check if a number is prime
+    number = int(number)
+    divisor = get_divisor(number)
+    
+    context = {
+        "number": number,
+        "isprime": divisor is None,
+
+    }
+
+     # Only add "divisor" if the number is NOT prime
+    if divisor:
+        context["divisor"] = divisor
+
+    # Returns HTML 
+    return render(request, "basic/prime.html", context)
+
+
+def hello(request):
+    # Return some HTML
+    return render(request, "basic/helloworld.html", {})
+
 
 # Computation function
 def compute(request, value):
