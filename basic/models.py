@@ -1,16 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User  # Use built-in User model
 
-# Computed objects cache computations that were already performed
-class Computed(models.Model):
-    input = models.IntegerField()
-    output = models.IntegerField()
-    time_computed = models.DateTimeField(null=True)
-
-    def __str__(self):
-        return f"{self.input} -> {self.output}"
-
-
 # TestSession now references User instead of Doctor
 class TestSession(models.Model):
     test_id = models.AutoField(primary_key=True)
