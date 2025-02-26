@@ -4,6 +4,6 @@ from . import views
 app_name="basic"
 
 urlpatterns = [
-    path("compute/<int:value>", views.compute, name="compute"),
-    path("isprime/<int:value>", views.isprime, name="isprime"),
+   # path("compute/<int:value>", views.compute, name="compute"),
+   # path("isprime/<int:value>", views.isprime, name="isprime"),
 ]
