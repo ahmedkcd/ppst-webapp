@@ -39,6 +39,8 @@ python manage.py makemigrations
 
 python manage.py migrate
 
+python manage.py shell < fixture.py
+
 python manage.py createsuperuser  # Follow prompts to set up an admin user
 
 ---
