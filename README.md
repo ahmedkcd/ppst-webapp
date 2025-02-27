@@ -26,8 +26,8 @@ Ensure you have the following installed:
 ---
 
 ### 2️⃣ Clone the Repository
-git clone https://github.com/yourusername/yourproject.git
-cd yourproject
+git clone https://github.com/ahmedkcd/ppst-webapp.git
+cd ppst-webapp
 
 ---
 
