@@ -2,9 +2,7 @@
 
 A webapp created for Senior Project Spring 2025
 
-By: Matt Cossari, Atilla Turan, Alvaro Ibarra
-
----
+By: Matt Cossari, Atilla Turan, Alvaro Ibarra, Tanner Dodge, Govinda Avinesh Muthuselvam
 
 ## 🚀 Getting Started
 
@@ -96,3 +94,4 @@ Visit **http://127.0.0.1:8000/** in your browser.
 - **ModuleNotFoundError?**  
   - Ensure you activated the virtual environment before running Django commands:
     source venv/bin/activate  # On Windows: venv\Scripts\activate
+
