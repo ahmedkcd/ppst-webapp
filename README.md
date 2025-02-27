@@ -1,14 +1,8 @@
 # ppst-webapp
+
 A webapp created for Senior Project Spring 2025
 
 By: Matt Cossari, Atilla Turan, Alvaro Ibarra
-
-
-Test:
-
-# Django Project
-
-This is a Django-based web application that manages test sessions, responses, and statistics. The project uses PostgreSQL as its database and supports user authentication.
 
 ---
 
