@@ -1,0 +1,59 @@
+# Byte-compiled / optimized / package files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+.venv/
+env/
+ENV/
+
+# Django-related files
+*.log
+db.sqlite3  # Ignore SQLite database (if using PostgreSQL, this is unnecessary)
+media/  # Ignore user-uploaded files (optional, unless stored externally)
+staticfiles/  # Collected static files (generated via `collectstatic`)
+
+# Ignore secret settings
+.env  # Environment variables file (if using dotenv)
+config/settings_local.py  # Custom local settings file (if applicable)
+
+# Ignore migrations cache (but NOT migrations themselves!)
+**/migrations/*.pyc
+**/migrations/__pycache__/
+
+# Ignore IDE/editor files
+.vscode/
+.idea/
+*.swp  # Vim swap files
+*.sublime-project
+*.sublime-workspace
+
+# Ignore Jupyter Notebook checkpoints (if applicable)
+.ipynb_checkpoints/
+
+# Ignore compiled code and coverage reports
+*.mo
+*.pot
+htmlcov/
+coverage.xml
+*.cover
+*.pycoverage
+.cache
+
+# Ignore dependency files
+Pipfile
+Pipfile.lock
+poetry.lock
+
+# Ignore Node.js files (if using frontend dependencies)
+node_modules/
+npm-debug.log
+yarn.lock
+
+# Ignore Docker and deployment files (if using Docker)
+docker-compose.override.yml
+*.dockerfile
+*.pid
