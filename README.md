@@ -83,12 +83,6 @@ Visit **http://127.0.0.1:8000/** in your browser.
 ---
 
 ## 🐛 Troubleshooting
-- **Database connection errors?**  
-  - Ensure PostgreSQL is running:  
-    sudo service postgresql start  # Linux/Mac
-  
-  - Check if the database exists using:
-    psql -U your_database_user -d your_database_name
 
 - **ModuleNotFoundError?**  
   - Ensure you activated the virtual environment before running Django commands:
