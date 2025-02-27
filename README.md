@@ -67,6 +67,7 @@ python manage.py createsuperuser  # Follow prompts to set up an admin user
 
 ### 7️⃣ Run the Server
 python manage.py runserver
+
 Visit **http://127.0.0.1:8000/** in your browser.
 
 ---
