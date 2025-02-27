@@ -31,8 +31,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    "tasks.apps.TasksConfig",
-    "htmx.apps.HtmxConfig",
     "basic.apps.BasicConfig",
     "django.contrib.admin",
     "django.contrib.auth",
