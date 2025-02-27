@@ -34,27 +34,6 @@ pip install django
 
 ---
 
-### 5️⃣ Configure Database
-Make sure **PostgreSQL** is installed and running. Then, create a database:
-psql -U postgres
-CREATE DATABASE your_database_name;
-GRANT ALL PRIVILEGES ON DATABASE your_database_name TO your_database_user;
-\q
-
-Update your `settings.py` with your database credentials:
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'your_database_name',
-        'USER': 'your_database_user',
-        'PASSWORD': 'your_database_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-
----
-
 ### 6️⃣ Apply Migrations & Create Superuser
 python manage.py makemigrations
 python manage.py migrate
