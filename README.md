@@ -21,8 +21,6 @@ Ensure you have the following installed:
 - [Python (>=3.10)](https://www.python.org/downloads/)
 - [PostgreSQL](https://www.postgresql.org/download/)
 - [Git](https://git-scm.com/)
-- [Pipenv](https://pipenv.pypa.io/en/latest/) *(optional but recommended)*
-
 ---
 
 ### 2️⃣ Clone the Repository
@@ -36,14 +34,11 @@ Using **venv**:
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-Or using **pipenv** (recommended):
-pip install pipenv
-pipenv shell
 
 ---
 
-### 4️⃣ Install Dependencies
-pip install -r requirements.txt
+### 4️⃣ Install Django
+pip install django
 
 ---
 
