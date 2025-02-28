@@ -20,7 +20,7 @@ def get_or_create_user(username, email):
     user, created = User.objects.get_or_create(username=username, defaults={"email": email})
     if created:
         user.set_password("securepassword")  # Set a password if newly created
-        user.is_staff = True  # Allow admin access
+        user.is_staff = False  # Allow admin access
         user.save()
     return user
 
@@ -42,16 +42,16 @@ print(f"Created test sessions: {[session.test_id for session in test_sessions]}"
 
 # Create stimuli
 stimuli = [
-    Stimuli.objects.create(stimulus="Red Circle", correct_response="Press Red Button", span=3, type="Visual"),
-    Stimuli.objects.create(stimulus="Beep Sound", correct_response="Press Any Key", span=2, type="Auditory"),
+    Stimuli.objects.create(stimulus="42316", correct_response="12346", span=5, type="Numeric"),
+    Stimuli.objects.create(stimulus="219CZG", correct_response="123CGZ", span=6, type="AlphaNumeric"),
 ]
 
 print(f"Created stimuli: {[stim.stim_id for stim in stimuli]}")
 
 # Create responses
 responses = [
-    Response.objects.create(test=test_sessions[0], stim=stimuli[0], response="Pressed Red Button", latency=2.5, is_correct=True),
-    Response.objects.create(test=test_sessions[1], stim=stimuli[1], response="Pressed Any Key", latency=1.8, is_correct=True),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[0], response="12346", latency=2.5, is_correct=True),
+    Response.objects.create(test=test_sessions[1], stim=stimuli[1], response="321CDX", latency=1.8, is_correct=False),
 ]
 
 print(f"Created responses: {[resp.response_id for resp in responses]}")
