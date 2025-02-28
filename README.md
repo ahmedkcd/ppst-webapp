@@ -34,6 +34,13 @@ pip install django
 
 ---
 
+
+### 5 Start a Django Project - will create a Django project inside ppst-webapp-2 directory
+django-admin startproject djangoproject . 
+
+
+---
+
 ### 6️⃣ Apply Migrations & Create Superuser
 python manage.py makemigrations
 
