@@ -3,14 +3,14 @@ import os
 from datetime import timedelta
 from django.utils import timezone
 from django.contrib.auth.models import User
-from basic.models import TestSession, Stimuli, Response, Statistics
+from basic.models import TestSession, Stimuli, Response
 
 # Setup Django environment (useful if running outside `manage.py shell`)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangoproject.settings")
 django.setup()
 
 # Delete existing objects to start fresh (except users)
-for model in [TestSession, Stimuli, Response, Statistics]:
+for model in [TestSession, Stimuli, Response]:
     model.objects.all().delete()
 
 print("Existing data cleared.")
@@ -20,7 +20,7 @@ def get_or_create_user(username, email):
     user, created = User.objects.get_or_create(username=username, defaults={"email": email})
     if created:
         user.set_password("securepassword")  # Set a password if newly created
-        user.is_staff = False  # Allow admin access
+        user.is_staff = False  # admin access
         user.save()
     return user
 
@@ -55,11 +55,6 @@ responses = [
 ]
 
 print(f"Created responses: {[resp.response_id for resp in responses]}")
-
-# Create statistics
-Statistics.objects.create(avg_latency=2.15, accuracy=90.0, total_tests=2, total_responses=2)
-
-print("Created statistics.")
 
 # Verify queries
 tasks = TestSession.objects.filter(doctor=doctors[0])
