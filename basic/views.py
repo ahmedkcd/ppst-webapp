@@ -17,6 +17,7 @@
 import json
 import random
 
+from django.db import models
 from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -81,6 +82,18 @@ def record_responses_bulk(request):
                     response.latency = latency
                     response.is_correct = is_correct
                     response.save()
+
+                    test_session = response.test
+
+                stats = test_session.response_set.aggregate(
+                    avg_latency=models.Avg("latency"),
+                    total_responses=models.Count("response_id"),
+                    correct_responses=models.Count("response_id", filter=models.Q(is_correct=True))
+                )
+                test_session.avg_latency = stats["avg_latency"]
+                test_session.accuracy = (stats["correct_responses"] / stats["total_responses"]) * 100 if stats[
+                    "total_responses"] else 0
+                test_session.save()
 
             return JsonResponse({"message": "Responses recorded successfully."})
 
