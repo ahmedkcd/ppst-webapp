@@ -2,7 +2,7 @@
 
 A webapp created for Senior Project Spring 2025
 
-By: Matt Cossari, Atilla Turan, Alvaro Ibarra, Tanner Dodge, Govinda Avinesh Muthuselvam
+By: Matt Cossari, Atilla Turan, Alvaro Ibarra, Tanner Dodge, Govinda Avinesh Muthuselvam, Amy'r Smith and Adam Mahrous
 
 ## 🚀 Getting Started
 
@@ -34,30 +34,20 @@ pip install django
 
 ---
 
-### 5️⃣ Configure Database
-Make sure **PostgreSQL** is installed and running. Then, create a database:
-psql -U postgres
-CREATE DATABASE your_database_name;
-GRANT ALL PRIVILEGES ON DATABASE your_database_name TO your_database_user;
-\q
 
-Update your `settings.py` with your database credentials:
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'your_database_name',
-        'USER': 'your_database_user',
-        'PASSWORD': 'your_database_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+### 5️⃣ Start a Django Project - will create a Django project inside ppst-webapp-2 directory
+django-admin startproject djangoproject . 
+
 
 ---
 
 ### 6️⃣ Apply Migrations & Create Superuser
 python manage.py makemigrations
+
 python manage.py migrate
+
+python manage.py shell < fixture.py
+
 python manage.py createsuperuser  # Follow prompts to set up an admin user
 
 ---
