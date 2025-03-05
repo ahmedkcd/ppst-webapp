@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Test</title>
+</head>
+<body>
+    <h1>Generate a Test</h1>
+    <label for="age">Enter Age:</label>
+    <input type="number" id="age" name="age">
+    <button onclick="generateTest()">Generate</button>
+
+    <h2>Test Response</h2>
+    <pre id="result"></pre>
+
+    <script>
+        function generateTest() {
+            const age = document.getElementById("age").value;
+            if (!age) {
+                alert("Please enter an age");
+                return;
+            }
+
+            fetch(`/basic/generate-test/?age=${age}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => console.error("Error:", error));
+        }
+    </script>
+</body>
+</html>
