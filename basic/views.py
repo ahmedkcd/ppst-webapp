@@ -1,15 +1,8 @@
 # Create your views here.
 
-# every test needs 6 4 span and 6 5 span tests
-# to generate a test get 6 random 4 span and 6 random 5 span models
-# then create a new test id and 12 response tests that link to each stimilus
-# we have the same stimulus so just shuffle the order for each type
-# then link the responses to the test id
-# so itll go 12 stimulus -> 12 responses -> 1 test
-
 # stimulus are hard coded
 
-# pseudo /// for every stimulus with span of 5 and type numeric
+# pseudo ///
 # first generate a new test model with user id and age
 # then generate a response model for every stimulus
 # link each response with a unique stimulus and that same test id
