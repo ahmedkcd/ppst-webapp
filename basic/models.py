@@ -6,8 +6,10 @@ class TestSession(models.Model):
     test_id = models.AutoField(primary_key=True)
     doctor = models.ForeignKey(User, on_delete=models.CASCADE)  # Link to built-in User model
     age = models.IntegerField()
-    date = models.DateTimeField()
-    duration = models.DurationField()
+    date = models.DateTimeField(null=True)
+    duration = models.DurationField(null=True)
+    avg_latency = models.FloatField(null=True)
+    accuracy = models.FloatField(null=True)
 
     def __str__(self):
         return f"Test {self.test_id} - Age {self.age} with Dr. {self.doctor.username}"
@@ -30,21 +32,22 @@ class Response(models.Model):
     response_id = models.AutoField(primary_key=True)
     test = models.ForeignKey(TestSession, on_delete=models.CASCADE)
     stim = models.ForeignKey(Stimuli, on_delete=models.CASCADE)
-    response = models.TextField()
-    latency = models.FloatField()
-    is_correct = models.BooleanField()
+    response = models.TextField(null=True)
+    latency = models.FloatField(null=True)
+    is_correct = models.BooleanField(null=True)
 
     def __str__(self):
         return f"Response {self.response_id} (Test {self.test.test_id})"
 
 
 # Model for storing statistical data
-class Statistics(models.Model):
-    stats_id = models.AutoField(primary_key=True)
-    avg_latency = models.FloatField()
-    accuracy = models.FloatField()
-    total_tests = models.IntegerField()
-    total_responses = models.IntegerField()
-
-    def __str__(self):
-        return f"Aggregate Stats - {self.total_tests} Tests, {self.total_responses} Responses"
+# perhaps move into test session and store relavant data, like the avg latency across all responses, the accuracy of the overall test,
+# class Statistics(models.Model):
+#     stats_id = models.AutoField(primary_key=True)
+#     avg_latency = models.FloatField(null=True)
+#     accuracy = models.FloatField(null=True)
+#     total_tests = models.IntegerField(null=True)
+#     total_responses = models.IntegerField(null=True)
+# 
+#     def __str__(self):
+#         return f"Aggregate Stats - {self.total_tests} Tests, {self.total_responses} Responses"
