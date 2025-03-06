@@ -13,11 +13,15 @@ import random
 from django.db import models
 from django.db import transaction
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Response
 from .models import TestSession, Stimuli
+
+
+def test_page(request):
+    return render(request, "basic/test_page.html")
 
 
 def generate_test(request):
@@ -35,7 +39,7 @@ def generate_test(request):
 
     responses = []
 
-    for i in range(24):
+    for i in range(12):
         stimulus = stimuli_list[i]
         response = Response.objects.create(
             test=test_session,
