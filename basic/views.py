@@ -24,23 +24,48 @@ def test_page(request):
     return render(request, "basic/test_page.html")
 
 
+import random
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import TestSession, Stimuli, Response
+
+@login_required
 def generate_test(request):
-    age = request.GET.get("age", None)  # Default to None if not provided
+    age = request.GET.get("age")
     if age is None:
         return JsonResponse({"error": "Age parameter is required."}, status=400)
 
+    # Define preset test orders (4 possible sequences)
+    test_orders = [
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        [3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8],
+        [6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 4, 5],
+        [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+    ]
+
+    # Pick a random test order
+    selected_order = random.choice(test_orders)
+
+    # Fetch stimuli and apply the selected order
+    stimuli_list = list(Stimuli.objects.all())
+    if len(stimuli_list) < 12:
+        return JsonResponse({"error": "Not enough stimuli available."}, status=500)
+
+    ordered_stimuli = [stimuli_list[i] for i in selected_order]
+
+    # Store the order as a comma-separated string
+    stimuli_order_str = ",".join(map(str, selected_order))
+
+    # Create the test session
     test_session = TestSession.objects.create(
         doctor=request.user,
         age=age,
+        stimuli_order=stimuli_order_str  # Store as text
     )
-# add a test order that is randomnly selected from an array of 4, then the order is stored in the test session, and the stimuli is given to the generated respones in that order.
-    stimuli_list = list(Stimuli.objects.all())
-    random.shuffle(stimuli_list)
 
+    # Generate responses
     responses = []
-
-    for i in range(12):
-        stimulus = stimuli_list[i]
+    for stimulus in ordered_stimuli:
         response = Response.objects.create(
             test=test_session,
             stim=stimulus,
@@ -50,7 +75,11 @@ def generate_test(request):
             "stimulus": stimulus.stim_id,
         })
 
-    return JsonResponse({"test_id": test_session.test_id, "responses": responses})
+    return JsonResponse({
+        "test_id": test_session.test_id,
+        "stimuli_order": stimuli_order_str,  # Return order for verification
+        "responses": responses
+    })
 
 
 # a single json file that holds all the responses latencies everything, then a single view that parses and updates the db

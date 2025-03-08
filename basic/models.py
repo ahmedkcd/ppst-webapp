@@ -14,6 +14,7 @@ class TestSession(models.Model):
     accuracy = models.FloatField(null=True)
     stimuli_order = models.TextField(null=True)
     state = models.TextField(default="ready")
+    language = models.TextField(default="en")
 
     def __str__(self):
         return f"Test {self.test_id} - Age {self.age} with Dr. {self.doctor.username}"
