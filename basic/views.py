@@ -16,9 +16,14 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Response
-from .models import TestSession, Stimuli
+#from .models import Response
+#from .models import TestSession, Stimuli
+from basic.models import Response, TestSession, Stimuli
 
+#individual
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
 def test_page(request):
     return render(request, "basic/test_page.html")
@@ -98,3 +103,31 @@ def record_responses_bulk(request):
             return JsonResponse({"error": "Invalid JSON data."}, status=400)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
+# individual programming hw
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        print(f"DEBUG: Attempting login with {username}:{password}")
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            print("DEBUG: Authentication successful")
+            login(request, user)
+            return redirect("basic:dashboard")  # redirects to the dashboard
+        else:
+            print("DEBUG: Authentication failed")  # more debugging
+            return render(request, "basic/login.html", {"error": "Invalid credentials"})
+
+    return render(request, "basic/login.html")
+
+
+# Dashboard View that is accessible after login
+@login_required
+def dashboard(request):
+    return render(request, "basic/dashboard.html")
+
+def logout_view(request):
+    logout(request)
+    return redirect("login")

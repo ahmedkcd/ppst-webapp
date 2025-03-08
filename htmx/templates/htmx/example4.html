@@ -1,0 +1,59 @@
+{% extends 'baseb.html' %}
+{% block title %} Project manager dashboard {% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <!-- HTML for modal dialog -->
+  <div class="modal fade" id="memberModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Assigned To</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div id="member" class="modal-body">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p></p>
+  <!-- One row containing two columns, one for projects and one for tasks -->
+  <div class="row">
+    <div class="col-6">
+      <p></p>
+      <center>
+        <h3>Projects</h3>
+      </center>
+      <div class="list-group">
+        {% for project in projects %}
+        <div>
+          <button id='button-{{ project.id }}' type="button" class="list-group-item list-group-item-action"
+            hx-trigger="click" hx-target="#taskscol" hx-vars="id:{{ project.id }}"
+            hx-post="{% url 'htmx:tasks4project' %}">
+            {{ project.name }}
+          </button>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="col-6">
+      <p></p>
+      <center>
+        <h3>Tasks</h3>
+      </center>
+
+      <!-- Target div for displaying task list -->
+      <div id="taskscol">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

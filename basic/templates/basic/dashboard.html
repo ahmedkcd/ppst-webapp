@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/styles.css"> <!-- Link external CSS -->
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>PPST Dashboard</h2>
+            <ul>
+                <li><a href="#">Create New Test</a></li>
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Results</a></li>
+                <li><a href="#">Statistics</a></li>
+                <li><a href="{% url 'basic:login' %}">Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h1>Welcome, Doctor!</h1>
+            <div class="overview">
+                <h3>Quick Overview of Tests</h3>
+                <ul>
+                    <li>Active Tests: work in progress</li>
+                    <li>Pending Results: work in progress</li>
+                    <li>Completed Tests: work in progress</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

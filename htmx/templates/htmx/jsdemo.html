@@ -1,0 +1,114 @@
+<html>
+<head>
+    {% load static %}
+    <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
+
+    <script>
+
+            // Record the click on a response button 
+            function record(buttonID) {
+                return function () {
+                    id = document.getElementById(buttonID)
+                    val = document.getElementById("times").value
+                    val = val + ` ${id.innerText}:${Date.now()}`
+                    document.getElementById("times").value = val
+                }
+            }
+
+            // Change an HTML element from visible to invisible
+            // and vice versa
+            function togglevisibility(id) {
+                element = document.getElementById(id)
+                if (element.style.display === "none") {
+                    element.style.display = "block";
+                } else {
+                    element.style.display = "none";
+                }
+            }
+            
+            // Toggle the visibility of all buttons
+            function toggle() {
+                togglevisibility("play")
+                togglevisibility("button1")
+                togglevisibility("button2")
+                togglevisibility("button3")
+                togglevisibility("next")
+            }
+        
+            // Play audio. Make buttons visible upon completion
+            function playaudio() {
+
+                document.getElementById("answer").innerText=""
+                x = "{% static '312.m4a' %}"
+                stimulus = new Audio(x)
+                stimulus.addEventListener("ended", function(){
+                    toggle()
+                    document.getElementById("times").value=`${Date.now()}`
+                });
+
+                stimulus.addEventListener("play", function(){
+                    document.getElementById("answer").innerText=""
+                });
+
+                stimulus.play()
+            }
+
+            // Setup record function for response buttons
+            addEventListener("DOMContentLoaded", (event) => {
+                document.getElementById("button1").onclick = record("button1")
+                document.getElementById("button2").onclick = record("button2")
+                document.getElementById("button3").onclick = record("button3")
+
+            });
+        
+    </script>
+
+
+</head>
+
+
+
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+<h2> HTMX + Javascript Demo</h2>
+
+<button id="play" onclick="playaudio()">
+    Stimulus  
+</button>
+<br><br>
+
+<table>
+<tr>
+<td>
+    <button id="button1" style="display: none">
+        1
+    </button>
+</td>
+<td>
+    <button id="button2" style="display: none">
+        2
+    </button>
+</td>
+<td>
+    <button id="button3" style="display: none">
+        3
+    </button>
+</td>
+</tr>
+</table>
+
+<br><br>
+
+<input id="times" value="" type="hidden" name="times"  ></input>
+
+<button id="next" style="display: none" 
+hx-trigger="click" hx-post="{% url 'htmx:response' %}" hx-include="#times" 
+hx-target="#times" hx-swap="outerHTML"
+hx-on::after-request="toggle()">
+    Next  
+</button>
+
+<div id="answer"></div>
+
+</body>
+</html>
