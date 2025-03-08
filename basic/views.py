@@ -135,3 +135,6 @@ def logout_view(request):
 # Start of PPST project work
 def test_intro(request):
     return render(request, "basic/test_intro.html")
+
+def test_instructions(request):
+    return render(request, "basic/test_instructions.html")

@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import generate_test, test_page, login_view, dashboard, logout_view, test_intro
+from . import views
+from .views import generate_test, test_page, login_view, dashboard, logout_view, test_intro, test_instructions
 #individual
 #from .views import login_view
 
@@ -16,5 +17,5 @@ urlpatterns = [
     path("logout/", logout_view, name="logout"),
     #ppst
     path("test/intro/", test_intro, name="test_intro"),
-    
+    path("test/instructions/", views.test_instructions, name="test_instructions"),
 ]
