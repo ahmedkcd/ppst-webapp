@@ -33,7 +33,7 @@ def generate_test(request):
         doctor=request.user,
         age=age,
     )
-
+# add a test order that is randomnly selected from an array of 4, then the order is stored in the test session, and the stimuli is given to the generated respones in that order.
     stimuli_list = list(Stimuli.objects.all())
     random.shuffle(stimuli_list)
 
