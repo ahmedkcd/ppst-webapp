@@ -131,3 +131,7 @@ def dashboard(request):
 def logout_view(request):
     logout(request)
     return redirect("login")
+
+# Start of PPST project work
+def test_intro(request):
+    return render(request, "basic/test_intro.html")
