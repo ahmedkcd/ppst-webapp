@@ -101,6 +101,11 @@
             <div class="card">
                 <label for="age">Enter Patient Age:</label>
                 <input type="number" id="age" class="form-control" placeholder="Enter age">
+                <label for="language">Select Language:</label>
+                <select id="language" class="form-control">
+                    <option value="en">English</option>
+                    <option value="sp">Spanish</option>
+                </select>
                 <button class="btn btn-generate mt-3" onclick="generateTest()">Generate</button>
             </div>
 
@@ -118,8 +123,9 @@
                 alert("Please enter an age");
                 return;
             }
+            const language = document.getElementById("language").value;
 
-            fetch(`/basic/generate-test/?age=${age}`)
+            fetch(`/basic/generate-test/?age=${age}&language=${language}`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById("result").textContent = JSON.stringify(data, null, 2);

@@ -32,6 +32,7 @@ from .models import TestSession, Stimuli, Response
 @login_required
 def generate_test(request):
     age = request.GET.get("age")
+    language = request.GET.get("language")
     if age is None:
         return JsonResponse({"error": "Age parameter is required."}, status=400)
 
@@ -60,6 +61,7 @@ def generate_test(request):
     test_session = TestSession.objects.create(
         doctor=request.user,
         age=age,
+        language=language,
         stimuli_order=stimuli_order_str  # Store as text
     )
 
@@ -77,6 +79,7 @@ def generate_test(request):
 
     return JsonResponse({
         "test_id": test_session.test_id,
+        "language": test_session.language,
         "stimuli_order": stimuli_order_str,  # Return order for verification
         "responses": responses
     })
