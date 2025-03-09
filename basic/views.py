@@ -104,7 +104,7 @@ def record_responses_bulk(request):
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
-# individual programming hw
+# individual programming hw - Functional login and dashboard
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -126,11 +126,11 @@ def login_view(request):
 # Dashboard View that is accessible after login
 @login_required
 def dashboard(request):
-    return render(request, "basic/dashboard.html")
+    return render(request, "basic/dashboard.html", {"doctor_name": request.user.username})
 
 def logout_view(request):
     logout(request)
-    return redirect("login")
+    return redirect("basic:login")
 
 # Start of PPST project work
 def test_intro(request):
