@@ -1,5 +1,4 @@
 from django.db import models
-<<<<<<< HEAD
 from django.contrib.auth.models import User  # Use built-in User model
 
 # TestSession now references User instead of Doctor
@@ -52,20 +51,3 @@ class Response(models.Model):
 # 
 #     def __str__(self):
 #         return f"Aggregate Stats - {self.total_tests} Tests, {self.total_responses} Responses"
-=======
-
-# Create your models here.
-
-    
-# Computed objects cache computations that were already performed
-# A computation that has already been performed will not be performed again 
-class Computed(models.Model):  
-    input = models.IntegerField()
-    output = models.IntegerField()
-    time_computed = models.DateTimeField(null=True)
-
-    def __str__(self):
-        return(f"{self.input} -> {self.output}")
-
-
->>>>>>> djangostarter/Amyr-Final-Prog-Branch
