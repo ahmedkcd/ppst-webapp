@@ -20,4 +20,9 @@ from django.urls import path, include
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("basic/", include('basic.urls')),
+<<<<<<< HEAD
+=======
+    path("htmx/", include('htmx.urls')),
+    path("tasks/", include('tasks.urls')),
+>>>>>>> djangostarter/Amyr-Final-Prog-Branch
 ]

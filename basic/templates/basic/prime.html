@@ -1,0 +1,16 @@
+<html>
+    
+<h1>
+
+    Prime Home Page
+
+</h1>
+
+{% if isprime %}
+        <p>{{ number }} is a prime number since it has no divisors.</p>
+    {% else %}
+        <p>{{ number }} is not a prime number since {{ divisor }} is a divisor.</p>
+    {% endif %}
+
+</html>
+
