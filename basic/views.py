@@ -12,8 +12,9 @@ import random
 
 from django.db import models
 from django.db import transaction
+from django.db.models import Avg, Count, Q
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import Response
@@ -94,3 +95,26 @@ def record_responses_bulk(request):
             return JsonResponse({"error": "Invalid JSON data."}, status=400)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
+def test_statistics(request, test_id):
+    test_session = get_object_or_404(TestSession, test_id=test_id)
+    responses = Response.objects.filter(test=test_session)
+
+    total_responses = responses.count()
+    correct_responses = responses.filter(is_correct=True).count()
+    avg_latency = responses.aggregate(models.Avg('latency'))['latency__avg'] or 0
+
+    accuracy = (correct_responses / total_responses) * 100 if total_responses else 0
+
+    chart_data = {
+        'labels': ['Accuracy (%)', 'Avg Latency (ms)', 'Total Responses'],
+        'values': [accuracy, avg_latency, total_responses]
+    }
+
+    # Pass the chart_data to the template
+    return render(request, 'basic/test_statistics.html', {'test_id': test_id, 'chart_data': chart_data})
+
+
+
+
+
