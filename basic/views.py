@@ -15,9 +15,13 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render
 
 from .models import Response
 from .models import TestSession, Stimuli
+
+def testresults(request):
+    return render(request, "basic/testresults.html")
 
 
 def generate_test(request):
