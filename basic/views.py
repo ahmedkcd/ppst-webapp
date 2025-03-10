@@ -10,11 +10,13 @@
 import json
 import random
 
+from django import forms
 from django.db import models
 from django.db import transaction
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET, require_POST
 
 from .models import Response
 from .models import TestSession, Stimuli
@@ -94,3 +96,48 @@ def record_responses_bulk(request):
             return JsonResponse({"error": "Invalid JSON data."}, status=400)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
+def get_preset_stimuli():
+    """Retrieve all stimuli from the database as a list of tuples for dropdown selection."""
+    try:
+        stimuli = list(Stimuli.objects.values_list('stimulus', 'stimulus'))  # (stimulus, stimulus)
+        if not stimuli:
+            print("No stimuli in the database!")
+        return stimuli
+    except Exception as e:
+        print(f"Error fetching stimuli: {e}")  
+        return []  # Return an empty list instead of breaking the form
+    
+# Define a response form using dynamically loaded stimuli
+class StimulusResponseForm(forms.Form):
+    stimulus = forms.ChoiceField(choices=[])
+    response = forms.CharField(widget=forms.Textarea(attrs={"class": "form-control", "placeholder": "Enter response"}))
+
+    def __init__(self, *args, **kwargs):
+        super(StimulusResponseForm, self).__init__(*args, **kwargs)
+        self.fields['stimulus'].choices = get_preset_stimuli()
+
+@require_GET
+def testpage(request):
+    form = StimulusResponseForm()
+
+    return render(request, "basic/testpage.html", {
+        'form': form
+    })
+
+@require_POST
+def testpage_response(request):
+    times = request.POST['times']
+    responses = times.split(" ")
+    previous = int(responses[0])
+    responses.pop(0)
+    answer = "Server received: "
+    for response in responses:
+        values = response.split(':')
+        button = values[0]
+        latency = (int(values[1]) - previous)/1000
+        previous = int(values[1])
+        answer = f"{answer} Button {button} after a latency of {latency} seconds. "
+    return render(request, "htmx/partials/times.html",{
+        'answer': answer,
+    }) 
