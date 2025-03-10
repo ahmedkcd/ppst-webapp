@@ -21,7 +21,8 @@ from .models import Response
 from .models import TestSession, Stimuli
 
 def testresults(request):
-    return render(request, "basic/testresults.html")
+     test_sessions = TestSession.objects.all()  # Retrieve all test sessions
+     return render(request, "basic/testresults.html", {"test_sessions": test_sessions})
 
 
 def generate_test(request):
