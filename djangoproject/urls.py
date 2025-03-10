@@ -19,10 +19,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("basic/", include('basic.urls')),
-<<<<<<< HEAD
-=======
+    path('basic/', include(('basic.urls', 'basic'), namespace='basic')),  # Ensure namespace is included
     path("htmx/", include('htmx.urls')),
     path("tasks/", include('tasks.urls')),
->>>>>>> djangostarter/Amyr-Final-Prog-Branch
+
 ]
