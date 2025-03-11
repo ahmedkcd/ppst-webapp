@@ -1,0 +1,89 @@
+<html>
+<head>
+    {% load static %}
+    <script src="https://unpkg.com/htmx.org@2.0.2"></script>
+    <script>
+        let initialTimestamp = null; 
+        function record(buttonID) {
+            return function () {
+                let id = document.getElementById(buttonID);
+                let val = document.getElementById("times").value;
+                val = val + ` ${id.innerText}:${Date.now()}`;
+                document.getElementById("times").value = val.trim();
+            }
+        }
+
+        function generateButtons(stimulus) {
+            let buttonContainer = document.getElementById("button-container");
+            buttonContainer.innerHTML = "";  
+
+            if (stimulus) {
+                for (let char of stimulus) {
+                    let button = document.createElement("button");
+                    button.innerText = char;
+                    button.id = `button-${char}`;
+                    button.onclick = record(button.id);
+                    button.style.display = "none";
+                    buttonContainer.appendChild(button);
+                }
+                toggleButtons(true);
+            }
+        }
+        function toggleButtons(show) {
+            let buttons = document.querySelectorAll("#button-container button");
+            buttons.forEach(button => {
+                button.style.display = show ? "inline-block" : "none";
+            });
+            document.getElementById("next").style.display = show ? "block" : "none";
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelector("form button[type='submit']").addEventListener("click", function () {
+                initialTimestamp = Date.now();
+            });
+            let selectedStimulus = "{{ selected_stimulus|default:'' }}".trim();  // Ensure empty string fallback
+            if (selectedStimulus) {
+                generateButtons(selectedStimulus);
+        }
+    });
+    </script>
+</head>
+
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+<h2> Testpage </h2>
+
+<form method="get">
+    <label for="id_stimulus">Choose a Stimulus:</label>
+    {{ form.stimulus }}
+    <button type="submit">Submit</button>
+</form>
+
+<br>
+
+<div id="button-container">
+    {% if selected_stimulus %}
+        <p>Selected Stimulus: <strong>{{ selected_stimulus }}</strong></p>
+        <script>
+            generateButtons("{{ selected_stimulus }}");
+        </script>
+    {% endif %}
+</div>
+
+<br>
+
+<input id="times" value="" type="hidden" name="times">
+
+<button id="next" style="display: none"
+    hx-trigger="click"
+    hx-post="{% url 'basic:testpage_response' %}"
+    hx-include="#times"
+    hx-target="#times"
+    hx-swap="outerHTML">
+    Next  
+</button>
+
+<div id="answer"></div>
+
+</body>
+</html>
