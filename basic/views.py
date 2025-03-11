@@ -117,27 +117,42 @@ class StimulusResponseForm(forms.Form):
         super(StimulusResponseForm, self).__init__(*args, **kwargs)
         self.fields['stimulus'].choices = get_preset_stimuli()
 
-@require_GET
+from django.views.decorators.http import require_http_methods
+
+@require_http_methods(["GET", "POST"])
 def testpage(request):
-    form = StimulusResponseForm()
+    form = StimulusResponseForm(request.GET or None)  # Use GET, since the form submits with GET
+    selected_stimulus = request.GET.get("stimulus", None)  # Get stimulus directly from query parameters
 
     return render(request, "basic/testpage.html", {
-        'form': form
+        "form": form,
+        "selected_stimulus": selected_stimulus,  # This will pass stimulus to the template
     })
+
+
 
 @require_POST
 def testpage_response(request):
     times = request.POST['times']
-    responses = times.split(" ")
-    previous = int(responses[0])
+    
+    # Split times and filter out any empty strings
+    responses = [response for response in times.split(" ") if response.strip()]
+
+    # Ensure there are at least two responses to calculate latency
+    if len(responses) < 2:
+        return JsonResponse({"error": "Insufficient data."}, status=400)
+
+    previous = int(responses[0].split(":")[1])
     responses.pop(0)
     answer = "Server received: "
+
     for response in responses:
         values = response.split(':')
         button = values[0]
-        latency = (int(values[1]) - previous)/1000
+        latency = (int(values[1]) - previous) / 1000  # Convert to seconds
         previous = int(values[1])
         answer = f"{answer} Button {button} after a latency of {latency} seconds. "
-    return render(request, "htmx/partials/times.html",{
+
+    return render(request, "basic/times.html", {
         'answer': answer,
-    }) 
+    })
