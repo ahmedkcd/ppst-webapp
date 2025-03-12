@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Session</title>
+    <script>
+        let responses = [];
+        let currentIndex = 0;
+        let stimulusText = "";
+        let charIndex = 0;
+        let startTime;
+        let responseStartTime;
+        let latencies = [];
+        let userInput = "";
+
+        let testId = new URLSearchParams(window.location.search).get("test_id");
+
+        async function fetchResponses() {
+            const response = await fetch(`/basic/get-responses/?test_id=${testId}`);
+            const data = await response.json();
+            responses = data.responses;
+            startTest();
+        }
+
+        function startTest() {
+            if (currentIndex < responses.length) {
+                stimulusText = responses[currentIndex].stimulus_text;
+                charIndex = 0;
+                latencies = [];
+                userInput = "";
+
+                document.getElementById("stimulus").textContent = "";
+                document.getElementById("user-response").textContent = "Your Response: ";
+
+                showNextCharacter();
+            } else {
+                document.getElementById("stimulus").textContent = "Test Complete!";
+            }
+        }
+
+        function showNextCharacter() {
+            if (charIndex < stimulusText.length) {
+                document.getElementById("stimulus").textContent = stimulusText[charIndex];
+                charIndex++;
+                setTimeout(showNextCharacter, 2000);
+            }
+            else {
+                responseStartTime = Date.now();
+                document.getElementById("stimulus").textContent = '';
+            }
+        }
+
+        function submitResponse(choice) {
+            let responseId = responses[currentIndex].response_id;
+            latencies.push(Date.now() - responseStartTime);
+            let totalLatency = Date.now() - responseStartTime;
+
+            userInput += choice;
+            document.getElementById("user-response").textContent = "Your Response: " + userInput;
+
+            if (userInput.length === stimulusText.length) {
+                fetch("/basic/submit-response/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+                    body: JSON.stringify({
+                        response_id: responseId,
+                        response: userInput,
+                        latencies: latencies.join(","),  // Store latencies as a comma-separated string
+                    })
+                }).then(() => {
+                    currentIndex++;
+                    startTest();
+                });
+            }
+        }
+
+        function getCSRFToken() {
+            return document.cookie.split("; ")
+                .find(row => row.startsWith("csrftoken="))
+                ?.split("=")[1];
+        }
+
+        window.onload = fetchResponses;
+    </script>
+</head>
+<body>
+    <h1>Test Session</h1>
+    <p id="stimulus"></p>
+    <p id="user-response">Your Response: </p> </body> <!-- We would not show this for the actual test -->
+
+    <div>
+        <button onclick="submitResponse('1')">1</button>
+        <button onclick="submitResponse('2')">2</button>
+        <button onclick="submitResponse('3')">3</button>
+        <button onclick="submitResponse('4')">4</button>
+        <button onclick="submitResponse('5')">5</button>
+        <button onclick="submitResponse('6')">6</button>
+        <button onclick="submitResponse('7')">7</button>
+        <button onclick="submitResponse('8')">8</button>
+        <button onclick="submitResponse('9')">9</button>
+        <button onclick="submitResponse('0')">0</button>
+        <button onclick="submitResponse('A')">A</button>
+        <button onclick="submitResponse('B')">B</button>
+        <button onclick="submitResponse('C')">C</button>
+        <button onclick="submitResponse('D')">D</button>
+    </div>
+</body>
+</html>
