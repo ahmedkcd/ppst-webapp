@@ -8,26 +8,25 @@
 # link each response with a unique stimulus and that same test id
 
 import json
-import random
 
 from django.db import models
 from django.db import transaction
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
-
-from .models import Response
-from .models import TestSession, Stimuli
 
 
 def test_page(request):
     return render(request, "basic/test_page.html")
+
+def take_test(request):
+    return render(request, "basic/take_test.html")
 
 
 import random
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import TestSession, Stimuli, Response
+
 
 @login_required
 def generate_test(request):
@@ -81,7 +80,8 @@ def generate_test(request):
         "test_id": test_session.test_id,
         "language": test_session.language,
         "stimuli_order": stimuli_order_str,  # Return order for verification
-        "responses": responses
+        "responses": responses,
+        "link" : f"http://localhost:8000/basic/take-test/?test_id={test_session.test_id}"
     })
 
 
@@ -130,3 +130,39 @@ def record_responses_bulk(request):
             return JsonResponse({"error": "Invalid JSON data."}, status=400)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
+
+
+from django.http import JsonResponse
+from .models import Response
+
+def get_responses(request):
+    test_id = request.GET.get("test_id")
+    responses = Response.objects.filter(test_id=test_id).select_related('stim')
+
+    data = [
+        {"response_id": r.response_id, "stimulus_text": r.stim.stimulus}
+        for r in responses
+    ]
+
+    return JsonResponse({"responses": data})
+
+@csrf_exempt
+def submit_response(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        response_id = data.get("response_id")
+        user_response = data.get("response")
+        latencies = data.get("latencies", "")
+
+        try:
+            response = Response.objects.get(pk=response_id)
+            response.response = user_response
+            response.latencies = latencies
+            response.is_correct = (user_response == response.stim.correct_response)
+            response.save()
+            return JsonResponse({"status": "success"})
+        except Response.DoesNotExist:
+            return JsonResponse({"error": "Response not found"}, status=404)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
