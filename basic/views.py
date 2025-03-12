@@ -23,9 +23,8 @@ def take_test(request):
 
 
 import random
-from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from .models import TestSession, Stimuli, Response
+from .models import TestSession, Stimuli
 
 
 @login_required

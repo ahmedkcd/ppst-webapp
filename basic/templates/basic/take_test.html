@@ -54,7 +54,6 @@
         function submitResponse(choice) {
             let responseId = responses[currentIndex].response_id;
             latencies.push(Date.now() - responseStartTime);
-            let totalLatency = Date.now() - responseStartTime;
 
             userInput += choice;
             document.getElementById("user-response").textContent = "Your Response: " + userInput;
@@ -105,5 +104,4 @@
         <button onclick="submitResponse('C')">C</button>
         <button onclick="submitResponse('D')">D</button>
     </div>
-</body>
 </html>
