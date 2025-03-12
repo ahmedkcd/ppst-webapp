@@ -33,7 +33,6 @@
                 document.getElementById("stimulus").textContent = "";
                 document.getElementById("user-response").textContent = "Your Response: ";
 
-                responseStartTime = Date.now();
                 showNextCharacter();
             } else {
                 document.getElementById("stimulus").textContent = "Test Complete!";
@@ -42,15 +41,19 @@
 
         function showNextCharacter() {
             if (charIndex < stimulusText.length) {
-                document.getElementById("stimulus").textContent += stimulusText[charIndex];
-                latencies.push(Date.now() - responseStartTime);  // Capture latency for each character
+                document.getElementById("stimulus").textContent = stimulusText[charIndex];
                 charIndex++;
                 setTimeout(showNextCharacter, 2000);
+            }
+            else {
+                responseStartTime = Date.now();
+                document.getElementById("stimulus").textContent = '';
             }
         }
 
         function submitResponse(choice) {
             let responseId = responses[currentIndex].response_id;
+            latencies.push(Date.now() - responseStartTime);
             let totalLatency = Date.now() - responseStartTime;
 
             userInput += choice;
@@ -84,7 +87,7 @@
 <body>
     <h1>Test Session</h1>
     <p id="stimulus"></p>
-    <p id="user-response">Your Response: </p>
+    <p id="user-response">Your Response: </p> </body> <!-- We would not show this for the actual test -->
 
     <div>
         <button onclick="submitResponse('1')">1</button>
