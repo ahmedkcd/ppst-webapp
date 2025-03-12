@@ -14,9 +14,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 
-#from .models import Response
-#from .models import TestSession, Stimuli
-from basic.models import Response, TestSession, Stimuli
+#from basic.models import Response, TestSession, Stimuli
 
 #individual
 from django.shortcuts import render, redirect
@@ -174,3 +172,30 @@ def submit_response(request):
             return JsonResponse({"error": "Response not found"}, status=404)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+# indiv
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("basic:dashboard")
+        else:
+            return render(request, "basic/login.html", {"error": "Invalid credentials"})
+    return render(request, "basic/login.html")
+
+def logout_view(request):
+    logout(request)
+    return redirect("basic:login")
+
+@login_required
+def dashboard(request):
+    return render(request, "basic/dashboard.html", {"doctor_name": request.user.username})
+
+def test_intro(request):
+    return render(request, "basic/test_intro.html")
+
+def test_instructions(request):
+    return render(request, "basic/test_instructions.html")

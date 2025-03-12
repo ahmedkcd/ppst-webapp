@@ -42,11 +42,9 @@ print(f"Created test sessions: {[session.test_id for session in test_sessions]}"
 
 # Create stimuli data
 stimuli_data = [
-    ("4231", "1234", 4, "Numeric"), ("5892", "2589", 4, "Numeric"), ("7613", "1367", 4, "Numeric"), 
-    # input panel for numeric should be a collection of all present stimuli that is given to user
+    ("4231", "1234", 4, "Numeric"), ("5892", "2589", 4, "Numeric"), ("7613", "1367", 4, "Numeric"),
     ("19845", "14589", 5, "Numeric"), ("37260", "02367", 5, "Numeric"), ("90431", "01349", 5, "Numeric"),
-    ("A1B2", "12AB", 4, "AlphaNumeric"), ("M4X7", "47MX", 4, "AlphaNumeric"), ("C9D3", "39CD", 4, "AlphaNumeric"), 
-    # input panel for alphanumeric, 16 total buttons = 8 letters 8 numbers
+    ("A1B2", "12AB", 4, "AlphaNumeric"), ("M4X7", "47MX", 4, "AlphaNumeric"), ("C9D3", "39CD", 4, "AlphaNumeric"),
     ("K7L2M", "27KLM", 5, "AlphaNumeric"), ("Z8Y4X", "48XYZ", 5, "AlphaNumeric"), ("P5Q1R", "15PQR", 5, "AlphaNumeric"),
     ("4532", "2345", 4, "Practice"),("P5Q1R", "15PQR", 5, "Practice"),
 ]
