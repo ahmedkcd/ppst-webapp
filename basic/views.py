@@ -140,7 +140,7 @@ def get_responses(request):
     responses = Response.objects.filter(test_id=test_id).select_related('stim')
 
     data = [
-        {"response_id": r.response_id, "stimulus_text": r.stim.stimulus}
+        {"response_id": r.response_id, "stimulus_text": r.stim.stimulus, "stimulus_type" : r.stim.type}
         for r in responses
     ]
 
