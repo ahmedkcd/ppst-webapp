@@ -87,7 +87,8 @@ def generate_test(request):
         "language": test_session.language,
         "stimuli_order": stimuli_order_str,  # Return order for verification
         "responses": responses,
-        "link" : f"http://localhost:8000/basic/take-test/?test_id={test_session.test_id}"
+        #"link" : f"http://localhost:8000/basic/take-test/?test_id={test_session.test_id}"
+        "link" : f"http://localhost:8000/basic/test/intro/?test_id={test_session.test_id}"
     })
 
 
@@ -194,8 +195,28 @@ def logout_view(request):
 def dashboard(request):
     return render(request, "basic/dashboard.html", {"doctor_name": request.user.username})
 
+# def test_intro(request):
+#     return render(request, "basic/test_intro.html")
 def test_intro(request):
-    return render(request, "basic/test_intro.html")
+    test_id = request.GET.get("test_id", None)
+    return render(request, "basic/test_intro.html", {"test_id": test_id})
 
+# def test_instructions(request):
+#     return render(request, "basic/test_instructions.html")
 def test_instructions(request):
-    return render(request, "basic/test_instructions.html")
+    test_id = request.GET.get("test_id", None)
+    return render(request, "basic/test_instructions.html", {"test_id": test_id})
+
+from django.http import HttpResponseRedirect
+
+def start_test(request, test_id): # controls flow of test process in a single link
+    step = request.GET.get("step", "intro")
+
+    if step == "intro":
+        return HttpResponseRedirect(f"/basic/test/instructions/?test_id={test_id}&step=instructions")
+    elif step == "instructions":
+        return HttpResponseRedirect(f"/basic/take-test/?test_id={test_id}&step=test")
+    elif step == "test":
+        return HttpResponseRedirect(f"/basic/take-test/?test_id={test_id}")
+    else:
+        return HttpResponseRedirect(f"/basic/test/intro/?test_id={test_id}&step=intro")
