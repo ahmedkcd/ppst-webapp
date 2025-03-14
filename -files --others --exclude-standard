@@ -1,0 +1,12 @@
+* [33m1e806fc[m[33m ([m[1;31morigin/Atilla's-Branch[m[33m)[m Updated generate_test link to begin with test_intro
+* [33mcf43f11[m Resolved DB migration errors and successfully reloaded fixture
+*   [33m2823e14[m Resolved merge conflicts in urls.py and views.py
+[32m|[m[33m\[m  
+* [33m|[m [33mb82d91c[m Added functional settings button to Doctor Dashboard
+* [33m|[m [33md9f64e0[m Added instructions text and improved page styling
+* [33m|[m [33me608de5[m Basic styling improvements to intro page
+* [33m|[m [33m1fd7083[m Added navigation from intro to a simple instructions page
+* [33m|[m [33mdf1ec8a[m Added basic test intro page
+* [33m|[m [33m4552c68[m Individual Assignment Work
+* [33m|[m   [33m6442a07[m Merge remote-tracking branch 'origin/Matt's-Branch' into Atilla's-Branch
+[34m|[m[35m\[m [33m\[m  
