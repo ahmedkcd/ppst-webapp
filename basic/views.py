@@ -17,15 +17,22 @@ from django.views.decorators.csrf import csrf_exempt
 #from basic.models import Response, TestSession, Stimuli
 
 #individual
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 def test_page(request):
     return render(request, "basic/test_page.html")
 
+# def take_test(request):
+#     return render(request, "basic/take_test.html")
 def take_test(request):
-    return render(request, "basic/take_test.html")
+    test_id = request.GET.get("test_id")
+    if not test_id:
+        return HttpResponse("Error: Test ID missing", status=400)
+
+    test = get_object_or_404(TestSession, pk=test_id)
+    return render(request, "basic/take_test.html", {"test": test})
 
 
 import random
@@ -220,3 +227,18 @@ def start_test(request, test_id): # controls flow of test process in a single li
         return HttpResponseRedirect(f"/basic/take-test/?test_id={test_id}")
     else:
         return HttpResponseRedirect(f"/basic/test/intro/?test_id={test_id}&step=intro")
+    
+#practice segment work
+def practice_test(request):
+    test_id = request.GET.get("test_id")
+    stimuli = Stimuli.objects.filter(type="Practice")[:2]  #fetch 2 practice stimuli
+    practice_stimuli = [{"stimulus_text": s.stimulus} for s in stimuli]
+
+    return render(request, "basic/practice_test.html", {"practice_stimuli": practice_stimuli, "test_id": test_id})
+
+def get_practice_responses(request):
+    test_id = request.GET.get("test_id")
+    practice_stimuli = Stimuli.objects.filter(type="Practice")[:2]
+
+    data = [{"stimulus_text": s.stimulus} for s in practice_stimuli]
+    return JsonResponse({"responses": data})

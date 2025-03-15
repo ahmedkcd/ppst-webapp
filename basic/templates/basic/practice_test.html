@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Test</title>
+    <script>
+        let responses = [];
+        let currentIndex = 0;
+        let stimulusText = "";
+        let charIndex = 0;
+        let userInput = "";
+
+        let testId = new URLSearchParams(window.location.search).get("test_id");
+
+        async function fetchPracticeStimuli() {
+            const response = await fetch(`/basic/get-practice-responses/?test_id=${testId}`);
+            const data = await response.json();
+            responses = data.responses;
+            startTest();
+        }
+
+        function startTest() {
+            if (currentIndex < responses.length) {
+                stimulusText = responses[currentIndex].stimulus_text;
+                charIndex = 0;
+                userInput = "";
+
+                document.getElementById("stimulus").textContent = "";
+                document.getElementById("user-response").textContent = "Your Response: ";
+
+                showNextCharacter();
+            } else {
+                document.getElementById("stimulus").textContent = "Practice Complete!";
+                document.getElementById("next-btn").style.display = "block"; // Show button to proceed
+            }
+        }
+
+        function showNextCharacter() {
+            if (charIndex < stimulusText.length) {
+                document.getElementById("stimulus").textContent = stimulusText[charIndex];
+                charIndex++;
+                setTimeout(showNextCharacter, 2000);
+            } else {
+                document.getElementById("stimulus").textContent = '';
+            }
+        }
+
+        function submitResponse(choice) {
+            userInput += choice;
+            document.getElementById("user-response").textContent = "Your Response: " + userInput;
+
+            if (userInput.length === stimulusText.length) {
+                currentIndex++;
+                startTest();
+            }
+        }
+
+        function proceedToRealTest() {
+            window.location.href = `/basic/take-test/?test_id=${testId}`;
+        }
+
+        window.onload = fetchPracticeStimuli;
+    </script>
+</head>
+
+<body>
+    <h1>Practice Test</h1>
+    <p id="stimulus"></p>
+    <p id="user-response">Your Response: </p>
+
+    <div>
+        <button onclick="submitResponse('1')">1</button>
+        <button onclick="submitResponse('2')">2</button>
+        <button onclick="submitResponse('3')">3</button>
+        <button onclick="submitResponse('4')">4</button>
+        <button onclick="submitResponse('5')">5</button>
+        <button onclick="submitResponse('6')">6</button>
+        <button onclick="submitResponse('7')">7</button>
+        <button onclick="submitResponse('8')">8</button>
+        <button onclick="submitResponse('9')">9</button>
+        <button onclick="submitResponse('0')">0</button>
+        <button onclick="submitResponse('A')">A</button>
+        <button onclick="submitResponse('B')">B</button>
+        <button onclick="submitResponse('C')">C</button>
+        <button onclick="submitResponse('D')">D</button>
+    </div>
+
+    <button id="next-btn" style="display: none;" onclick="proceedToRealTest()">Proceed to Real Test</button>
+</body>
+
+</html>
