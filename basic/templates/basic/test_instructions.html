@@ -54,9 +54,13 @@
         style="background-color: #D6A3FB; padding: 10px; border-radius: 5px; text-decoration: none; color: black;">
         Start Practice
     </a> -->
-    <a href="{% url 'basic:practice_test' %}?test_id={{ test_id }}" class="btn"
+    <!-- <a href="{% url 'basic:practice_test' %}?test_id={{ test_id }}" class="btn"
         style="background-color: #D6A3FB; padding: 10px; border-radius: 5px; text-decoration: none; color: black;">
-        Start Practice</a>
+        Start Practice</a> -->
+
+    <a href="/basic/practice-countdown/?test_id={{ test_id }}" class="btn"
+        style="background-color: #D6A3FB; padding: 10px; border-radius: 5px; text-decoration: none; color: black;">Start
+        Practice</a>
 </body>
 
 </html>

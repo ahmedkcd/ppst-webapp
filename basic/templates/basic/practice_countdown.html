@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Test Countdown</title>
+    <script>
+        let countdown = 3;
+
+        function startCountdown() {
+            const countdownElement = document.getElementById("countdown");
+
+            const interval = setInterval(() => {
+                countdownElement.innerText = `Beginning Practice Stimuli Test in ${countdown}...`;
+                countdown--;
+
+                if (countdown < 0) {
+                    clearInterval(interval);
+                    // Redirect to the practice test page after countdown
+                    const testId = new URLSearchParams(window.location.search).get("test_id");
+                    window.location.href = `/basic/practice-test/?test_id=${testId}`;
+                }
+            }, 1000); // Update every second
+        }
+
+        window.onload = startCountdown;
+    </script>
+</head>
+
+<body>
+    <h1 id="countdown">Beginning Practice Stimuli Test in 3...</h1>
+</body>
+
+</html>

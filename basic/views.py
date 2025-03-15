@@ -242,3 +242,8 @@ def get_practice_responses(request):
 
     data = [{"stimulus_text": s.stimulus} for s in practice_stimuli]
     return JsonResponse({"responses": data})
+
+def practice_countdown(request):
+    test_id = request.GET.get("test_id")
+    return render(request, "basic/practice_countdown.html", {"test_id": test_id})
+
