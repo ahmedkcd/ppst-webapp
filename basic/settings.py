@@ -12,3 +12,6 @@ STATICFILES_DIRS = [
 
 # settings.py
 LOGIN_URL = '/basic/login/'  # Redirect unauthenticated users to the login page
+
+
+
