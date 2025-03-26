@@ -1,0 +1,122 @@
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-top: 20px;
+}
+
+#stimulus {
+    font-size: 3rem;
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
+
+#user-response {
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+/* Button container: keeps letter and number buttons side by side */
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 20%;
+    width: 100%;
+    gap: 50px;
+}
+
+/* Number buttons aligned to the left */
+.number-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Letter buttons aligned to the right */
+.letter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 1%;
+}
+
+/* Button styling */
+.number-buttons button,
+.letter-buttons button {
+    width: 45%;
+    height: 60px;
+    font-size: 2rem;
+    border-radius: 1px;
+    border: 2px solid #ece0f8;
+    background-color: #fef7ff;
+    color: #000;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.number-buttons button:hover,
+.letter-buttons button:hover {
+    background-color: #6c5ce7;
+    color: white;
+}
+
+.number-buttons button:focus,
+.letter-buttons button:focus {
+    outline: none;
+}
+
+/* Ensure buttons have consistent sizing */
+.number-buttons button {
+    flex: 1 1 15%;
+}
+
+.letter-buttons button {
+    flex: 1 1 20%;
+}
+
+
+
+@media (max-width: 480px) {
+    .button-container {
+        flex-direction: column;
+        bottom: 15%;
+        gap: 15px;
+    }
+
+    .number-buttons,
+    .letter-buttons {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .number-buttons button,
+    .letter-buttons button {
+        width: 25%;
+        font-size: 1.2rem;
+        height: 50px;
+    }
+
+    #user-response {
+        margin-top: 20px;
+        position: relative;
+        z-index: 99999;
+    }
+
+}
