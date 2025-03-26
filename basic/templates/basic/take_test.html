@@ -1,10 +1,14 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test Session</title>
+    <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
     <script>
         let responses = [];
         let currentIndex = 0;
@@ -32,7 +36,8 @@
                 userInput = "";
 
                 document.getElementById("stimulus").textContent = "";
-                document.getElementById("user-response").textContent = "Your Response: ";
+                document.getElementById("user-response").textContent =
+                    "Your Response: ";
 
                 showNextCharacter();
             } else {
@@ -42,33 +47,36 @@
 
         function showNextCharacter() {
             if (charIndex < stimulusText.length) {
-                document.getElementById("stimulus").textContent = stimulusText[charIndex];
+                document.getElementById("stimulus").textContent =
+                    stimulusText[charIndex];
                 charIndex++;
                 setTimeout(showNextCharacter, 2000);
-            }
-            else {
+            } else {
                 responseStartTime = Date.now();
-                document.getElementById("stimulus").textContent = '';
+                document.getElementById("stimulus").textContent = "";
             }
         }
 
         function submitResponse(choice) {
             let responseId = responses[currentIndex].response_id;
             latencies.push(Date.now() - responseStartTime);
-            let totalLatency = Date.now() - responseStartTime;
 
             userInput += choice;
-            document.getElementById("user-response").textContent = "Your Response: " + userInput;
+            document.getElementById("user-response").textContent =
+                "Your Response: " + userInput;
 
             if (userInput.length === stimulusText.length) {
                 fetch("/basic/submit-response/", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": getCSRFToken(),
+                    },
                     body: JSON.stringify({
                         response_id: responseId,
                         response: userInput,
-                        latencies: latencies.join(","),  // Store latencies as a comma-separated string
-                    })
+                        latencies: latencies.join(","), // Store latencies as a comma-separated string
+                    }),
                 }).then(() => {
                     currentIndex++;
                     startTest();
@@ -77,8 +85,9 @@
         }
 
         function getCSRFToken() {
-            return document.cookie.split("; ")
-                .find(row => row.startsWith("csrftoken="))
+            return document.cookie
+                .split("; ")
+                .find((row) => row.startsWith("csrftoken="))
                 ?.split("=")[1];
         }
 
@@ -89,25 +98,31 @@
 <body>
     <h1>Test Session</h1>
     <p id="stimulus"></p>
-    <p id="user-response">Your Response: </p>
-</body> <!-- We would not show this for the actual test -->
-
-<div>
-    <button onclick="submitResponse('1')">1</button>
-    <button onclick="submitResponse('2')">2</button>
-    <button onclick="submitResponse('3')">3</button>
-    <button onclick="submitResponse('4')">4</button>
-    <button onclick="submitResponse('5')">5</button>
-    <button onclick="submitResponse('6')">6</button>
-    <button onclick="submitResponse('7')">7</button>
-    <button onclick="submitResponse('8')">8</button>
-    <button onclick="submitResponse('9')">9</button>
-    <button onclick="submitResponse('0')">0</button>
-    <button onclick="submitResponse('A')">A</button>
-    <button onclick="submitResponse('B')">B</button>
-    <button onclick="submitResponse('C')">C</button>
-    <button onclick="submitResponse('D')">D</button>
-</div>
+    <p id="user-response">Your Response:</p>
 </body>
 
-</html>
+<div class="button-container">
+    <div class="number-buttons">
+        <button onclick="submitResponse('1')">1</button>
+        <button onclick="submitResponse('2')">2</button>
+        <button onclick="submitResponse('3')">3</button>
+        <button onclick="submitResponse('4')">4</button>
+        <button onclick="submitResponse('5')">5</button>
+        <button onclick="submitResponse('6')">6</button>
+        <button onclick="submitResponse('7')">7</button>
+        <button onclick="submitResponse('8')">8</button>
+        <button onclick="submitResponse('9')">9</button>
+        <button onclick="submitResponse('0')">0</button>
+    </div>
+
+    <div class="letter-buttons">
+        <button onclick="submitResponse('A')">A</button>
+        <button onclick="submitResponse('B')">B</button>
+        <button onclick="submitResponse('C')">C</button>
+        <button onclick="submitResponse('D')">D</button>
+        <button onclick="submitResponse('E')">E</button>
+        <button onclick="submitResponse('F')">F</button>
+        <button onclick="submitResponse('G')">G</button>
+        <button onclick="submitResponse('H')">H</button>
+    </div>
+</div>
