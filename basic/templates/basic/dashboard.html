@@ -1,4 +1,3 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,10 +11,10 @@
     <div class="sidebar">
         <div class="logo">+</div>
         <ul>
-            <li><a href="#"><i class="fas fa-plus-circle"></i> Create New Test</a></li>
-            <li class="active"><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            <li><a href="#"><i class="fas fa-chart-bar"></i> Results</a></li>
-            <li><a href="#"><i class="fas fa-chart-pie"></i> Statistics</a></li>
+            <li><a href="#" class="fas fa-plus-circle"> Create New Test</a></li>
+            <li class="active"><a href="#" class="fas fa-tachometer-alt"> Dashboard</a></li>
+            <li><a href="#" class="fas fa-chart-bar"> Results</a></li>
+            <li><a href="#" class="fas fa-chart-pie"> Statistics</a></li>
         </ul>
     </div>
 
@@ -25,15 +24,14 @@
             <div class="user-settings">
                 <i class="fas fa-bell"></i>
                 <i class="fas fa-cog"></i>
-                <div class="user-icon">{{ doctor_name.0|upper }}</div>
+                <div class="user-icon">{{ doctor_name|slice:":1"|upper }}</div>
                 <a href="{% url 'basic:logout' %}" class="logout-button">Logout</a>
-
-
             </div>
         </header>
+
         <div class="dashboard-container">
-            <h2>Welcome, Dr. {{ doctor_name }}!</h2>
-            <p>Quick Overview of Test</p>
+            <h2>Welcome, {{ user.username }}!</h2>
+            <p>Quick Overview of Tests</p>
             <ul>
                 <li>Active Tests: X</li>
                 <li>Pending Results: X</li>
