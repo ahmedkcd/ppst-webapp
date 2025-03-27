@@ -14,9 +14,6 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 
-#from basic.models import Response, TestSession, Stimuli
-
-#individual
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -24,12 +21,22 @@ from django.contrib.auth.decorators import login_required
 def test_page(request):
     return render(request, "basic/test_page.html")
 
+def take_test(request):
+    return render(request, "basic/take_test.html")
+
+
+import random
+from django.contrib.auth.decorators import login_required
+from .models import TestSession, Stimuli
+
+
 # def take_test(request):
 #     return render(request, "basic/take_test.html")
 def take_test(request):
     test_id = request.GET.get("test_id")
     if not test_id:
         return HttpResponse("Error: Test ID missing", status=400)
+
 
     test = get_object_or_404(TestSession, pk=test_id)
     return render(request, "basic/take_test.html", {"test": test})
@@ -39,6 +46,7 @@ import random
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import TestSession, Stimuli, Response
+
 
 
 @login_required
@@ -94,7 +102,7 @@ def generate_test(request):
         "language": test_session.language,
         "stimuli_order": stimuli_order_str,  # Return order for verification
         "responses": responses,
-        #"link" : f"http://localhost:8000/basic/take-test/?test_id={test_session.test_id}"
+
         "link" : f"http://localhost:8000/basic/test/intro/?test_id={test_session.test_id}"
     })
 

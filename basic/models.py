@@ -75,4 +75,3 @@ class Statistics(models.Model):
         """
         stats, _ = cls.objects.get_or_create(pk=1)
         stats.update_statistics()
-        
