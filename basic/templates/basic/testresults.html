@@ -12,8 +12,8 @@
             document.getElementById('age').innerText = 'Age: ' + age;
             document.getElementById('date').innerText = 'Date: ' + date;
             document.getElementById('duration').innerText = 'Duration: ' + duration;
-            document.getElementById('latency').innerText = 'Avg Latency: ' + avg_latency;
-            document.getElementById('accuracy').innerText = 'Accuracy: ' + accuracy;
+            document.getElementById('latency').innerText = 'Avg Latency: ' + avg_latency + ' ms';
+            document.getElementById('accuracy').innerText = 'Accuracy: ' + accuracy + ' %';
         }
 
         function closeDetails() {
@@ -33,12 +33,16 @@
                 }
             });
         }
+
+        function exportTestData(testId) {
+            window.location.href = `/basic/export_test_data/?test_id=${testId}`;
+        }
     </script>
     <style>
         :root {
             --light-purple: #f9f0ff;
             --sidebar-purple: #f3e8ff;
-            --button-purple: #c084fc;
+            --button-purple: #7c3aed;
         }
     </style>
 </head>
@@ -62,8 +66,18 @@
                 {% for test in test_sessions %}
                 <div class="test-item bg-white p-4 rounded shadow flex justify-between items-center">
                     <span>Test #{{ test.test_id }} - Dr. {{ test.doctor.username }}</span>
-                    <button onclick="showDetails('{{ test.doctor.username }}', 45, '2024-03-10', '14:30', '30 min', '50ms', '98%')" 
-                            class="bg-[var(--button-purple)] text-white px-4 py-1 rounded">View</button>
+                    <div class="flex gap-2">
+                        <!-- Download Button -->
+                        <button onclick="exportTestData('{{ test.test_id }}')" 
+                                class="bg-[var(--button-purple)] text-white px-4 py-2 rounded">
+                            Download
+                        </button>
+                        <!--View Button -->
+                        <button onclick="showDetails('{{ test.doctor.username }}', '{{ test.age }}', '{{ test.date }}', '{{ test.duration }}', '{{ test.avg_latency }}', '{{ test.accuracy }}')" 
+                                class="bg-[var(--button-purple)] text-white px-4 py-2 rounded">
+                            View
+                        </button>
+                    </div>
                 </div>
                 {% empty %}
                 <p>No test sessions available.</p>
@@ -85,6 +99,8 @@
     </div>
 </body>
 </html>
+
+
 
 
 
