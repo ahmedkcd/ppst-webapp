@@ -1,0 +1,13 @@
+<!-- HTML snippet for task list -->
+<div class="list-group">
+    {% for task in tasks %}
+      <button   type="button" class="list-group-item list-group-item-action"
+                data-bs-toggle="modal" data-bs-target="#memberModal"
+                hx-trigger="click" hx-target="#member"
+                hx-get="{% url 'htmx:member4task' task.id %}"
+      >
+        {{ task.description }}
+      </button>
+
+    {% endfor %}
+</div>

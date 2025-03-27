@@ -14,6 +14,9 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 
+from django.shortcuts import render, redirect, HttpResponse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
 def test_page(request):
     return render(request, "basic/test_page.html")
@@ -25,6 +28,25 @@ def take_test(request):
 import random
 from django.contrib.auth.decorators import login_required
 from .models import TestSession, Stimuli
+
+
+# def take_test(request):
+#     return render(request, "basic/take_test.html")
+def take_test(request):
+    test_id = request.GET.get("test_id")
+    if not test_id:
+        return HttpResponse("Error: Test ID missing", status=400)
+
+
+    test = get_object_or_404(TestSession, pk=test_id)
+    return render(request, "basic/take_test.html", {"test": test})
+
+
+import random
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from .models import TestSession, Stimuli, Response
+
 
 
 @login_required
@@ -80,7 +102,8 @@ def generate_test(request):
         "language": test_session.language,
         "stimuli_order": stimuli_order_str,  # Return order for verification
         "responses": responses,
-        "link" : f"http://localhost:8000/basic/take-test/?test_id={test_session.test_id}"
+
+        "link" : f"http://localhost:8000/basic/test/intro/?test_id={test_session.test_id}"
     })
 
 
@@ -165,3 +188,70 @@ def submit_response(request):
             return JsonResponse({"error": "Response not found"}, status=404)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+# indiv
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("basic:dashboard")
+        else:
+            return render(request, "basic/login.html", {"error": "Invalid credentials"})
+    return render(request, "basic/login.html")
+
+def logout_view(request):
+    logout(request)
+    return redirect("basic:login")
+
+@login_required
+def dashboard(request):
+    return render(request, "basic/dashboard.html", {"doctor_name": request.user.username})
+
+# def test_intro(request):
+#     return render(request, "basic/test_intro.html")
+def test_intro(request):
+    test_id = request.GET.get("test_id", None)
+    return render(request, "basic/test_intro.html", {"test_id": test_id})
+
+# def test_instructions(request):
+#     return render(request, "basic/test_instructions.html")
+def test_instructions(request):
+    test_id = request.GET.get("test_id", None)
+    return render(request, "basic/test_instructions.html", {"test_id": test_id})
+
+from django.http import HttpResponseRedirect
+
+def start_test(request, test_id): # controls flow of test process in a single link
+    step = request.GET.get("step", "intro")
+
+    if step == "intro":
+        return HttpResponseRedirect(f"/basic/test/instructions/?test_id={test_id}&step=instructions")
+    elif step == "instructions":
+        return HttpResponseRedirect(f"/basic/take-test/?test_id={test_id}&step=test")
+    elif step == "test":
+        return HttpResponseRedirect(f"/basic/take-test/?test_id={test_id}")
+    else:
+        return HttpResponseRedirect(f"/basic/test/intro/?test_id={test_id}&step=intro")
+    
+#practice segment work
+def practice_test(request):
+    test_id = request.GET.get("test_id")
+    stimuli = Stimuli.objects.filter(type="Practice")[:2]  #fetch 2 practice stimuli
+    practice_stimuli = [{"stimulus_text": s.stimulus} for s in stimuli]
+
+    return render(request, "basic/practice_test.html", {"practice_stimuli": practice_stimuli, "test_id": test_id})
+
+def get_practice_responses(request):
+    test_id = request.GET.get("test_id")
+    practice_stimuli = Stimuli.objects.filter(type="Practice")[:2]
+
+    data = [{"stimulus_text": s.stimulus} for s in practice_stimuli]
+    return JsonResponse({"responses": data})
+
+def practice_countdown(request):
+    test_id = request.GET.get("test_id")
+    return render(request, "basic/practice_countdown.html", {"test_id": test_id})
+

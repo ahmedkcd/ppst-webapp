@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Practice Test</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <style>
+        .proceed-btn-wrapper {
+            display: none;
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+
+        .proceed-btn-wrapper button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            background-color: #6c5ce7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .proceed-btn-wrapper button:hover {
+            background-color: #574b90;
+        }
+    </style>
+
+    <script>
+        let responses = [];
+        let currentIndex = 0;
+        let stimulusText = "";
+        let charIndex = 0;
+        let userInput = "";
+
+        const testId = new URLSearchParams(window.location.search).get("test_id");
+
+        async function fetchPracticeStimuli() {
+            const response = await fetch(`/basic/get-practice-responses/?test_id=${testId}`);
+            const data = await response.json();
+            responses = data.responses;
+            startTest();
+        }
+
+        function startTest() {
+            if (currentIndex < responses.length) {
+                stimulusText = responses[currentIndex].stimulus_text;
+                charIndex = 0;
+                userInput = "";
+
+                document.getElementById("stimulus").textContent = "";
+                document.getElementById("user-response").textContent = "Your Response: ";
+                document.getElementById("next-btn").style.display = "none";
+
+                showNextCharacter();
+            } else {
+                document.getElementById("stimulus").textContent = "Practice Complete!";
+                document.getElementById("next-btn").style.display = "flex";
+            }
+        }
+
+        function showNextCharacter() {
+            if (charIndex < stimulusText.length) {
+                document.getElementById("stimulus").textContent = stimulusText[charIndex];
+                charIndex++;
+                setTimeout(showNextCharacter, 2000);
+            } else {
+                document.getElementById("stimulus").textContent = "";
+            }
+        }
+
+        function submitResponse(choice) {
+            userInput += choice;
+            document.getElementById("user-response").textContent = "Your Response: " + userInput;
+
+            if (userInput.length === stimulusText.length) {
+                currentIndex++;
+                startTest();
+            }
+        }
+
+        function proceedToRealTest() {
+            window.location.href = `/basic/take-test/?test_id=${testId}`;
+        }
+
+        window.onload = fetchPracticeStimuli;
+    </script>
+</head>
+
+<body>
+    <h1>Practice Test</h1>
+    <p id="stimulus"></p>
+    <p id="user-response">Your Response:</p>
+
+    <div class="button-container">
+        <div class="number-buttons">
+            <button onclick="submitResponse('1')">1</button>
+            <button onclick="submitResponse('2')">2</button>
+            <button onclick="submitResponse('3')">3</button>
+            <button onclick="submitResponse('4')">4</button>
+            <button onclick="submitResponse('5')">5</button>
+            <button onclick="submitResponse('6')">6</button>
+            <button onclick="submitResponse('7')">7</button>
+            <button onclick="submitResponse('8')">8</button>
+            <button onclick="submitResponse('9')">9</button>
+            <button onclick="submitResponse('0')">0</button>
+        </div>
+
+        <div class="letter-buttons">
+            <button onclick="submitResponse('A')">A</button>
+            <button onclick="submitResponse('B')">B</button>
+            <button onclick="submitResponse('C')">C</button>
+            <button onclick="submitResponse('D')">D</button>
+            <button onclick="submitResponse('E')">E</button>
+            <button onclick="submitResponse('F')">F</button>
+            <button onclick="submitResponse('G')">G</button>
+            <button onclick="submitResponse('H')">H</button>
+        </div>
+    </div>
+
+    <!-- Proceed button below everything -->
+    <div class="proceed-btn-wrapper" id="next-btn">
+        <button onclick="proceedToRealTest()">Proceed to Real Test</button>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPST Test - Introduction</title>
+    <style>
+        /* fine tune style later on  */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            font-size: 35px;
+            font-weight: bold;
+        }
+
+        p {
+            max-width: 600px;
+            font-size: 27px;
+            line-height: 1.5;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 15px 25px;
+            font-size: 27px;
+            border: none;
+            background-color: #d6b3f9;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #c399e0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Philadelphia Pointing Span Test (PPST)</h1>
+    <p>Welcome to the Philadelphia Pointing Span Test (PPST). This test measures your cognitive span and processing
+        speed by evaluating how well you can recall and reorder presented stimuli.</p>
+
+    <!-- <a href="{% url 'basic:test_instructions' %}">
+        <button>Continue</button>
+    </a> -->
+    <a href="{% url 'basic:test_instructions' %}?test_id={{ test_id }}" class="btn"
+        style="background-color: #D6A3FB; padding: 10px; border-radius: 5px; text-decoration: none; color: black;">
+        Next
+    </a>
+</body>
+
+</html>
