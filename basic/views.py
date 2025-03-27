@@ -49,9 +49,7 @@ def logout_view(request):
     return redirect("basic:landing")
 
 
-# Core Pages
-def test_page(request):
-    return render(request, "basic/take_test.html")
+
 
 
 def results(request):
