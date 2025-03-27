@@ -16,6 +16,12 @@ from basic.models import TestSession, User, Stimuli, Response
 def login_view(request):
     return render(request, "basic/login.html")
 
+def test_page(request):
+    return render(request, "basic/test_page.html")
+
+def take_test(request):
+    return render(request, "basic/take_test.html")
+
 
 def user_login(request):
     if request.method == "POST":
