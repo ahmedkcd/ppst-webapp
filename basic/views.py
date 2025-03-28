@@ -1,52 +1,32 @@
-# Create your views here.
-
-# stimulus are hard coded
-
-# pseudo ///
-# first generate a new test model with user id and age
-# then generate a response model for every stimulus
-# link each response with a unique stimulus and that same test id
-
 import json
 
+from django.contrib.auth import authenticate, login, logout
 from django.db import models
 from django.db import transaction
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render, redirect, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
-from django.shortcuts import render, redirect, HttpResponse
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 
 def test_page(request):
     return render(request, "basic/test_page.html")
 
-def take_test(request):
-    return render(request, "basic/take_test.html")
 
+#def take_test(request):
+ #   return render(request, "basic/take_test.html")
 
-import random
-from django.contrib.auth.decorators import login_required
-from .models import TestSession, Stimuli
-
-
-# def take_test(request):
-#     return render(request, "basic/take_test.html")
 def take_test(request):
     test_id = request.GET.get("test_id")
     if not test_id:
         return HttpResponse("Error: Test ID missing", status=400)
-
 
     test = get_object_or_404(TestSession, pk=test_id)
     return render(request, "basic/take_test.html", {"test": test})
 
 
 import random
-from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from .models import TestSession, Stimuli, Response
-
+from .models import TestSession, Stimuli
 
 
 @login_required
@@ -68,9 +48,7 @@ def generate_test(request):
     selected_order = random.choice(test_orders)
 
     # Fetch stimuli and apply the selected order
-    stimuli_list = list(Stimuli.objects.all())
-    if len(stimuli_list) < 12:
-        return JsonResponse({"error": "Not enough stimuli available."}, status=500)
+    stimuli_list = list(Stimuli.objects.exclude(type="Practice"))
 
     ordered_stimuli = [stimuli_list[i] for i in selected_order]
 
@@ -103,12 +81,8 @@ def generate_test(request):
         "stimuli_order": stimuli_order_str,  # Return order for verification
         "responses": responses,
 
-        "link" : f"http://localhost:8000/basic/test/intro/?test_id={test_session.test_id}"
+        "link": f"http://localhost:8000/basic/test/intro/?test_id={test_session.test_id}"
     })
-
-
-# a single json file that holds all the responses latencies everything, then a single view that parses and updates the db
-# it would be best to just have one request for all the responses after a test is recorded
 
 
 @csrf_exempt  # Disable CSRF for simplicity (use proper authentication in production)
@@ -154,9 +128,9 @@ def record_responses_bulk(request):
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
 
-
 from django.http import JsonResponse
 from .models import Response
+
 
 def get_responses(request):
     test_id = request.GET.get("test_id")
@@ -168,6 +142,7 @@ def get_responses(request):
     ]
 
     return JsonResponse({"responses": data})
+
 
 @csrf_exempt
 def submit_response(request):
@@ -189,7 +164,7 @@ def submit_response(request):
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
-# indiv
+
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -202,13 +177,16 @@ def login_view(request):
             return render(request, "basic/login.html", {"error": "Invalid credentials"})
     return render(request, "basic/login.html")
 
+
 def logout_view(request):
     logout(request)
     return redirect("basic:login")
 
+
 @login_required
 def dashboard(request):
     return render(request, "basic/dashboard.html", {"doctor_name": request.user.username})
+
 
 # def test_intro(request):
 #     return render(request, "basic/test_intro.html")
@@ -216,15 +194,18 @@ def test_intro(request):
     test_id = request.GET.get("test_id", None)
     return render(request, "basic/test_intro.html", {"test_id": test_id})
 
+
 # def test_instructions(request):
 #     return render(request, "basic/test_instructions.html")
 def test_instructions(request):
     test_id = request.GET.get("test_id", None)
     return render(request, "basic/test_instructions.html", {"test_id": test_id})
 
+
 from django.http import HttpResponseRedirect
 
-def start_test(request, test_id): # controls flow of test process in a single link
+
+def start_test(request, test_id):  # controls flow of test process in a single link
     step = request.GET.get("step", "intro")
 
     if step == "intro":
@@ -235,23 +216,21 @@ def start_test(request, test_id): # controls flow of test process in a single li
         return HttpResponseRedirect(f"/basic/take-test/?test_id={test_id}")
     else:
         return HttpResponseRedirect(f"/basic/test/intro/?test_id={test_id}&step=intro")
-    
-#practice segment work
+
+
+# practice segment work
 def practice_test(request):
     test_id = request.GET.get("test_id")
-    stimuli = Stimuli.objects.filter(type="Practice")[:2]  #fetch 2 practice stimuli
-    practice_stimuli = [{"stimulus_text": s.stimulus} for s in stimuli]
 
-    return render(request, "basic/practice_test.html", {"practice_stimuli": practice_stimuli, "test_id": test_id})
+    return render(request, "basic/practice_test.html", {"test_id": test_id})
 
 def get_practice_responses(request):
-    test_id = request.GET.get("test_id")
-    practice_stimuli = Stimuli.objects.filter(type="Practice")[:2]
 
+    practice_stimuli = Stimuli.objects.filter(type="Practice")[:2]
     data = [{"stimulus_text": s.stimulus} for s in practice_stimuli]
     return JsonResponse({"responses": data})
+
 
 def practice_countdown(request):
     test_id = request.GET.get("test_id")
     return render(request, "basic/practice_countdown.html", {"test_id": test_id})
-

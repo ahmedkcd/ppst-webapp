@@ -3,12 +3,12 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Test Session</title>
-    <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}" />
+    <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet" />
+          rel="stylesheet"/>
     <script>
         let responses = [];
         let currentIndex = 0;
@@ -36,7 +36,7 @@
                 userInput = "";
 
                 document.getElementById("stimulus").textContent = "";
-                
+
                 document.getElementById("user-response").textContent = "Your Response: ";
 
 
@@ -52,8 +52,7 @@
                 document.getElementById("stimulus").textContent = stimulusText[charIndex];
                 charIndex++;
                 setTimeout(showNextCharacter, 2000);
-            }
-            else {
+            } else {
                 responseStartTime = Date.now();
                 document.getElementById("stimulus").textContent = '';
             }
@@ -72,7 +71,7 @@
                 fetch("/basic/submit-response/", {
                     method: "POST",
 
-                    headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+                    headers: {"Content-Type": "application/json", "X-CSRFToken": getCSRFToken()},
                     body: JSON.stringify({
                         response_id: responseId,
                         response: userInput,
@@ -100,9 +99,9 @@
 
 
 <body>
-    <h1>Test Session</h1>
-    <p id="stimulus"></p>
-    <p id="user-response">Your Response:</p>
+<h1>Test Session</h1>
+<p id="stimulus"></p>
+<p id="user-response">Your Response:</p>
 </body>
 
 <div class="button-container">

@@ -3,14 +3,14 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Practice Test</title>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}" />
+    <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet" />
+          rel="stylesheet"/>
 
     <style>
         .proceed-btn-wrapper {
@@ -47,7 +47,7 @@
         const testId = new URLSearchParams(window.location.search).get("test_id");
 
         async function fetchPracticeStimuli() {
-            const response = await fetch(`/basic/get-practice-responses/?test_id=${testId}`);
+            const response = await fetch(`/basic/get-practice-responses`);
             const data = await response.json();
             responses = data.responses;
             startTest();
@@ -99,40 +99,40 @@
 </head>
 
 <body>
-    <h1>Practice Test</h1>
-    <p id="stimulus"></p>
-    <p id="user-response">Your Response:</p>
+<h1>Practice Test</h1>
+<p id="stimulus"></p>
+<p id="user-response">Your Response:</p>
 
-    <div class="button-container">
-        <div class="number-buttons">
-            <button onclick="submitResponse('1')">1</button>
-            <button onclick="submitResponse('2')">2</button>
-            <button onclick="submitResponse('3')">3</button>
-            <button onclick="submitResponse('4')">4</button>
-            <button onclick="submitResponse('5')">5</button>
-            <button onclick="submitResponse('6')">6</button>
-            <button onclick="submitResponse('7')">7</button>
-            <button onclick="submitResponse('8')">8</button>
-            <button onclick="submitResponse('9')">9</button>
-            <button onclick="submitResponse('0')">0</button>
-        </div>
-
-        <div class="letter-buttons">
-            <button onclick="submitResponse('A')">A</button>
-            <button onclick="submitResponse('B')">B</button>
-            <button onclick="submitResponse('C')">C</button>
-            <button onclick="submitResponse('D')">D</button>
-            <button onclick="submitResponse('E')">E</button>
-            <button onclick="submitResponse('F')">F</button>
-            <button onclick="submitResponse('G')">G</button>
-            <button onclick="submitResponse('H')">H</button>
-        </div>
+<div class="button-container">
+    <div class="number-buttons">
+        <button onclick="submitResponse('1')">1</button>
+        <button onclick="submitResponse('2')">2</button>
+        <button onclick="submitResponse('3')">3</button>
+        <button onclick="submitResponse('4')">4</button>
+        <button onclick="submitResponse('5')">5</button>
+        <button onclick="submitResponse('6')">6</button>
+        <button onclick="submitResponse('7')">7</button>
+        <button onclick="submitResponse('8')">8</button>
+        <button onclick="submitResponse('9')">9</button>
+        <button onclick="submitResponse('0')">0</button>
     </div>
 
-    <!-- Proceed button below everything -->
-    <div class="proceed-btn-wrapper" id="next-btn">
-        <button onclick="proceedToRealTest()">Proceed to Real Test</button>
+    <div class="letter-buttons">
+        <button onclick="submitResponse('A')">A</button>
+        <button onclick="submitResponse('B')">B</button>
+        <button onclick="submitResponse('C')">C</button>
+        <button onclick="submitResponse('D')">D</button>
+        <button onclick="submitResponse('E')">E</button>
+        <button onclick="submitResponse('F')">F</button>
+        <button onclick="submitResponse('G')">G</button>
+        <button onclick="submitResponse('H')">H</button>
     </div>
+</div>
+
+<!-- Proceed button below everything -->
+<div class="proceed-btn-wrapper" id="next-btn">
+    <button onclick="proceedToRealTest()">Proceed to Real Test</button>
+</div>
 </body>
 
 </html>

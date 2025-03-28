@@ -45,17 +45,15 @@
 </head>
 
 <body>
-    <h1>Philadelphia Pointing Span Test (PPST)</h1>
-    <p>Welcome to the Philadelphia Pointing Span Test (PPST). This test measures your cognitive span and processing
-        speed by evaluating how well you can recall and reorder presented stimuli.</p>
+<h1>Philadelphia Pointing Span Test (PPST)</h1>
+<p>Welcome to the Philadelphia Pointing Span Test (PPST). This test measures your cognitive span and processing
+    speed by evaluating how well you can recall and reorder presented stimuli.</p>
 
-    <!-- <a href="{% url 'basic:test_instructions' %}">
-        <button>Continue</button>
-    </a> -->
-    <a href="{% url 'basic:test_instructions' %}?test_id={{ test_id }}" class="btn"
-        style="background-color: #D6A3FB; padding: 10px; border-radius: 5px; text-decoration: none; color: black;">
-        Next
-    </a>
+
+<a href="{% url 'basic:test_instructions' %}?test_id={{ test_id }}" class="btn"
+   style="background-color: #D6A3FB; padding: 10px; border-radius: 5px; text-decoration: none; color: black;">
+    Next
+</a>
 </body>
 
 </html>
