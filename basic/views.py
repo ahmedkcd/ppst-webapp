@@ -138,7 +138,7 @@ def test_statistics(request, test_id):
 
     total_responses = responses.count()
     correct_responses = responses.filter(is_correct=True).count()
-    avg_latency = responses.aggregate(models.Avg('latency'))['latency__avg'] or 0
+    avg_latency = responses.aggregate(models.Avg('latencies'))['latencies__avg'] or 0
 
     accuracy = (correct_responses / total_responses) * 100 if total_responses else 0
 
