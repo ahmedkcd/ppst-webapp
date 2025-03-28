@@ -35,13 +35,7 @@ pip install django
 ---
 
 
-### 5️⃣ Start a Django Project - will create a Django project inside ppst-webapp-2 directory
-django-admin startproject djangoproject . 
-
-
----
-
-### 6️⃣ Apply Migrations & Create Superuser
+### 5️⃣ Apply Migrations & Create Superuser
 python manage.py makemigrations
 
 python manage.py migrate
@@ -52,7 +46,7 @@ python manage.py createsuperuser  # Follow prompts to set up an admin user
 
 ---
 
-### 7️⃣ Run the Server (restarts the surver to apply changes)
+### 6️⃣ Run the Server
 python manage.py runserver
 
 Visit **http://127.0.0.1:8000/** in your browser.

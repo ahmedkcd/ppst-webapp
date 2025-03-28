@@ -19,7 +19,7 @@ print("Existing data cleared.")
 def get_or_create_user(username, email):
     user, created = User.objects.get_or_create(username=username, defaults={"email": email})
     if created:
-        user.set_password("securepassword")  # Set a password if newly created
+        user.set_password("securepassword")
         user.is_staff = False  # admin access
         user.save()
     return user
@@ -48,6 +48,7 @@ stimuli_data = [
     ("19845", "14589", 5, "Numeric"), ("37260", "02367", 5, "Numeric"), ("90431", "01349", 5, "Numeric"),
     ("A1B2", "12AB", 4, "AlphaNumeric"), ("M4X7", "47MX", 4, "AlphaNumeric"), ("C9D3", "39CD", 4, "AlphaNumeric"),
     ("K7L2M", "27KLM", 5, "AlphaNumeric"), ("Z8Y4X", "48XYZ", 5, "AlphaNumeric"), ("P5Q1R", "15PQR", 5, "AlphaNumeric"),
+    ("4532", "2345", 4, "Practice"),("P5Q1R", "15PQR", 5, "Practice"),
 ]
 
 stimuli = [
