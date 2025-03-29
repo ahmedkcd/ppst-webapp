@@ -52,22 +52,22 @@ stimuli_data = [
     # Numeric (4-span)
     ("7613", "1367", 4, "Numeric"),
     ("4231", "1234", 4, "Numeric"),
-    ("5892", "2589", 4, "Numeric"),
+    ("5279", "2579", 4, "Numeric"),
 
     # Numeric (5-span)
-    ("19845", "14589", 5, "Numeric"),
-    ("37260", "02367", 5, "Numeric"),
-    ("90431", "01349", 5, "Numeric"),
+    ("19457", "14579", 5, "Numeric"),
+    ("36279", "23679", 5, "Numeric"),
+    ("91347", "13479", 5, "Numeric"),
 
     # Alphanumeric (4-span)
-    ("A1B2", "12AB", 4, "AlphaNumeric"),
+    ("B1H3", "13BH", 4, "AlphaNumeric"),
     ("M4X7", "47MX", 4, "AlphaNumeric"),
-    ("C9D3", "39CD", 4, "AlphaNumeric"),
+    ("G9R2", "29GR", 4, "AlphaNumeric"),
 
     # Alphanumeric (5-span)
-    ("R7L2M", "27LMR", 5, "AlphaNumeric"),
-    ("B8Y4X", "48BXY", 5, "AlphaNumeric"),
-    ("F5Q1R", "15FQR", 5, "AlphaNumeric"),
+    ("R7L2M", "127MR", 5, "AlphaNumeric"),
+    ("B9Y4X", "49BXY", 5, "AlphaNumeric"),
+    ("F5M1R", "15FMR", 5, "AlphaNumeric"),
 
     # Practice (mixed examples)
     ("B129", "129B", 4, "Practice"),
