@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Practice Test</title>
 
-    <!-- Styles -->
     <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
@@ -91,8 +90,9 @@
         }
 
         function proceedToRealTest() {
-            window.location.href = `/basic/take-test/?test_id=${testId}`;
+            window.location.href = `/basic/practice/transition/?test_id=${testId}`;
         }
+
 
         window.onload = fetchPracticeStimuli;
     </script>
@@ -112,24 +112,21 @@
             <button onclick="submitResponse('5')">5</button>
             <button onclick="submitResponse('6')">6</button>
             <button onclick="submitResponse('7')">7</button>
-            <button onclick="submitResponse('8')">8</button>
             <button onclick="submitResponse('9')">9</button>
-            <button onclick="submitResponse('0')">0</button>
         </div>
 
         <div class="letter-buttons">
-            <button onclick="submitResponse('A')">A</button>
             <button onclick="submitResponse('B')">B</button>
-            <button onclick="submitResponse('C')">C</button>
-            <button onclick="submitResponse('D')">D</button>
-            <button onclick="submitResponse('E')">E</button>
-            <button onclick="submitResponse('F')">F</button>
-            <button onclick="submitResponse('G')">G</button>
             <button onclick="submitResponse('H')">H</button>
+            <button onclick="submitResponse('G')">G</button>
+            <button onclick="submitResponse('F')">F</button>
+            <button onclick="submitResponse('M')">M</button>
+            <button onclick="submitResponse('R')">R</button>
+            <button onclick="submitResponse('X')">X</button>
+            <button onclick="submitResponse('Y')">Y</button>
         </div>
     </div>
 
-    <!-- Proceed button below everything -->
     <div class="proceed-btn-wrapper" id="next-btn">
         <button onclick="proceedToRealTest()">Proceed to Real Test</button>
     </div>
