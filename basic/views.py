@@ -258,3 +258,7 @@ def practice_countdown(request):
 def practice_transition(request):
     test_id = request.GET.get("test_id")
     return render(request, "basic/practice_transition.html", {"test_id": test_id})
+
+def test_complete(request):
+    return render(request, "basic/test_complete.html")
+

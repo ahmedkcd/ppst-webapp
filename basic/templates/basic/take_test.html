@@ -80,8 +80,14 @@
                     })
                 }).then(() => {
                     currentIndex++;
-                    startTest();
+                    if (currentIndex >= responses.length) {
+                        // Redirect to completion page when test ends
+                        window.location.href = "/basic/test/complete/";
+                    } else {
+                        startTest();
+                    }
                 });
+
             }
         }
 
