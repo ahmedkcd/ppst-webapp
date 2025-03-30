@@ -47,22 +47,22 @@
 </head>
 
 <body>
-    <div class="login-container">
-        <h2>Login</h2>
+<div class="login-container">
+    <h2>Login</h2>
 
-        {% if messages %}
+    {% if messages %}
         {% for message in messages %}
-        <p class="error">{{ message }}</p>
+            <p class="error">{{ message }}</p>
         {% endfor %}
-        {% endif %}
+    {% endif %}
 
-        <form method="POST">
-            {% csrf_token %}
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Sign In</button>
-        </form>
-    </div>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Sign In</button>
+    </form>
+</div>
 </body>
 
 </html>

@@ -3,13 +3,13 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Practice Test</title>
 
     <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet" />
+          rel="stylesheet"/>
 
     <style>
         .proceed-btn-wrapper {
@@ -46,7 +46,7 @@
         const testId = new URLSearchParams(window.location.search).get("test_id");
 
         async function fetchPracticeStimuli() {
-            const response = await fetch(`/basic/get-practice-responses/?test_id=${testId}`);
+            const response = await fetch(`/basic/get-practice-responses`);
             const data = await response.json();
             responses = data.responses;
             startTest();

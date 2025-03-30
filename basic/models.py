@@ -45,7 +45,6 @@ class Response(models.Model):
         return f"Response {self.response_id} (Test {self.test.test_id})"
 
 
-
 class Statistics(models.Model):
     stats_id = models.AutoField(primary_key=True)
     total_tests = models.IntegerField(default=0)
