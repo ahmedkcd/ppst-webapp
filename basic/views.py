@@ -202,22 +202,6 @@ def test_instructions(request):
     return render(request, "basic/test_instructions.html", {"test_id": test_id})
 
 
-from django.http import HttpResponseRedirect
-
-
-def start_test(request, test_id):  # controls flow of test process in a single link
-    step = request.GET.get("step", "intro")
-
-    if step == "intro":
-        return HttpResponseRedirect(f"/basic/test/instructions/?test_id={test_id}&step=instructions")
-    elif step == "instructions":
-        return HttpResponseRedirect(f"/basic/take-test/?test_id={test_id}&step=test")
-    elif step == "test":
-        return HttpResponseRedirect(f"/basic/take-test/?test_id={test_id}")
-    else:
-        return HttpResponseRedirect(f"/basic/test/intro/?test_id={test_id}&step=intro")
-
-
 # practice segment work
 def practice_test(request):
     test_id = request.GET.get("test_id")
