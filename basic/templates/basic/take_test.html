@@ -31,6 +31,7 @@
         function startTest() {
             if (currentIndex < responses.length) {
                 stimulusText = responses[currentIndex].stimulus_text;
+                stimulusType = responses[currentIndex].stimulus_type;
                 charIndex = 0;
                 latencies = [];
                 userInput = "";
@@ -38,6 +39,9 @@
                 document.getElementById("stimulus").textContent = "";
 
                 document.getElementById("user-response").textContent = "Your Response: ";
+
+                document.getElementById("keyboard").style.display = "none";
+                document.getElementById("numericKeyboard").style.display = "none";
 
 
                 showNextCharacter();
@@ -55,6 +59,13 @@
             } else {
                 responseStartTime = Date.now();
                 document.getElementById("stimulus").textContent = '';
+
+                if (stimulusType === "AlphaNumeric") {
+                    document.getElementById("keyboard").style.display = "block";
+                }
+                else if (stimulusType === "Numeric") {
+                    document.getElementById("numericKeyboard").style.display = "block";
+                }
             }
         }
 
@@ -111,7 +122,7 @@
 </body>
 
 <div class="button-container">
-    <div class="number-buttons">
+    <div id = "keyboard" style="display: none;" class="number-buttons">
 
         <button onclick="submitResponse('1')">1</button>
         <button onclick="submitResponse('2')">2</button>
@@ -124,13 +135,12 @@
 
     </div>
 
-    <div class="letter-buttons">
+    <div id = "numericKeyboard"  style="display: none;" class="letter-buttons">
 
         <button onclick="submitResponse('B')">B</button>
         <button onclick="submitResponse('H')">H</button>
         <button onclick="submitResponse('G')">G</button>
         <button onclick="submitResponse('F')">F</button>
-
         <button onclick="submitResponse('M')">M</button>
         <button onclick="submitResponse('R')">R</button>
         <button onclick="submitResponse('X')">X</button>

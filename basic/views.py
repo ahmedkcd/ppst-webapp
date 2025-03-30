@@ -1,10 +1,13 @@
 import json
+import csv
 
 from django.contrib.auth import authenticate, login, logout
 from django.db import models
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect, HttpResponse
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -25,6 +28,7 @@ def take_test(request):
 
 
 import random
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import TestSession, Stimuli
 
@@ -80,8 +84,7 @@ def generate_test(request):
         "language": test_session.language,
         "stimuli_order": stimuli_order_str,  # Return order for verification
         "responses": responses,
-
-        "link": f"http://localhost:8000/basic/test/intro/?test_id={test_session.test_id}"
+        "link": f"http://localhost:8000/basic/take-test/?test_id={test_session.test_id}"
     })
 
 
@@ -137,7 +140,7 @@ def get_responses(request):
     responses = Response.objects.filter(test_id=test_id).select_related('stim')
 
     data = [
-        {"response_id": r.response_id, "stimulus_text": r.stim.stimulus}
+        {"response_id": r.response_id, "stimulus_text": r.stim.stimulus, "stimulus_type" : r.stim.type}
         for r in responses
     ]
 
@@ -226,3 +229,28 @@ def practice_transition(request):
 def test_complete(request):
     return render(request, "basic/test_complete.html")
 
+
+
+
+def export_test_data(request):
+    test_id = request.GET.get("test_id")
+    responses = Response.objects.filter(test_id=test_id).select_related("stim")
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = f'attachment; filename="test_{test_id}_data.csv"'
+
+    writer = csv.writer(response)
+
+    writer.writerow(["Response ID", "Stimulus", "User Response", "Correct Response", "Is Correct", "Latencies"])
+
+    for resp in responses:
+        writer.writerow([
+            resp.response_id,
+            resp.stim.stimulus,
+            resp.response,
+            resp.stim.correct_response,
+            "Yes" if resp.is_correct else "No",
+            resp.latencies
+        ])
+
+    return response
