@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (
     generate_test, test_page, login_view, dashboard, logout_view,
     test_intro, test_instructions, take_test, get_responses, submit_response, practice_test,
-    get_practice_responses, practice_countdown
+    get_practice_responses, practice_countdown, practice_transition, test_complete
 )
 
 app_name = "basic"

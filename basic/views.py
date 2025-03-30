@@ -80,11 +80,11 @@ def generate_test(request):
         })
 
     return JsonResponse({
-        "test_id": test_session.test_id,
-        "language": test_session.language,
-        "stimuli_order": stimuli_order_str,  # Return order for verification
-        "responses": responses,
-        "link": f"http://localhost:8000/basic/take-test/?test_id={test_session.test_id}"
+        # "test_id": test_session.test_id,
+        # "language": test_session.language,
+        # "stimuli_order": stimuli_order_str,  # Return order for verification
+        # "responses": responses,
+        "link": f"http://localhost:8000/basic/intro/?test_id={test_session.test_id}"
     })
 
 

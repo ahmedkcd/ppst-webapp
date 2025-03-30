@@ -13,6 +13,7 @@
         let responses = [];
         let currentIndex = 0;
         let stimulusText = "";
+        let stimulusType = "";
         let charIndex = 0;
         let startTime;
         let responseStartTime;
@@ -62,8 +63,9 @@
 
                 if (stimulusType === "AlphaNumeric") {
                     document.getElementById("keyboard").style.display = "block";
+                    document.getElementById("numericKeyboard").style.display = "block";
                 }
-                else if (stimulusType === "Numeric") {
+                if (stimulusType === "Numeric") {
                     document.getElementById("numericKeyboard").style.display = "block";
                 }
             }
@@ -116,13 +118,13 @@
 
 
 <body>
-<h1>Test Session</h1>
-<p id="stimulus"></p>
-<p id="user-response">Your Response:</p>
+    <h1>Test Session</h1>
+    <p id="stimulus"></p>
+    <p id="user-response">Your Response:</p>
 </body>
 
 <div class="button-container">
-    <div id = "keyboard" style="display: none;" class="number-buttons">
+    <div id = "numericKeyboard" style="display: none;" class="number-buttons">
 
         <button onclick="submitResponse('1')">1</button>
         <button onclick="submitResponse('2')">2</button>
@@ -135,7 +137,7 @@
 
     </div>
 
-    <div id = "numericKeyboard"  style="display: none;" class="letter-buttons">
+    <div id = "keyboard"  style="display: none;" class="letter-buttons">
 
         <button onclick="submitResponse('B')">B</button>
         <button onclick="submitResponse('H')">H</button>

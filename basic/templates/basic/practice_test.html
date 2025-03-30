@@ -61,6 +61,8 @@
                 document.getElementById("stimulus").textContent = "";
                 document.getElementById("user-response").textContent = "Your Response: ";
                 document.getElementById("next-btn").style.display = "none";
+                document.getElementById("keyboard").style.display = "none";
+                document.getElementById("numericKeyboard").style.display = "none";
 
                 showNextCharacter();
             } else {
@@ -76,6 +78,14 @@
                 setTimeout(showNextCharacter, 2000);
             } else {
                 document.getElementById("stimulus").textContent = "";
+
+                if (stimulusType === "AlphaNumeric") {
+                    document.getElementById("keyboard").style.display = "block";
+                    document.getElementById("numericKeyboard").style.display = "block";
+                }
+                if (stimulusType === "Numeric") {
+                    document.getElementById("numericKeyboard").style.display = "block";
+                }
             }
         }
 
@@ -102,34 +112,37 @@
     <h1>Practice Test</h1>
     <p id="stimulus"></p>
     <p id="user-response">Your Response:</p>
+</body>
 
-    <div class="button-container">
-        <div class="number-buttons">
-            <button onclick="submitResponse('1')">1</button>
-            <button onclick="submitResponse('2')">2</button>
-            <button onclick="submitResponse('3')">3</button>
-            <button onclick="submitResponse('4')">4</button>
-            <button onclick="submitResponse('5')">5</button>
-            <button onclick="submitResponse('6')">6</button>
-            <button onclick="submitResponse('7')">7</button>
-            <button onclick="submitResponse('9')">9</button>
-        </div>
+<div class="button-container">
+    <div id = "numericKeyboard" style="display: none;" class="number-buttons">
 
-        <div class="letter-buttons">
-            <button onclick="submitResponse('B')">B</button>
-            <button onclick="submitResponse('H')">H</button>
-            <button onclick="submitResponse('G')">G</button>
-            <button onclick="submitResponse('F')">F</button>
-            <button onclick="submitResponse('M')">M</button>
-            <button onclick="submitResponse('R')">R</button>
-            <button onclick="submitResponse('X')">X</button>
-            <button onclick="submitResponse('Y')">Y</button>
-        </div>
+        <button onclick="submitResponse('1')">1</button>
+        <button onclick="submitResponse('2')">2</button>
+        <button onclick="submitResponse('3')">3</button>
+        <button onclick="submitResponse('4')">4</button>
+        <button onclick="submitResponse('5')">5</button>
+        <button onclick="submitResponse('6')">6</button>
+        <button onclick="submitResponse('7')">7</button>
+        <button onclick="submitResponse('9')">9</button>
+
     </div>
+
+    <div id = "keyboard"  style="display: none;" class="letter-buttons">
+
+        <button onclick="submitResponse('B')">B</button>
+        <button onclick="submitResponse('H')">H</button>
+        <button onclick="submitResponse('G')">G</button>
+        <button onclick="submitResponse('F')">F</button>
+        <button onclick="submitResponse('M')">M</button>
+        <button onclick="submitResponse('R')">R</button>
+        <button onclick="submitResponse('X')">X</button>
+        <button onclick="submitResponse('Y')">Y</button>
+    </div>
+</div>
 
     <div class="proceed-btn-wrapper" id="next-btn">
         <button onclick="proceedToRealTest()">Proceed to Real Test</button>
     </div>
-</body>
 
 </html>
