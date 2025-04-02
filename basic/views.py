@@ -47,14 +47,17 @@ def doctor_user_login(request):
 @login_required(login_url='/basic/')
 def doctor_dashboard(request):
     return render(request, 'basic/doctor_dashboard.html')
-
+    
+@login_required(login_url='/basic/')
 def doctor_results(request):
     test_sessions = TestSession.objects.filter(doctor=request.user)
     return render(request, 'basic/doctor_results.html', {'test_sessions': test_sessions})
-
+    
+@login_required(login_url='/basic/')
 def doctor_statistics(request):
     return render(request, 'basic/doctor_statistics.html')
-
+    
+@login_required(login_url='/basic/')
 def doctor_newtest(request):
     return render(request, "basic/doctor_newtest.html")
 
