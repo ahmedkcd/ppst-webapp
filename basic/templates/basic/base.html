@@ -64,7 +64,7 @@
           </a>
         </li>
         <li
-          class="nav_item {% if request.path == '/basic/dashboard' %}active{% endif %}"
+          class="nav_item {% if request.path == '/basic/doctor-dashboard' %}active{% endif %}"
         >
           <a href="{% url 'basic:doctor-dashboard' %}">
             <span class="nav_icon">
@@ -79,7 +79,7 @@
         </li>
 
         <li
-          class="nav_item {% if request.path == '/basic/results' %}active{% endif %}"
+          class="nav_item {% if request.path == '/basic/doctor-results' %}active{% endif %}"
         >
           <a href="{% url 'basic:doctor-results' %}">
             <span class="nav_icon">
