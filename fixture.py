@@ -58,7 +58,7 @@ stimuli_data = [
     ("G9R2", "29GR", 4, "AlphaNumeric"),
 
     # Alphanumeric (5-span)
-    ("R7L2M", "127MR", 5, "AlphaNumeric"),
+    ("RHL2M", "12HMR", 5, "AlphaNumeric"),
     ("B9Y4X", "49BXY", 5, "AlphaNumeric"),
     ("F5M1R", "15FMR", 5, "AlphaNumeric"),
 

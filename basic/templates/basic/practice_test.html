@@ -67,6 +67,8 @@
                 showNextCharacter();
             } else {
                 document.getElementById("stimulus").textContent = "Practice Complete!";
+                document.getElementById("keyboard").style.display = "none";
+                document.getElementById("numericKeyboard").style.display = "none";
                 document.getElementById("next-btn").style.display = "flex";
             }
         }
@@ -79,13 +81,9 @@
             } else {
                 document.getElementById("stimulus").textContent = "";
 
-                if (stimulusType === "AlphaNumeric") {
-                    document.getElementById("keyboard").style.display = "block";
-                    document.getElementById("numericKeyboard").style.display = "block";
-                }
-                if (stimulusType === "Numeric") {
-                    document.getElementById("numericKeyboard").style.display = "block";
-                }
+                document.getElementById("keyboard").style.display = "block";
+                document.getElementById("numericKeyboard").style.display = "block";
+
             }
         }
 

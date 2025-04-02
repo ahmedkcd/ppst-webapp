@@ -84,7 +84,7 @@ def generate_test(request):
         # "language": test_session.language,
         # "stimuli_order": stimuli_order_str,  # Return order for verification
         # "responses": responses,
-        "link": f"http://localhost:8000/basic/intro/?test_id={test_session.test_id}"
+        "link": f"http://localhost:8000/basic/test/intro/?test_id={test_session.test_id}"
     })
 
 
