@@ -84,7 +84,7 @@ h1 {
 
 /* Ensure buttons have consistent sizing */
 .number-buttons button {
-  flex: 1 1 15%;
+  flex: 1 1 20%;
 }
 
 .letter-buttons button {
