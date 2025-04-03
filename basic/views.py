@@ -9,6 +9,72 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+
+from basic.models import TestSession, User, Response
+from django.contrib import messages
+
+
+
+def doctor_login_view(request):
+    return render(request,'basic/doctor_login.html')
+
+def doctor_test_page(request):
+    return render(request, 'basic/doctor_taketest.html')
+
+
+def doctor_user_login(request):
+    if request.method == "POST":
+        # Getting the username and password in the form post in the html page/
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        # Authenticate the username and password
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            # Authentication is successfull
+            login(request, user)
+            return redirect("basic:doctor-dashboard")  # Redirecting to the dashboard
+        else:
+            # Authentication is denied
+            messages.error(request, "Invalid username or password")
+            return  redirect("basic:doctor-login") # Redirecting to the login page, when refreshed
+
+    return render(request, "basic/doctor_login.html")
+
+
+@login_required(login_url='/basic/')
+def doctor_dashboard(request):
+    return render(request, 'basic/doctor_dashboard.html')
+    
+@login_required(login_url='/basic/')
+def doctor_results(request):
+    test_sessions = TestSession.objects.filter(doctor=request.user)
+    return render(request, 'basic/doctor_results.html', {'test_sessions': test_sessions})
+    
+@login_required(login_url='/basic/')
+def doctor_statistics(request):
+    return render(request, 'basic/doctor_statistics.html')
+    
+@login_required(login_url='/basic/')
+def doctor_newtest(request):
+    return render(request, "basic/doctor_newtest.html")
+
+def base(request):
+    return render(request, "basic/base.html")
+
+def landing(request):
+     total_tests = TestSession.objects.count()  # Count all test sessions
+     total_doctors = User.objects.filter(testsession__isnull=False).distinct().count()  # Count unique doctors with tests
+
+     return render(request, "basic/landing.html", {
+        "total_tests": total_tests,
+        "total_doctors": total_doctors,
+    })
+def doctor_logout_view(request):
+    logout(request)  
+    return redirect('basic:landing') 
 
 
 def test_page(request):
@@ -33,7 +99,7 @@ from django.contrib.auth.decorators import login_required
 from .models import TestSession, Stimuli
 
 
-@login_required
+
 def generate_test(request):
     age = request.GET.get("age")
     language = request.GET.get("language")

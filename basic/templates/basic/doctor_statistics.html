@@ -1,0 +1,141 @@
+{% extends 'basic/base.html' %}
+
+{% block title %}Statistics{% endblock %}
+
+{% block content %}
+
+<h1>Statistics</h1>
+<p> This is the statistics page</p>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+
+<style>
+    body {
+            background-color: #f4f7f6;
+            font-family: Arial, sans-serif;
+        }
+
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+        }
+
+      
+        .statistics {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+</style>
+
+<body>
+
+    <div class="dashboard-container">
+
+
+    <div class="statistics"> <!-- Statistics -->
+    <h1>Test Statistics for Test ID: {{ test_id }}</h1>
+
+    <canvas id="statisticsChart" width="900" height="600"></canvas>
+
+    <pre>{{ chart_data|json_script:"chart-data" }}</pre> <!-- Inspect the JSON content -->
+
+    <script id="chart-data" type="application/json">
+        {{ chart_data|json_script:"chart-data" }}
+    </script>
+
+    <script>
+        // Log the chart data to inspect its format
+        const chartDataElement = document.getElementById('chart-data');
+        if (chartDataElement) {
+            try {
+                const chartData = JSON.parse(chartDataElement.textContent);
+                console.log("Parsed Chart Data: ", chartData);  // This will show the parsed data
+
+                // Get the context of the canvas element
+                const ctx = document.getElementById('statisticsChart').getContext('2d');
+
+                // Create the chart
+                const statisticsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            label: 'Test Statistics',
+                            data: chartData.values,
+                            backgroundColor: 'rgba(128, 0, 128, 0.2)',
+                            borderColor: 'rgba(128, 0, 128, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: false,
+                        legend: {
+                            display: true,
+                            labels: {
+                                font: {
+                                    size: 16,
+                                    family: 'Arial, sans-serif',
+                                    weight: 'bold',
+                                    color: 'black'
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    font: {
+                                        size: 16,
+                                        family: 'Arial, sans-serif',
+                                        weight: 'bold',
+                                        color: 'black'
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 16,
+                                        family: 'Arial, sans-serif',
+                                        weight: 'bold',
+                                        color: 'black'
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            datalabels: {
+                                display: true,
+                                color: 'black',
+                                font: {
+                                    size: 16,
+                                    family: 'Arial, sans-serif',
+                                    weight: 'bold',
+                                },
+                                formatter: function(value) {
+                                    return value % 1 === 0 ? value.toFixed(0) : value.toFixed(2); // Round the values to two decimal places
+                                }
+                            }
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            } catch (e) {
+                console.error("Error parsing JSON:", e);
+            }
+        } else {
+            console.error("Chart data not found.");
+        }
+    </script>
+    </div>
+
+</body>
+
+{% endblock %}
