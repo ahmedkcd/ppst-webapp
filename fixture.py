@@ -19,7 +19,7 @@ print("Existing data cleared.")
 def get_or_create_user(username, email):
     user, created = User.objects.get_or_create(username=username, defaults={"email": email})
     if created:
-        user.set_password("securepassword")  # Set a password if newly created
+        user.set_password("securepassword")
         user.is_staff = False  # admin access
         user.save()
     return user
@@ -42,10 +42,29 @@ print(f"Created test sessions: {[session.test_id for session in test_sessions]}"
 
 # Create stimuli data
 stimuli_data = [
-    ("4231", "1234", 4, "Numeric"), ("5892", "2589", 4, "Numeric"), ("7613", "1367", 4, "Numeric"),
-    ("19845", "14589", 5, "Numeric"), ("37260", "02367", 5, "Numeric"), ("90431", "01349", 5, "Numeric"),
-    ("A1B2", "12AB", 4, "AlphaNumeric"), ("M4X7", "47MX", 4, "AlphaNumeric"), ("C9D3", "39CD", 4, "AlphaNumeric"),
-    ("K7L2M", "27KLM", 5, "AlphaNumeric"), ("Z8Y4X", "48XYZ", 5, "AlphaNumeric"), ("P5Q1R", "15PQR", 5, "AlphaNumeric"),
+    # Numeric (4-span)
+    ("7613", "1367", 4, "Numeric"),
+    ("4231", "1234", 4, "Numeric"),
+    ("5279", "2579", 4, "Numeric"),
+
+    # Numeric (5-span)
+    ("19457", "14579", 5, "Numeric"),
+    ("36279", "23679", 5, "Numeric"),
+    ("91347", "13479", 5, "Numeric"),
+
+    # Alphanumeric (4-span)
+    ("B1H3", "13BH", 4, "AlphaNumeric"),
+    ("M4X7", "47MX", 4, "AlphaNumeric"),
+    ("G9R2", "29GR", 4, "AlphaNumeric"),
+
+    # Alphanumeric (5-span)
+    ("RHL2M", "12HMR", 5, "AlphaNumeric"),
+    ("B9Y4X", "49BXY", 5, "AlphaNumeric"),
+    ("F5M1R", "15FMR", 5, "AlphaNumeric"),
+
+    # Practice (mixed examples)
+    ("B129", "129B", 4, "Practice"),
+    ("HG97", "79GH", 4, "Practice"),
 ]
 
 stimuli = [
@@ -57,18 +76,18 @@ print(f"Created stimuli: {[stim.stim_id for stim in stimuli]}")
 
 # Create responses for a fully completed test session with some incorrect answers
 responses = [
-    Response.objects.create(test=test_sessions[0], stim=stimuli[0], response="1234", latency=2.1, is_correct=True),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[1], response="5893", latency=2.5, is_correct=False),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[2], response="1367", latency=2.0, is_correct=True),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[3], response="14859", latency=2.3, is_correct=False),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[4], response="02367", latency=2.8, is_correct=True),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[5], response="90341", latency=1.9, is_correct=False),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[6], response="12AB", latency=2.2, is_correct=True),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[7], response="4MX8", latency=2.7, is_correct=False),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[8], response="39CD", latency=1.8, is_correct=True),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[9], response="27KLM", latency=2.4, is_correct=True),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[10], response="4X8YY", latency=3.0, is_correct=False),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[11], response="15PQR", latency=2.6, is_correct=True),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[0], response="1234", latencies=2.1, is_correct=True),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[1], response="5893", latencies=2.5, is_correct=False),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[2], response="1367", latencies=2.0, is_correct=True),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[3], response="14859", latencies=2.3, is_correct=False),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[4], response="02367", latencies=2.8, is_correct=True),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[5], response="90341", latencies=1.9, is_correct=False),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[6], response="12AB", latencies=2.2, is_correct=True),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[7], response="4MX8", latencies=2.7, is_correct=False),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[8], response="39CD", latencies=1.8, is_correct=True),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[9], response="27KLM", latencies=2.4, is_correct=True),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[10], response="4X8YY", latencies=3.0, is_correct=False),
+    Response.objects.create(test=test_sessions[0], stim=stimuli[11], response="15PQR", latencies=2.6, is_correct=True),
 ]
 
 print(f"Created responses: {[resp.response_id for resp in responses]}")
