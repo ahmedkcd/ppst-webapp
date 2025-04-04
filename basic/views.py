@@ -8,6 +8,8 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render, redirect, HttpResponse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.db.models import Avg, Count, Q
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
@@ -196,6 +198,23 @@ def record_responses_bulk(request):
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
+def test_statistics(request, test_id):
+    test_session = get_object_or_404(TestSession, test_id=test_id)
+    responses = Response.objects.filter(test=test_session)
+
+    total_responses = responses.count()
+    correct_responses = responses.filter(is_correct=True).count()
+    avg_latency = responses.aggregate(models.Avg('latencies'))['latencies__avg'] or 0
+
+    accuracy = (correct_responses / total_responses) * 100 if total_responses else 0
+
+    chart_data = {
+        'labels': ['Accuracy (%)', 'Avg Latency (ms)', 'Total Responses'],
+        'values': [accuracy, avg_latency, total_responses]
+    }
+
+    # Pass the chart_data to the template
+    return render(request, 'basic/test_statistics.html', {'test_id': test_id, 'chart_data': chart_data})
 
 from django.http import JsonResponse
 from .models import Response
