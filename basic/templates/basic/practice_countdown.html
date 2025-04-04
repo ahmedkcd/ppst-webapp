@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+{% load static %}
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,6 +32,10 @@
 
 <body>
 <h1 id="countdown">Beginning Practice Stimuli Test in 3...</h1>
+<audio controls autoplay>
+    <source src="{% static 'basic/PPST_PracticeCountdown.m4a' %}" type="audio/mpeg">
+    Your browser does not support the audio file.
+</audio>
 </body>
 
 </html>

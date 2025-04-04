@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,6 +51,11 @@
 <h2>Next Steps:</h2>
 <p>Press "Start Practice" when you're ready. After this, the real test will begin.</p>
 
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 15px; margin-top: 30px;">
+    <audio controls autoplay style="width: 300px;">
+        <source src="{% static 'basic/PPST_PracticeCountdown.m4a' %}" type="audio/mpeg">
+        Your browser does not support the audio file.
+    </audio>
 <a href="/basic/practice-countdown/?test_id={{ test_id }}" class="btn"
    style="background-color: #D6A3FB; padding: 10px; border-radius: 5px; text-decoration: none; color: black;">Start
     Practice</a>

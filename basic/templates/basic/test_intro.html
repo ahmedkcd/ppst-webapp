@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+{% load static %}
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -50,6 +52,11 @@
     speed by evaluating how well you can recall and reorder presented stimuli.</p>
 
 
+    <audio controls>
+        <source src="PPST_Welcome.m4a" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
 <a href="{% url 'basic:test_instructions' %}?test_id={{ test_id }}" class="btn"
    style="background-color: #D6A3FB; padding: 10px; border-radius: 5px; text-decoration: none; color: black;">
     Next
