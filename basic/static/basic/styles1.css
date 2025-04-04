@@ -1,0 +1,267 @@
+/* Default for all elements */
+* {
+    margin: 0 ;
+    padding: 0 ;
+    box-sizing: border-box ; 
+    font-family: "Poppins", Arial, sans-serif;
+  }
+  
+  /* Plain body background, height, display */
+  body {
+    display: flex;
+    height: 100vh;
+    background-color: #ffffff;
+  }
+  
+  /* Default sidebar styling when it's collapsed */
+  .sidebar {
+    width: 60px; 
+    background-color: #FEF7FF;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    left: 0;
+    height: 100vh;
+    margin-top: 3%;
+    transition: 0.5s ease; /* Smooth transition for expanding/collapsing */
+  }
+  
+  /* Styling for the nav item */
+  .nav_item {
+    margin: 15px 0;
+    list-style-type: none;
+    text-align: center;
+    transition: 0.3s;
+  }
+  
+  /* Styling for the nav item links */
+  .nav_item a {
+    text-decoration: none;
+    color: black;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  /* Active and hover background color for the nav bar items */
+  .nav_item.active a,
+  .nav_item a:hover {
+    background-color: #d0bcff;
+  }
+  
+  /* Default state for the nav bar text, when the nav bar is collapsed */
+  .sidebar .nav_text {
+    display: block; 
+    font-size: 10px; /* Smaller font size when the nav bar is collapsed */
+  }
+  
+  /* Text styling for the nav bar, when it's expanded */
+  .sidebar.show .nav_text {
+    display: block; /* Show the text when the sidebar is expanded */
+    font-size: 15px; /* Regular font size when expanded */
+  }
+  
+  /* Expanded sidebar when 'show' class is added */
+  .sidebar.show {
+    width: 260px; /* Expanded sidebar width when text is visible */
+  }
+  
+  /* Center the '+' icon */
+  #nav-bar .nav_item #create-test {
+    margin: 0 auto; 
+  }
+  
+  /* Updated header styling */
+  .header {
+    width: 100%;
+    height: 3rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Distribute space evenly */
+    padding: 0 1.5rem;
+    background-color: #FEF7FF;
+    z-index: 100;
+    transition: width 0.5s ease;
+  }
+  
+  .header-text {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    /* Removed display: flex; justify-content: center; */
+  }
+  
+  /* Keep the hamburger menu aligned properly */
+  .header_toggle {
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+  /* Profile container (no absolute positioning) */
+  .profile-container {
+    display: flex;
+    align-items: center;
+  }
+  
+  
+  /* Profile Icon */
+  .profile-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #6c5ce7;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .profile-icon:hover {
+    background-color: #4834d4;
+  }
+  
+  
+  /* Profile Popup */
+  .profile-popup {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    width: 180px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  
+  .profile-welcome {
+    font-size: 20px; /* Make it slightly larger */
+    font-weight: bold;
+    color: #6c5ce7; /* A nice purple shade */
+    text-align: center;
+    margin-bottom: 5px;
+  }
+  
+  
+  /* Profile name */
+  .profile-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+    width:100%;
+  }
+  /* Show popup when active */
+  .profile-popup.show {
+    display: flex;
+  }
+  
+  /* Sign Out button */
+  .signout-btn {
+    background-color: #d63031;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+  }
+  
+  .signout-btn:hover {
+    background-color: #c0392b;
+  }
+  
+  
+  /* Main content area */
+  .content {
+    flex: 1;
+    padding: 20px;
+    margin-left: 7%; /* Adjust for the sidebar width (icon-only) */
+    margin-top: 0.5%;
+    padding-top: 5rem;
+    transition: margin-left 0.5s ease-in-out;
+  }
+  
+  /* Styling for the 'Create New Test' icon */
+  #create-test {
+    width: 40px;
+    height: 40px;
+    background-color: #ffd8e4;
+    border: none;
+    border-radius: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  /* Navigation text styles */
+  .nav_text {
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+    text-align: center;
+    transition: 0.3s;
+  }
+  
+  /* Nav icon styling */
+  .nav_icon svg {
+    position: absolute !;
+    width: 24px;
+    height: 24px;
+    fill: black; /* Icon fill color */
+  }
+  
+  .body-pd {
+    margin-left: 220px; /* Adjust body content when sidebar is expanded */
+    transition: margin-left 0.5s ease;
+  }
+  
+  /* Styling for mobile phones or screen widths less than 768px */
+  @media (max-width: 768px) {
+    /* There is no sidebar for mobile phones, only way they can access it is using the hamburger menu */
+    .sidebar {
+      display: none;
+      margin-right: auto;
+      transition: width 0.5s ease;
+    }
+  
+    .content {
+      margin-left: 7%; /* Ensures some space */
+      margin-right: 10px; /* Adds balance */
+      margin-top: 3%; /* Adjust to fit under header */
+    }
+  
+    .sidebar.show {
+      display: flex;
+      width: 100%; /* Take up a reasonable width instead of 100% */
+      height: 100vh;
+    }
+  
+    .header {
+      padding-left: 10px; /* Keeps the toggle aligned properly */
+    }
+  
+    /* Modify the toggle button to be more prominent */
+    .header_toggle {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+  }

@@ -1,35 +1,107 @@
-# Create your views here.
-
-# stimulus are hard coded
-
-# pseudo ///
-# first generate a new test model with user id and age
-# then generate a response model for every stimulus
-# link each response with a unique stimulus and that same test id
-
 import json
+import csv
 
+from django.contrib.auth import authenticate, login, logout
 from django.db import models
 from django.db import transaction
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render, redirect, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.db.models import Avg, Count, Q
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+
+from basic.models import TestSession, User, Response
+from django.contrib import messages
+
+
+
+def doctor_login_view(request):
+    return render(request,'basic/doctor_login.html')
+
+def doctor_test_page(request):
+    return render(request, 'basic/doctor_taketest.html')
+
+
+def doctor_user_login(request):
+    if request.method == "POST":
+        # Getting the username and password in the form post in the html page/
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        # Authenticate the username and password
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            # Authentication is successfull
+            login(request, user)
+            return redirect("basic:doctor-dashboard")  # Redirecting to the dashboard
+        else:
+            # Authentication is denied
+            messages.error(request, "Invalid username or password")
+            return  redirect("basic:doctor-login") # Redirecting to the login page, when refreshed
+
+    return render(request, "basic/doctor_login.html")
+
+
+@login_required(login_url='/basic/')
+def doctor_dashboard(request):
+    return render(request, 'basic/doctor_dashboard.html')
+    
+@login_required(login_url='/basic/')
+def doctor_results(request):
+    test_sessions = TestSession.objects.filter(doctor=request.user)
+    return render(request, 'basic/doctor_results.html', {'test_sessions': test_sessions})
+    
+@login_required(login_url='/basic/')
+def doctor_statistics(request):
+    return render(request, 'basic/doctor_statistics.html')
+    
+@login_required(login_url='/basic/')
+def doctor_newtest(request):
+    return render(request, "basic/doctor_newtest.html")
+
+def base(request):
+    return render(request, "basic/base.html")
+
+def landing(request):
+     total_tests = TestSession.objects.count()  # Count all test sessions
+     total_doctors = User.objects.filter(testsession__isnull=False).distinct().count()  # Count unique doctors with tests
+
+     return render(request, "basic/landing.html", {
+        "total_tests": total_tests,
+        "total_doctors": total_doctors,
+    })
+def doctor_logout_view(request):
+    logout(request)  
+    return redirect('basic:landing') 
 
 
 def test_page(request):
     return render(request, "basic/test_page.html")
 
+
+#def take_test(request):
+ #   return render(request, "basic/take_test.html")
+
 def take_test(request):
-    return render(request, "basic/take_test.html")
+    test_id = request.GET.get("test_id")
+    if not test_id:
+        return HttpResponse("Error: Test ID missing", status=400)
+
+    test = get_object_or_404(TestSession, pk=test_id)
+    return render(request, "basic/take_test.html", {"test": test})
 
 
 import random
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import TestSession, Stimuli
 
 
-@login_required
+
 def generate_test(request):
     age = request.GET.get("age")
     language = request.GET.get("language")
@@ -48,9 +120,7 @@ def generate_test(request):
     selected_order = random.choice(test_orders)
 
     # Fetch stimuli and apply the selected order
-    stimuli_list = list(Stimuli.objects.all())
-    if len(stimuli_list) < 12:
-        return JsonResponse({"error": "Not enough stimuli available."}, status=500)
+    stimuli_list = list(Stimuli.objects.exclude(type="Practice"))
 
     ordered_stimuli = [stimuli_list[i] for i in selected_order]
 
@@ -78,16 +148,12 @@ def generate_test(request):
         })
 
     return JsonResponse({
-        "test_id": test_session.test_id,
-        "language": test_session.language,
-        "stimuli_order": stimuli_order_str,  # Return order for verification
-        "responses": responses,
-        "link" : f"http://localhost:8000/basic/take-test/?test_id={test_session.test_id}"
+        # "test_id": test_session.test_id,
+        # "language": test_session.language,
+        # "stimuli_order": stimuli_order_str,  # Return order for verification
+        # "responses": responses,
+        "link": f"http://localhost:8000/basic/test/intro/?test_id={test_session.test_id}"
     })
-
-
-# a single json file that holds all the responses latencies everything, then a single view that parses and updates the db
-# it would be best to just have one request for all the responses after a test is recorded
 
 
 @csrf_exempt  # Disable CSRF for simplicity (use proper authentication in production)
@@ -153,16 +219,18 @@ def test_statistics(request, test_id):
 from django.http import JsonResponse
 from .models import Response
 
+
 def get_responses(request):
     test_id = request.GET.get("test_id")
     responses = Response.objects.filter(test_id=test_id).select_related('stim')
 
     data = [
-        {"response_id": r.response_id, "stimulus_text": r.stim.stimulus}
+        {"response_id": r.response_id, "stimulus_text": r.stim.stimulus, "stimulus_type" : r.stim.type}
         for r in responses
     ]
 
     return JsonResponse({"responses": data})
+
 
 @csrf_exempt
 def submit_response(request):
@@ -183,3 +251,95 @@ def submit_response(request):
             return JsonResponse({"error": "Response not found"}, status=404)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("basic:dashboard")
+        else:
+            return render(request, "basic/login.html", {"error": "Invalid credentials"})
+    return render(request, "basic/login.html")
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("basic:login")
+
+
+@login_required
+def dashboard(request):
+    return render(request, "basic/dashboard.html", {"doctor_name": request.user.username})
+
+
+# def test_intro(request):
+#     return render(request, "basic/test_intro.html")
+def test_intro(request):
+    test_id = request.GET.get("test_id", None)
+    return render(request, "basic/test_intro.html", {"test_id": test_id})
+
+
+# def test_instructions(request):
+#     return render(request, "basic/test_instructions.html")
+def test_instructions(request):
+    test_id = request.GET.get("test_id", None)
+    return render(request, "basic/test_instructions.html", {"test_id": test_id})
+
+
+# practice segment work
+def practice_test(request):
+    test_id = request.GET.get("test_id")
+
+    return render(request, "basic/practice_test.html", {"test_id": test_id})
+
+def get_practice_responses(request):
+
+    practice_stimuli = Stimuli.objects.filter(type="Practice")[:2]
+    data = [{"stimulus_text": s.stimulus} for s in practice_stimuli]
+    return JsonResponse({"responses": data})
+
+
+def practice_countdown(request):
+    test_id = request.GET.get("test_id")
+    return render(request, "basic/practice_countdown.html", {"test_id": test_id})
+
+def practice_transition(request):
+    test_id = request.GET.get("test_id")
+    return render(request, "basic/practice_transition.html", {"test_id": test_id})
+
+def test_complete(request):
+    return render(request, "basic/test_complete.html")
+
+
+
+
+def export_test_data(request):
+    test_id = request.GET.get("test_id")
+    responses = Response.objects.filter(test_id=test_id).select_related("stim")
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = f'attachment; filename="test_{test_id}_data.csv"'
+
+    writer = csv.writer(response)
+
+    writer.writerow(["Response ID", "Stimulus", "User Response", "Correct Response", "Is Correct", "Latencies"])
+
+    for resp in responses:
+        writer.writerow([
+            resp.response_id,
+            resp.stim.stimulus,
+            resp.response,
+            resp.stim.correct_response,
+            "Yes" if resp.is_correct else "No",
+            resp.latency
+        ])
+
+    return response
+
+def testresults(request):
+     test_sessions = TestSession.objects.all()  # Retrieve all test sessions
+     return render(request, "basic/testresults.html", {"test_sessions": test_sessions})

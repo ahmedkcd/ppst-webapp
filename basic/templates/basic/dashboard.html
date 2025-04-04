@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/styles.css"> <!-- Link external CSS -->
+    <script>
+        function openSettings() {
+            document.getElementById("settingsModal").style.display = "block";
+        }
+
+        function closeSettings() {
+            document.getElementById("settingsModal").style.display = "none";
+        }
+    </script>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .close {
+            color: red;
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="sidebar">
+        <h2>PPST Dashboard</h2>
+        <ul>
+            <li><a href="#">Create New Test</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Results</a></li>
+            <li><a href="#">Statistics</a></li>
+            <li><a href="#" onclick="openSettings()">Settings</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <h1>Welcome, Doctor!</h1>
+        <div class="overview">
+            <h3>Quick Overview of Tests</h3>
+            <ul>
+                <li>Active Tests: work in progress</li>
+                <li>Pending Results: work in progress</li>
+                <li>Completed Tests: work in progress</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Account Settings Modal -->
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeSettings()">&times;</span>
+        <h2>Account Settings</h2>
+        <p>Logged in as: <strong>{{ doctor_name }}</strong></p>
+        <a href="{% url 'basic:logout' %}">
+            <button>Logout</button>
+        </a>
+    </div>
+</div>
+
+</body>
+
+</html>
