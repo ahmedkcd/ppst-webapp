@@ -66,6 +66,7 @@
     <div class="card">
         <h2>Test Response</h2>
         <pre id="result">No test generated yet.</pre>
+        <button class="btn btn-secondary mt-2" onclick="copyToClipboard()">Copy</button>
     </div>
 </div>
 </div>
@@ -85,6 +86,12 @@ function generateTest() {
             document.getElementById("result").textContent = JSON.stringify(data, null, 2);
         })
         .catch(error => console.error("Error:", error));
+}
+function copyToClipboard() {
+    const link = document.getElementById("result").textContent;
+    navigator.clipboard.writeText(link).then(() => {
+        alert("Copied to clipboard!");
+    }).catch(err => console.error("Error copying text: ", err));
 }
 </script>
 {% endblock %}
