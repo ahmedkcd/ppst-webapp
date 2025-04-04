@@ -37,5 +37,7 @@ urlpatterns = [
     path("", landing, name='landing'),
     path('doctor-logout', doctor_logout_view, name='doctor-logout'),
     path('doctor-testpage', doctor_test_page, name='doctor-testpage'),
+    path("testresults/", views.testresults, name="testresults"),
+    path("export_test_data/", views.export_test_data, name="export_test_data")
 
 ]
