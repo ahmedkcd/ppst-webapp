@@ -46,7 +46,9 @@ def doctor_user_login(request):
 
 @login_required(login_url='/basic/')
 def doctor_dashboard(request):
-    return render(request, 'basic/doctor_dashboard.html')
+     return render(request, 'basic/dashboard.html', {
+        'doctor_name': request.user.username
+    })
     
 @login_required(login_url='/basic/')
 def doctor_results(request):

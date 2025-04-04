@@ -16,6 +16,15 @@ class TestSession(models.Model):
     state = models.TextField(default="ready")
     language = models.TextField(default="en")
 
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+    ]
+    doctor = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    
+    
     def __str__(self):
         return f"Test {self.test_id} - Age {self.age} with Dr. {self.doctor.username}"
 
