@@ -316,7 +316,11 @@ def export_test_data(request):
             resp.response,
             resp.stim.correct_response,
             "Yes" if resp.is_correct else "No",
-            resp.latencies
+            resp.latency
         ])
 
     return response
+
+def testresults(request):
+     test_sessions = TestSession.objects.all()  # Retrieve all test sessions
+     return render(request, "basic/testresults.html", {"test_sessions": test_sessions})
