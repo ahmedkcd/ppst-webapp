@@ -42,8 +42,6 @@
                 document.getElementById("user-response").textContent = "Your Response: ";
 
                 document.getElementById("keyboard").style.display = "none";
-                document.getElementById("numericKeyboard").style.display = "none";
-
 
                 showNextCharacter();
             } else {
@@ -53,35 +51,29 @@
 
         function showNextCharacter() {
             if (charIndex < stimulusText.length) {
-
                 document.getElementById("stimulus").textContent = stimulusText[charIndex];
                 charIndex++;
                 setTimeout(showNextCharacter, 2000);
             } else {
                 responseStartTime = Date.now();
                 document.getElementById("stimulus").textContent = '';
-
-                if (stimulusType === "AlphaNumeric") {
-                    document.getElementById("keyboard").style.display = "block";
-                    document.getElementById("numericKeyboard").style.display = "block";
-                }
-                if (stimulusType === "Numeric") {
-                    document.getElementById("numericKeyboard").style.display = "block";
-                }
+                document.getElementById("keyboard").style.display = "block";
             }
         }
 
         function submitResponse(choice) {
-            let responseId = responses[currentIndex].response_id;
             latencies.push(Date.now() - responseStartTime);
 
             userInput += choice;
 
             document.getElementById("user-response").textContent = "Your Response: " + userInput;
 
+            responseStartTime = Date.now();
+        }
 
-            if (userInput.length === stimulusText.length) {
-                fetch("/basic/submit-response/", {
+        function submitFullResponse(userInput){
+            let responseId = responses[currentIndex].response_id;
+            fetch("/basic/submit-response/", {
                     method: "POST",
 
                     headers: {"Content-Type": "application/json", "X-CSRFToken": getCSRFToken()},
@@ -99,8 +91,6 @@
                         startTest();
                     }
                 });
-
-            }
         }
 
         function getCSRFToken() {
@@ -124,7 +114,8 @@
 </body>
 
 <div class="button-container">
-    <div id = "numericKeyboard" style="display: none;" class="number-buttons">
+
+    <div id = "keyboard"  style="display: none;" class="letter-buttons">
 
         <button onclick="submitResponse('1')">1</button>
         <button onclick="submitResponse('2')">2</button>
@@ -134,11 +125,6 @@
         <button onclick="submitResponse('6')">6</button>
         <button onclick="submitResponse('7')">7</button>
         <button onclick="submitResponse('9')">9</button>
-
-    </div>
-
-    <div id = "keyboard"  style="display: none;" class="letter-buttons">
-
         <button onclick="submitResponse('B')">B</button>
         <button onclick="submitResponse('H')">H</button>
         <button onclick="submitResponse('G')">G</button>
@@ -147,7 +133,12 @@
         <button onclick="submitResponse('R')">R</button>
         <button onclick="submitResponse('X')">X</button>
         <button onclick="submitResponse('Y')">Y</button>
+
     </div>
 </div>
+
+<div class="proceed-btn-wrapper" id="next-btn">
+        <button onclick="submitFullResponse()">Submit</button>
+    </div>
 
 </html>
