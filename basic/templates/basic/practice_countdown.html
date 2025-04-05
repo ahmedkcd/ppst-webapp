@@ -2,9 +2,42 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Practice Test Countdown</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #5e4b8b;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
     <script>
         let countdown = 3;
 
@@ -17,11 +50,10 @@
 
                 if (countdown < 0) {
                     clearInterval(interval);
-                    // Redirect to the practice test page after countdown
                     const testId = new URLSearchParams(window.location.search).get("test_id");
                     window.location.href = `/basic/practice-test/?test_id=${testId}`;
                 }
-            }, 1000); // Update every second
+            }, 1000);
         }
 
         window.onload = startCountdown;
@@ -29,7 +61,7 @@
 </head>
 
 <body>
-<h1 id="countdown">Beginning Practice Stimuli Test in 3...</h1>
+    <h1 id="countdown">Beginning Practice Stimuli Test in 3...</h1>
 </body>
 
 </html>
