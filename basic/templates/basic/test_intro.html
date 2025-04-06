@@ -58,11 +58,14 @@
     <p>Welcome to the Philadelphia Pointing Span Test (PPST). This test measures your cognitive span and processing
         speed by evaluating how well you can recall and reorder presented stimuli.</p>
 
-    <audio controls autoplay>
-        <source src="{% static 'basic/PPST_Welcome.m4a' %}" type="audio/mpeg">
-        Your browser does not support this audio file.
-    </audio>
+    <div class="audio-player">
+        <audio controls autoplay>
+            <source src="{% static 'basic/PPST_Welcome-Final.mp3' %}" type="audio/mpeg">
+            Your browser does not support this audio file.
+        </audio>
+    </div>
     <a href="{% url 'basic:test_instructions' %}?test_id={{ test_id }}" class="btn">Next</a>
+    
 </body>
 
 </html>
