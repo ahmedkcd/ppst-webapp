@@ -1,23 +1,22 @@
-import json
 import csv
+import json
 
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.db import transaction
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render, redirect, HttpResponse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
 
-from basic.models import TestSession, User, Response
-from django.contrib import messages
-
+from basic.models import User
 
 
 def doctor_login_view(request):
-    return render(request,'basic/doctor_login.html')
+    return render(request, 'basic/doctor_login.html')
+
 
 def doctor_test_page(request):
     return render(request, 'basic/doctor_taketest.html')
@@ -39,7 +38,7 @@ def doctor_user_login(request):
         else:
             # Authentication is denied
             messages.error(request, "Invalid username or password")
-            return  redirect("basic:doctor-login") # Redirecting to the login page, when refreshed
+            return redirect("basic:doctor-login")  # Redirecting to the login page, when refreshed
 
     return render(request, "basic/doctor_login.html")
 
@@ -47,42 +46,49 @@ def doctor_user_login(request):
 @login_required(login_url='/basic/')
 def doctor_dashboard(request):
     return render(request, 'basic/doctor_dashboard.html')
-    
+
+
 @login_required(login_url='/basic/')
 def doctor_results(request):
     test_sessions = TestSession.objects.filter(doctor=request.user)
     return render(request, 'basic/doctor_results.html', {'test_sessions': test_sessions})
-    
+
+
 @login_required(login_url='/basic/')
 def doctor_statistics(request):
     return render(request, 'basic/doctor_statistics.html')
-    
+
+
 @login_required(login_url='/basic/')
 def doctor_newtest(request):
     return render(request, "basic/doctor_newtest.html")
 
+
 def base(request):
     return render(request, "basic/base.html")
 
-def landing(request):
-     total_tests = TestSession.objects.count()  # Count all test sessions
-     total_doctors = User.objects.filter(testsession__isnull=False).distinct().count()  # Count unique doctors with tests
 
-     return render(request, "basic/landing.html", {
+def landing(request):
+    total_tests = TestSession.objects.count()  # Count all test sessions
+    total_doctors = User.objects.filter(testsession__isnull=False).distinct().count()  # Count unique doctors with tests
+
+    return render(request, "basic/landing.html", {
         "total_tests": total_tests,
         "total_doctors": total_doctors,
     })
+
+
 def doctor_logout_view(request):
-    logout(request)  
-    return redirect('basic:landing') 
+    logout(request)
+    return redirect('basic:landing')
 
 
 def test_page(request):
     return render(request, "basic/test_page.html")
 
 
-#def take_test(request):
- #   return render(request, "basic/take_test.html")
+# def take_test(request):
+#   return render(request, "basic/take_test.html")
 
 def take_test(request):
     test_id = request.GET.get("test_id")
@@ -94,10 +100,8 @@ def take_test(request):
 
 
 import random
-from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import TestSession, Stimuli
-
 
 
 def generate_test(request):
@@ -197,6 +201,19 @@ def record_responses_bulk(request):
     return JsonResponse({"error": "Invalid request method."}, status=405)
 
 
+@csrf_exempt
+def submit_all_responses(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        for item in data["responses"]:
+            response = Response.objects.get(response_id=item["response_id"])
+            response.response = item["response"]
+            response.latencies = item["latencies"]
+            response.is_correct = (item["response"] == response.stim.correct_response)
+            response.save()
+        return JsonResponse({"status": "success"})
+
+
 from django.http import JsonResponse
 from .models import Response
 
@@ -206,7 +223,7 @@ def get_responses(request):
     responses = Response.objects.filter(test_id=test_id).select_related('stim')
 
     data = [
-        {"response_id": r.response_id, "stimulus_text": r.stim.stimulus, "stimulus_type" : r.stim.type}
+        {"response_id": r.response_id, "stimulus_text": r.stim.stimulus, "stimulus_type": r.stim.type}
         for r in responses
     ]
 
@@ -277,8 +294,8 @@ def practice_test(request):
 
     return render(request, "basic/practice_test.html", {"test_id": test_id})
 
-def get_practice_responses(request):
 
+def get_practice_responses(request):
     practice_stimuli = Stimuli.objects.filter(type="Practice")[:2]
     data = [{"stimulus_text": s.stimulus} for s in practice_stimuli]
     return JsonResponse({"responses": data})
@@ -288,14 +305,14 @@ def practice_countdown(request):
     test_id = request.GET.get("test_id")
     return render(request, "basic/practice_countdown.html", {"test_id": test_id})
 
+
 def practice_transition(request):
     test_id = request.GET.get("test_id")
     return render(request, "basic/practice_transition.html", {"test_id": test_id})
 
+
 def test_complete(request):
     return render(request, "basic/test_complete.html")
-
-
 
 
 def export_test_data(request):
