@@ -3,8 +3,8 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test Session</title>
     <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
@@ -135,8 +135,8 @@
             } else {
                 responseStartTime = Date.now();
                 document.getElementById("stimulus").textContent = '';
+                document.getElementById("buttons").style.display = "grid";
                 document.getElementById("next-stimulus-btn").style.display = "block";
-                document.getElementById("buttons").style.display = "block";
             }
         }
 
@@ -173,7 +173,7 @@
                 body: JSON.stringify({
                     test_id: testId,
                     responses: allResponses
-                 }),
+                }),
             }).then(() => {
                 window.location.href = "/basic/test/complete/";
             });
@@ -215,4 +215,5 @@
     </div>
     <button id="next-stimulus-btn" onclick="submitFullResponse(userInput)">Submit</button>
 </body>
+
 </html>
