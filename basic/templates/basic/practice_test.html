@@ -154,9 +154,15 @@
 
         function submitResponse(choice) {
             userInput += choice;
+            const sound = document.getElementById("buttonPress"); //sound when button is pressed
+            sound.currentTime = 0;
+            sound.play();
         }
 
         function nextStimulus() {
+            const sound = document.getElementById("submitSound");
+            sound.currentTime = 0;
+            sound.play();
             currentIndex++;
             startCountdown();
         }
@@ -172,6 +178,10 @@
 <body>
     <p id="countdown" class="countdown" style="display:none;"></p>
     <p id="stimulus"></p>
+
+    <audio id="buttonPress" src="{% static 'basic/sounds/clicksoundeffect.mp3' %}"></audio>
+    <audio id="submitSound" src="{% static 'basic/sounds/next-button2.mp3' %}"></audio>
+
     <div id="buttons" class="grid-buttons" style="display:none">
         <button onclick="submitResponse('1')">1</button>
         <button onclick="submitResponse('2')">2</button>
