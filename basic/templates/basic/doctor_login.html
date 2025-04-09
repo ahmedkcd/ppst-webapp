@@ -18,7 +18,7 @@
       <h2>Log In</h2>
     </div>
     <div class="login-container">
-      <form method="post">
+      <form method="post" action="{% url 'basic:doctor-login-user' %}">
         {% csrf_token %}
 
         <div class="input-group">

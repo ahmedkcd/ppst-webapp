@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="/static/styles.css"> <!-- Link external CSS -->
+    <link rel="stylesheet" href="{% static 'basic/styles.css' %}"> <!-- Link external CSS -->
     <script>
         function openSettings() {
             document.getElementById("settingsModal").style.display = "block";
@@ -64,13 +65,24 @@
         <div class="overview">
             <h3>Quick Overview of Tests</h3>
             <ul>
+                <li>Total Tests: {{ total_tests }}</li>
                 <li>Active Tests: {{ active_tests }}</li>
                 <li>Pending Tests: {{ pending_tests }}</li>
-                <li>Recent Completed Tests (Top 10): {{ completed_tests }}</li>
-                <li>Graph for Past Ten Tests Completed: work in progress</li>
-                <li>Graph for Total Tests Completed: work in progress</li>
             </ul>
+        
+            <h4>Recent Completed Tests (Top 10 Tests)</h4>
+            <ul>
+                {% for test in recent_tests %}
+                    <li>{{ test.created_at|date:"M d, Y" }} - Score: {{ test.score }}</li>
+                {% empty %}
+                    <li>No recent tests available.</li>
+                {% endfor %}
+            </ul>
+        
+            <h4>Graph for Past 10 Tests Completed</h4>
+            <canvas id="testGraph" width="400" height="200"></canvas>
         </div>
+        
     </div>
 </div>
 
@@ -99,27 +111,3 @@
 
 
 
-
-
-
-
-
-
-
-{% extends 'basic/base.html' %}
-
-{% block title %}Dashboard{% endblock %}
-
-{% block content %}
-<div class="welcome">
-    <h2>Welcome, Dr. {{ doctor_name }}!</h2>
-    <div class="overview">
-        <h3>Quick Overview of Tests</h3>
-        <ul>
-            <li>Active Tests: {{ active_tests }}</li>
-            <li>Pending Results: {{ pending_tests }}</li>
-            <li>Completed Tests: {{ completed_tests }}</li>
-        </ul>
-    </div>
-</div>
-{% endblock %}

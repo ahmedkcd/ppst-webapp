@@ -11,3 +11,4 @@ STATICFILES_DIRS = [
 
 # settings.py
 LOGIN_URL = '/basic/login/'  # Redirect unauthenticated users to the login page
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development, print emails to console

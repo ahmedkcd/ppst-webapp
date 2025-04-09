@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User  # Use built-in User model
 from django.db import models
+from django.utils import timezone
 from django.db.models import Avg
 
 
@@ -15,6 +16,7 @@ class TestSession(models.Model):
     stimuli_order = models.TextField(null=True)
     state = models.TextField(default="ready")
     language = models.TextField(default="en")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     STATUS_CHOICES = [
         ('active', 'Active'),
