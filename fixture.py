@@ -34,10 +34,10 @@ print(f"Doctors in database: {[doctor.username for doctor in doctors]}")
 
 # Create test sessions
 test_sessions = [
-    TestSession.objects.create(doctor=doctors[0], age=35, date=timezone.now(), duration=timedelta(minutes=30)),
-    TestSession.objects.create(doctor=doctors[1], age=40, date=timezone.now(), duration=timedelta(hours=1)),
-    TestSession.objects.create(doctor=doctors[0], age=47, date=timezone.now(), duration=timedelta(hours=1)),
-    TestSession.objects.create(doctor=doctors[1], age=38, date=timezone.now(), duration=timedelta(minutes=30)),
+    TestSession.objects.create(doctor=doctors[0], age=35, date=timezone.now(), duration=timedelta(minutes=30), test_id=1),
+    TestSession.objects.create(doctor=doctors[1], age=40, date=timezone.now(), duration=timedelta(hours=1), test_id=2),
+    TestSession.objects.create(doctor=doctors[0], age=47, date=timezone.now(), duration=timedelta(hours=1), test_id=3),
+    TestSession.objects.create(doctor=doctors[1], age=38, date=timezone.now(), duration=timedelta(minutes=30), test_id=4),
 ]
 
 print(f"Created test sessions: {[session.test_id for session in test_sessions]}")

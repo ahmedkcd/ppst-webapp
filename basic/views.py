@@ -13,6 +13,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
+import uuid
+
 from basic.models import TestSession, User, Response
 from django.contrib import messages
 
@@ -35,7 +37,7 @@ def doctor_user_login(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            # Authentication is successfull
+            # Authentication is successful
             login(request, user)
             return redirect("basic:doctor-dashboard")  # Redirecting to the dashboard
         else:
@@ -127,12 +129,15 @@ def generate_test(request):
     # Store the order as a comma-separated string
     stimuli_order_str = ",".join(map(str, selected_order))
 
+    test_uuid = str(uuid.uuid4())
+
     # Create the test session
     test_session = TestSession.objects.create(
         doctor=request.user,
         age=age,
         language=language,
-        stimuli_order=stimuli_order_str  # Store as text
+        stimuli_order=stimuli_order_str,
+        test_id=test_uuid,
     )
 
     # Generate responses
@@ -147,57 +152,14 @@ def generate_test(request):
             "stimulus": stimulus.stim_id,
         })
 
+
+    test_link = f"http://localhost:8000/basic/test/intro/?test_id={test_uuid}"
+
     return JsonResponse({
-        # "test_id": test_session.test_id,
-        # "language": test_session.language,
-        # "stimuli_order": stimuli_order_str,  # Return order for verification
-        # "responses": responses,
-        "link": f"http://localhost:8000/basic/test/intro/?test_id={test_session.test_id}"
+        "message": "Test generated successfully.",
+        "link": test_link,
+        "copy_paste": f"Copy this link to access the test:\n{test_link}"
     })
-
-
-@csrf_exempt  # Disable CSRF for simplicity (use proper authentication in production)
-def record_responses_bulk(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            responses_data = data.get("responses", [])
-
-            if not responses_data:
-                return JsonResponse({"error": "No responses provided."}, status=400)
-
-            with transaction.atomic():  # Ensures all updates succeed or none do
-                for response_entry in responses_data:
-                    response_id = response_entry.get("response_id")
-                    user_response = response_entry.get("response")
-                    latency = response_entry.get("latency")
-                    is_correct = response_entry.get("is_correct")
-
-                    response = get_object_or_404(Response, response_id=response_id)
-                    response.response = user_response
-                    response.latency = latency
-                    response.is_correct = is_correct
-                    response.save()
-
-                    test_session = response.test
-
-                stats = test_session.response_set.aggregate(
-                    avg_latency=models.Avg("latency"),
-                    total_responses=models.Count("response_id"),
-                    correct_responses=models.Count("response_id", filter=models.Q(is_correct=True))
-                )
-                test_session.avg_latency = stats["avg_latency"]
-                test_session.accuracy = (stats["correct_responses"] / stats["total_responses"]) * 100 if stats[
-                    "total_responses"] else 0
-                test_session.save()
-
-            return JsonResponse({"message": "Responses recorded successfully."})
-
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON data."}, status=400)
-
-    return JsonResponse({"error": "Invalid request method."}, status=405)
-
 def test_statistics(request, test_id):
     test_session = get_object_or_404(TestSession, test_id=test_id)
     responses = Response.objects.filter(test=test_session)
@@ -335,7 +297,7 @@ def export_test_data(request):
             resp.response,
             resp.stim.correct_response,
             "Yes" if resp.is_correct else "No",
-            resp.latency
+            resp.latencies
         ])
 
     return response

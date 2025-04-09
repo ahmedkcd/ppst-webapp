@@ -64,7 +64,7 @@
     </div>
 
     <div class="card">
-        <h2>Test Response</h2>
+        <h2>Test Link</h2>
         <pre id="result">No test generated yet.</pre>
         <button class="btn btn-secondary mt-2" onclick="copyToClipboard()">Copy</button>
     </div>
@@ -83,13 +83,22 @@ function generateTest() {
     fetch(`/basic/generate-test/?age=${age}&language=${language}`)
         .then(response => response.json())
         .then(data => {
-            document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML =`
+                <p id="test-link" style="font-family: monospace;">${data.link}</p>
+            `;
         })
         .catch(error => console.error("Error:", error));
 }
+
 function copyToClipboard() {
-    const link = document.getElementById("result").textContent;
-    navigator.clipboard.writeText(link).then(() => {
+    const linkText = document.getElementById("test-link").textContent;
+    navigator.clipboard.writeText(linkText).then(() => {
         alert("Copied to clipboard!");
     }).catch(err => console.error("Error copying text: ", err));
 }
