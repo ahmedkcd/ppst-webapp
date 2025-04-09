@@ -141,15 +141,44 @@
 
         function showNextCharacter() {
             const stimEl = document.getElementById("stimulus");
+            const audioEl = document.getElementById("stimulus-audio");
+
             if (charIndex < stimulusText.length) {
-                stimEl.textContent = stimulusText[charIndex];
+                const currentChar = stimulusText[charIndex];
+                stimEl.textContent = currentChar;
                 charIndex++;
+                const fileName = mapToAudio(currentChar);
+                audioEl.src = `/static/basic/${fileName}`;
+                audioEl.play().catch(err => console.error("Audio play error:", err));
                 setTimeout(showNextCharacter, 2000);
             } else {
                 stimEl.textContent = "";
                 document.getElementById("buttons").style.display = "grid";
                 document.getElementById("next-stimulus-btn").style.display = "block";
             }
+        }
+
+        function mapToAudio(char) {
+            const map = {
+                '1': 'One.m4a',
+                '2': 'Two.m4a',
+                '3': 'Three.m4a',
+                '4': 'Four.m4a',
+                '5': 'Five.m4a',
+                '6': 'Six.m4a',
+                '7': 'Seven.m4a',
+                '8': 'Eight.m4a',
+                '9': 'Nine.m4a',
+                'B': 'B (English).m4a',
+                'F': 'F (English).m4a',
+                'G': 'G (English).m4a',
+                'H': 'H (English).m4a',
+                'M': 'M (English).m4a',
+                'R': 'R (English).m4a',
+                'X': 'X (English).m4a',
+                'Y': 'Y (English).m4a'
+            };
+            return map[char] || `${char}.m4a`;
         }
 
         function submitResponse(choice) {
@@ -172,6 +201,7 @@
 <body>
     <p id="countdown" class="countdown" style="display:none;"></p>
     <p id="stimulus"></p>
+    <audio id="stimulus-audio" src="" hidden></audio>
     <div id="buttons" class="grid-buttons" style="display:none">
         <button onclick="submitResponse('1')">1</button>
         <button onclick="submitResponse('2')">2</button>
