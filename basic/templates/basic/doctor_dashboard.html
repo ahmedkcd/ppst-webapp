@@ -1,88 +1,12 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Doctor Dashboard</title>
-    <link rel="stylesheet" href="{% static 'basic/styles.css' %}">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-</head>
-<body>
-
-<!-- Sidebar -->
-<div class="sidebar" id="nav-bar">
-    <ul>
-        <li class="nav_item">
-            <button id="create-test">+</button>
-            <span class="nav_text">Create New Test</span>
-        </li>
-        <li class="nav_item active">
-            <a href="#"><span class="nav_text">Dashboard</span></a>
-        </li>
-        <li class="nav_item">
-            <a href="{% url 'basic:doctor-results' %}"><span class="nav_text">Results</span></a>
-        </li>
-        <li class="nav_item">
-            <a href="{% url 'basic:doctor-statistics' %}"><span class="nav_text">Statistics</span></a>
-        </li>
-    </ul>
-</div>
-
-<!-- Top Header -->
-<header class="header" id="header">
-    <div class="header_toggle" id="header-toggle">
-        <i class="fas fa-bars"></i>
-    </div>
-    <div class="header-text">PPST</div>
-    <div class="profile-container">
-        <div class="profile-icon" onclick="toggleProfilePopup()">M</div>
-        <div class="profile-popup" id="profile-popup">
-            <div class="profile-welcome">Welcome!</div>
-            <div class="profile-name">Dr. {{ doctor_name|title }}</div>
-            <form method="POST" action="{% url 'basic:logout' %}">
-                {% csrf_token %}
-                <button class="signout-btn" type="submit">Sign Out</button>
-            </form>
-        </div>
-    </div>
-</header>
-
-<!-- Main Content -->
-<div class="content">
-    <div class="welcome">
-        <h2>Welcome, Dr. {{ doctor_name }}!</h2>
-        <div class="overview">
-            <h3>Quick Overview of Tests</h3>
-            <ul>
-                <li>Active Tests: {{ active_tests }}</li>
-                <li>Pending Results: {{ pending_tests }}</li>
-                <li>Completed Tests: {{ completed_tests }}</li>
-            </ul>
-        </div>
-    </div>
-</div>
-
-<!-- JavaScript -->
-<script>
-    const profilePopup = document.getElementById('profile-popup');
-    const profileIcon = document.querySelector('.profile-icon');
-    profileIcon.addEventListener('click', function () {
-        profilePopup.classList.toggle('show');
-    });
-
-    document.addEventListener('click', function (e) {
-        if (!profilePopup.contains(e.target) && !profileIcon.contains(e.target)) {
-            profilePopup.classList.remove('show');
-        }
-    });
-
-    const sidebar = document.querySelector('.sidebar');
-    const toggle = document.getElementById('header-toggle');
-    toggle.addEventListener('click', () => {
-        sidebar.classList.toggle('show');
-        document.body.classList.toggle('body-pd');
-    });
-</script>
-
-</body>
-</html>
+{% extends 'basic/base.html' %} {% block title %}Dashboard{% endblock %} {%block content %}
+<h1>Dashboard</h1>
+<p>Welcome, Doctor {{user.username}}!</p>
+<h3>Quick Overview of Test</h3>
+<ul>
+    <li>Active Tests: {{ active_tests }}</li>
+    <li>Pending Tests: {{ pending_tests }}</li>
+    <li>Recent Completed Tests (Top 10): {{ completed_tests }}</li>
+    <li>Graph for Past Ten Tests Completed: work in progress</li>
+    <li>Graph for Total Tests Completed: work in progress</li>
+</ul>
+{% endblock %}
