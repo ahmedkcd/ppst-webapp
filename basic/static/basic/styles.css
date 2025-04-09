@@ -70,16 +70,16 @@ button:hover {
     color: #666;
 }
 
-h2{
+h2 {
     text-align: left;
     padding-left: 100px;
 }
 
-input,button{
+input, button {
     box-sizing: border-box;
 }
 
-ul{
+ul {
     list-style-type: none;
     text-align: left;
     color: red;
