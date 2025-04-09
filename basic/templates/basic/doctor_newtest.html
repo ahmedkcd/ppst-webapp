@@ -39,6 +39,26 @@
         padding: 10px;
         border-radius: 5px;
     }
+
+    .custom-toast {
+        position: fixed;
+        bottom: 100%;
+        left: 53%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        opacity: 0;
+        transition: opacity 0.4s ease, bottom 0.4s ease;
+        z-index: 9999;
+        font-size: 14px;
+    }
+
+    .custom-toast.show {
+        opacity: 1;
+        bottom: 10px;
+    }
 </style>
 </head>
 
@@ -66,8 +86,13 @@
     <div class="card">
         <h2>Test Response</h2>
         <pre id="result">No test generated yet.</pre>
-        <button class="btn btn-secondary mt-2" onclick="copyToClipboard()">Copy</button>
+    
+        <div class="d-flex gap-2 mt-2">
+            <button class="btn btn-secondary flex-fill" onclick="copyToClipboard()">Copy Link</button>
+            
+        </div>
     </div>
+    
 </div>
 </div>
 
@@ -88,10 +113,36 @@ function generateTest() {
         .catch(error => console.error("Error:", error));
 }
 function copyToClipboard() {
-    const link = document.getElementById("result").textContent;
-    navigator.clipboard.writeText(link).then(() => {
-        alert("Copied to clipboard!");
-    }).catch(err => console.error("Error copying text: ", err));
+    const resultText = document.getElementById("result").textContent;
+    try {
+        const json = JSON.parse(resultText);
+        const link = json.link;
+        navigator.clipboard.writeText(link).then(() => {
+            showToast("Link copied to clipboard!");
+        });
+    } catch (e) {
+        console.error("Invalid JSON:", e);
+        showToast("Failed to copy: Link is invalid");
+    }
 }
+
+
+
+function showToast(message) {
+    const toast = document.createElement("div");
+    toast.className = "custom-toast";
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+   
+    setTimeout(() => toast.classList.add("show"), 100);
+
+    
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => document.body.removeChild(toast), 500);
+    }, 2500);
+}
+
 </script>
 {% endblock %}
