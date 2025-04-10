@@ -97,6 +97,13 @@
         <h2>Next Steps:</h2>
         <p>Press "Start Practice" when you're ready. <br> After this, the real test will begin.</p>
 
+        <div class="audio-player">
+            <audio controls autoplay>
+                <source src="{% static 'basic/PPST_Instructions.mp3' %}" type="audio/mpeg">
+                Your browser does not support this audio file.
+            </audio>
+        </div>
+
         <a href="/basic/practice-countdown/?test_id={{ test_id }}" class="btn"
             onclick="playSoundAndNavigate(event)">Start Practice</a>
         <audio id="buttonPress" src="{% static 'basic/sounds/intro-button.mp3' %}" preload="auto"></audio>

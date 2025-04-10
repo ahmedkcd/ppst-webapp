@@ -50,10 +50,15 @@
             font-size: 2rem;
             color: #6c5ce7;
         }
+        .audio-player {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+        }
     </style>
     <script>
         window.onload = function () {
-            let timeLeft = 15;
+            let timeLeft = 17;
             const countdownElement = document.getElementById("countdown");
             const testId = new URLSearchParams(window.location.search).get("test_id");
 
@@ -80,8 +85,16 @@
             <li>Your responses will now be recorded for analysis.</li>
             <li>Try to stay focused and respond as quickly and accurately as possible.</li>
         </ul>
-        <p>Get ready! The test will begin automatically in <span id="countdown">15</span> seconds.</p>
+        <p>Get ready! The test will begin automatically in <span id="countdown">17</span> seconds.</p>
     </div>
+
+    <div class="audio-player">
+        <audio controls autoplay>
+            <source src="{% static 'basic/PPST_PracticeComplete.mp3' %}" type="audio/mpeg">
+            Your browser does not support this audio file.
+        </audio>
+    </div>
+
 </body>
 
 </html>

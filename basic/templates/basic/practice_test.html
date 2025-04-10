@@ -146,15 +146,43 @@
 
         function showNextCharacter() {
             const stimEl = document.getElementById("stimulus");
+            const audioEl = document.getElementById("stimulus-audio");
             if (charIndex < stimulusText.length) {
-                stimEl.textContent = stimulusText[charIndex];
+                const currentChar = stimulusText[charIndex];
+                stimEl.textContent = currentChar;
                 charIndex++;
+                const fileName = mapToAudio(currentChar);
+                audioEl.src = `/static/basic/${fileName}`;
+                audioEl.play().catch(err => console.error("Audio play error:", err));
                 setTimeout(showNextCharacter, 1100);
             } else {
                 stimEl.textContent = "";
                 document.getElementById("buttons").style.display = "grid";
                 document.getElementById("next-stimulus-btn").style.display = "block";
             }
+        }
+
+        function mapToAudio(char) {
+            const map = {
+                '1': 'One.mp3',
+                '2': 'Two.mp3',
+                '3': 'Three.mp3',
+                '4': 'Four.mp3',
+                '5': 'Five.mp3',
+                '6': 'Six.mp3',
+                '7': 'Seven.mp3',
+                '8': 'Eight.mp3',
+                '9': 'Nine.mp3',
+                'B': 'B (English).mp3',
+                'F': 'F (English).mp3',
+                'G': 'G (English).mp3',
+                'H': 'H (English).mp3',
+                'M': 'M (English).mp3',
+                'R': 'R (English).mp3',
+                'X': 'X (English).mp3',
+                'Y': 'Y (English).mp3'
+            };
+            return map[char] || `${char}.m4a`;
         }
 
         function submitResponse(choice) {
@@ -168,11 +196,15 @@
             const sound = document.getElementById("submitSound");
             sound.currentTime = 0;
             sound.play();
+        }
 
             document.getElementById("stimulus").style.display = "none";
             document.getElementById("buttons").style.display = "none";
             document.getElementById("next-stimulus-btn").style.display = "none";
 
+            currentIndex++;
+            startCountdown();
+        function nextStimulus() {
             currentIndex++;
             startCountdown();
         }
@@ -187,7 +219,6 @@
             }, 250);
         }
 
-
         window.onload = fetchPracticeStimuli;
     </script>
 </head>
@@ -196,6 +227,7 @@
     <p id="countdown" class="countdown" style="display:none;"></p>
     <p id="stimulus"></p>
 
+    <audio id="stimulus-audio" src="" hidden></audio>
     <audio id="buttonPress" src="{% static 'basic/sounds/clicksoundeffect.mp3' %}"></audio>
     <audio id="submitSound" src="{% static 'basic/sounds/next-button2.mp3' %}"></audio>
 

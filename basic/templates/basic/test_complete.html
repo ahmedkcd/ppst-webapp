@@ -49,6 +49,12 @@
             margin-top: 50px;
             color: #444;
         }
+        .audio-player {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
     </style>
 </head>
 
@@ -62,7 +68,12 @@
         <p>You may now close this window.</p>
     </div>
 
-
+    <div class="audio-player">
+        <audio controls autoplay>
+            <source src="{% static 'basic/PPST_TestCompleteFinal.mp3' %}" type="audio/mpeg">
+            Your browser does not support this audio file.
+        </audio>
+    </div>
 </body>
 
 </html>
