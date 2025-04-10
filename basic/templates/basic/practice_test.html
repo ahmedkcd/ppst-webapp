@@ -23,7 +23,7 @@
         }
 
         #stimulus {
-            font-size: 9rem;
+            font-size: 12rem;
             text-align: center;
             margin-bottom: 20px;
         }
@@ -196,7 +196,6 @@
             const sound = document.getElementById("submitSound");
             sound.currentTime = 0;
             sound.play();
-        }
 
             document.getElementById("stimulus").style.display = "none";
             document.getElementById("buttons").style.display = "none";
@@ -204,6 +203,7 @@
 
             currentIndex++;
             startCountdown();
+        }
 
 
         function proceedToRealTest() {

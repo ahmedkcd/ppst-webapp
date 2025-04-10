@@ -22,7 +22,7 @@
         }
 
         #stimulus {
-            font-size: 9rem;
+            font-size: 12rem;
             text-align: center;
             margin-bottom: 20px;
         }
@@ -58,10 +58,9 @@
             color: gray;
         }
 
-        .proceed-btn-wrapper {
-            display: none;
-            margin-top: 40px;
-        }
+        {#.proceed-btn-wrapper {#}
+        {#    display: none;#}
+        {#    margin-top: 40px;#}
 
         .proceed-btn-wrapper button,
         #next-stimulus-btn {
@@ -134,7 +133,6 @@
         function startTest() {
             if (currentIndex < responses.length) {
                 stimulusText = responses[currentIndex].stimulus_text;
-                stimulusType = responses[currentIndex].stimulus_type;
                 charIndex = 0;
                 latencies = [];
                 userInput = "";
@@ -279,7 +277,6 @@
 <body>
     <p id="countdown" class="countdown" style="display:none;"></p>
     <p id="stimulus"></p>
-    <p id="user-response">Your Response:</p>
     <audio id="stimulus-audio"></audio>
 
     <audio id="buttonPress" src="{% static 'basic/sounds/clicksoundeffect.mp3' %}"></audio>
