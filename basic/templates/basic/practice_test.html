@@ -154,7 +154,7 @@
                 const fileName = mapToAudio(currentChar);
                 audioEl.src = `/static/basic/${fileName}`;
                 audioEl.play().catch(err => console.error("Audio play error:", err));
-                setTimeout(showNextCharacter, 1100);
+                setTimeout(showNextCharacter, 1500);
             } else {
                 stimEl.textContent = "";
                 document.getElementById("buttons").style.display = "grid";
