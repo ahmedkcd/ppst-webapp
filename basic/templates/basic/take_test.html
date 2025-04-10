@@ -22,7 +22,7 @@
         }
 
         #stimulus {
-            font-size: 6rem;
+            font-size: 9rem;
             text-align: center;
             margin-bottom: 20px;
         }
@@ -53,7 +53,7 @@
         }
 
         .countdown {
-            font-size: 3rem;
+            font-size: 4rem;
             margin-bottom: 20px;
             color: gray;
         }
@@ -109,6 +109,28 @@
             startTest();
         }
 
+        function startCountdown() {
+            document.getElementById("stimulus").style.display = "none";
+            document.getElementById("buttons").style.display = "none";
+            document.getElementById("next-stimulus-btn").style.display = "none";
+
+            let countdown = 3;
+            const countdownEl = document.getElementById("countdown");
+            countdownEl.style.display = "block";
+            countdownEl.textContent = `Get ready... ${countdown}`;
+
+            const interval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    countdownEl.textContent = `Get ready... ${countdown}`;
+                } else {
+                    clearInterval(interval);
+                    countdownEl.style.display = "none";
+                    startTest();
+                }
+            }, 1000);
+        }
+
         function startTest() {
             if (currentIndex < responses.length) {
                 stimulusText = responses[currentIndex].stimulus_text;
@@ -117,12 +139,17 @@
                 latencies = [];
                 userInput = "";
 
+                //restore stimuli visibility
+                document.getElementById("stimulus").style.display = "block";
                 document.getElementById("stimulus").textContent = "";
-                document.getElementById("next-stimulus-btn").style.display = "none";
+
+                // Hide response UI
                 document.getElementById("buttons").style.display = "none";
+                document.getElementById("next-stimulus-btn").style.display = "none";
 
                 showNextCharacter();
             } else {
+                document.getElementById("stimulus").style.display = "block";
                 document.getElementById("stimulus").textContent = "Test Complete!";
             }
         }
@@ -144,6 +171,22 @@
             latencies.push(Date.now() - responseStartTime);
             userInput += choice;
             responseStartTime = Date.now();
+            const sound = document.getElementById("buttonPress"); //sound when button is pressed
+            sound.currentTime = 0;
+            sound.play();
+        }
+
+        function nextStimulus() {
+            const sound = document.getElementById("submitSound");
+            sound.currentTime = 0;
+            sound.play();
+
+            document.getElementById("stimulus").style.display = "none";
+            document.getElementById("buttons").style.display = "none";
+            document.getElementById("next-stimulus-btn").style.display = "none";
+
+            currentIndex++;
+            startCountdown();
         }
 
         function submitFullResponse(userInput) {
@@ -159,8 +202,9 @@
             if (currentIndex >= responses.length) {
                 sendAllResponses(); // New function below
             } else {
-                startTest();
+                startCountdown();
             }
+
         }
 
         function sendAllResponses() {
@@ -189,12 +233,28 @@
         }
 
         window.onload = fetchResponses;
+
+        function playSubmitSoundAndSubmit() {
+            const sound = document.getElementById("submitSound");
+            sound.currentTime = 0;
+            sound.play();
+
+            setTimeout(() => {
+                submitFullResponse(userInput);
+            }, 250);
+        }
+
     </script>
 </head>
 
 <body>
-    <!-- id="countdown" class="countdown" style="display:none;" -->
+    <p id="countdown" class="countdown" style="display:none;"></p>
     <p id="stimulus"></p>
+
+    <audio id="buttonPress" src="{% static 'basic/sounds/clicksoundeffect.mp3' %}"></audio>
+    <audio id="submitSound" src="{% static 'basic/sounds/next-button2.mp3' %}"></audio>
+    <audio id="buttonClick" src="{% static 'basic/sounds/intro-button.mp3' %}"></audio>
+
     <div id="buttons" class="grid-buttons" style="display:none">
         <button onclick="submitResponse('1')">1</button>
         <button onclick="submitResponse('2')">2</button>
@@ -213,7 +273,8 @@
         <button onclick="submitResponse('X')">X</button>
         <button onclick="submitResponse('Y')">Y</button>
     </div>
-    <button id="next-stimulus-btn" onclick="submitFullResponse(userInput)">Submit</button>
+    <button id="next-stimulus-btn" onclick="playSubmitSoundAndSubmit()">Submit</button>
+
 </body>
 
 </html>
