@@ -1,7 +1,6 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
-{% load static %}
 
 <head>
     <meta charset="UTF-8">
@@ -51,6 +50,22 @@
             background-color: #c288f3;
         }
     </style>
+    <script>
+        function playSoundAndNavigate(event) {
+            event.preventDefault();
+            const audio = document.getElementById("buttonPress");
+            const destination = event.currentTarget.href;
+
+            audio.currentTime = 0;
+            audio.play();
+
+            setTimeout(() => {
+                window.location.href = destination;
+            }, 300);
+        }
+    </script>
+
+
 </head>
 
 <body>
@@ -64,8 +79,11 @@
             Your browser does not support this audio file.
         </audio>
     </div>
-    <a href="{% url 'basic:test_instructions' %}?test_id={{ test_id }}" class="btn">Next</a>
-    
+
+    <a href="{% url 'basic:test_instructions' %}?test_id={{ test_id }}" class="btn"
+        onclick="playSoundAndNavigate(event)">Next</a>
+
+    <audio id="buttonPress" src="{% static 'basic/sounds/intro-button.mp3' %}" preload="auto"></audio>
 </body>
 
 </html>

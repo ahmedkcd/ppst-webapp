@@ -3,9 +3,9 @@ from django.urls import path
 from .views import (
     generate_test, test_page, login_view, dashboard, logout_view,
     test_intro, test_instructions, take_test, get_responses, submit_response, practice_test,
-    get_practice_responses, practice_countdown, practice_transition, test_complete, doctor_dashboard,
-    doctor_login_view,doctor_logout_view,doctor_newtest,doctor_results,doctor_statistics,doctor_test_page,
-    doctor_user_login, base, landing, testresults, export_test_data
+    get_practice_responses, practice_countdown, practice_transition, test_complete, doctor_dashboard,submit_all_responses,
+    doctor_logout_view, doctor_newtest, doctor_results, doctor_statistics, doctor_test_page,
+    doctor_user_login, base, landing, testresults, export_test_data, test_statistics
 )
 
 app_name = "basic"
@@ -21,6 +21,7 @@ urlpatterns = [
     path("take-test/", take_test, name="take_test"),
     path("get-responses/", get_responses, name="get_responses"),
     path("submit-response/", submit_response, name="submit_responses"),
+    path ("submit-all-responses/", submit_all_responses, name="submit_all_responses"),
     # Practice seg
     path("practice-test/", practice_test, name="practice_test"),
     path("get-practice-responses/", get_practice_responses, name="get_practice_responses"),
@@ -32,12 +33,13 @@ urlpatterns = [
     path("doctor-dashboard", doctor_dashboard, name='doctor-dashboard'),
     path("doctor-results", doctor_results, name='doctor-results'),
     path("doctor-statistics", doctor_statistics, name='doctor-statistics'),
-    path("doctor-newtest", doctor_newtest,name="doctor-newtest"),
-    path("base",base,name="base"),
+    path("doctor-newtest", doctor_newtest, name="doctor-newtest"),
+    path("base", base, name="base"),
     path("", landing, name='landing'),
     path('doctor-logout', doctor_logout_view, name='doctor-logout'),
     path('doctor-testpage', doctor_test_page, name='doctor-testpage'),
     path("testresults/", testresults, name="testresults"),
-    path("export_test_data/", export_test_data, name="export_test_data")
+    path("export_test_data/", export_test_data, name="export_test_data"),
+    path("test_statistics/<int:test_id>/", test_statistics, name="test_statistics"),
 
 ]

@@ -1,23 +1,23 @@
-import json
 import csv
+import json
+import uuid
 
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.db import transaction
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render, redirect, HttpResponse
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
 
-from basic.models import TestSession, User, Response
-from django.contrib import messages
-
+from basic.models import User
 
 
 def doctor_login_view(request):
-    return render(request,'basic/doctor_login.html')
+    return render(request, 'basic/doctor_login.html')
+
 
 def doctor_test_page(request):
     return render(request, 'basic/doctor_taketest.html')
@@ -33,7 +33,7 @@ def doctor_user_login(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            # Authentication is successfull
+            # Authentication is successful
             login(request, user)
             return redirect("basic:doctor-dashboard")  # Redirecting to the dashboard
         else:
@@ -81,9 +81,6 @@ def test_page(request):
     return render(request, "basic/test_page.html")
 
 
-#def take_test(request):
- #   return render(request, "basic/take_test.html")
-
 def take_test(request):
     test_id = request.GET.get("test_id")
     if not test_id:
@@ -94,10 +91,8 @@ def take_test(request):
 
 
 import random
-from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from .models import TestSession, Stimuli
-
 
 
 def generate_test(request):
@@ -125,12 +120,15 @@ def generate_test(request):
     # Store the order as a comma-separated string
     stimuli_order_str = ",".join(map(str, selected_order))
 
+    test_uuid = str(uuid.uuid4())
+
     # Create the test session
     test_session = TestSession.objects.create(
         doctor=request.user,
         age=age,
         language=language,
-        stimuli_order=stimuli_order_str  # Store as text
+        stimuli_order=stimuli_order_str,
+        test_id=test_uuid,
     )
 
     # Generate responses
@@ -145,56 +143,45 @@ def generate_test(request):
             "stimulus": stimulus.stim_id,
         })
 
+    test_link = f"http://localhost:8000/basic/test/intro/?test_id={test_uuid}"
+
     return JsonResponse({
-        # "test_id": test_session.test_id,
-        # "language": test_session.language,
-        # "stimuli_order": stimuli_order_str,  # Return order for verification
-        # "responses": responses,
-        "link": f"http://localhost:8000/basic/test/intro/?test_id={test_session.test_id}"
+        "message": "Test generated successfully.",
+        "link": test_link,
+        "copy_paste": f"Copy this link to access the test:\n{test_link}"
     })
 
 
-@csrf_exempt  # Disable CSRF for simplicity (use proper authentication in production)
-def record_responses_bulk(request):
+def test_statistics(request, test_id):
+    test_session = get_object_or_404(TestSession, test_id=test_id)
+    responses = Response.objects.filter(test=test_session)
+
+    total_responses = responses.count()
+    correct_responses = responses.filter(is_correct=True).count()
+    avg_latency = responses.aggregate(models.Avg('latencies'))['latencies__avg'] or 0
+
+    accuracy = (correct_responses / total_responses) * 100 if total_responses else 0
+
+    chart_data = {
+        'labels': ['Accuracy (%)', 'Avg Latency (ms)', 'Total Responses'],
+        'values': [accuracy, avg_latency, total_responses]
+    }
+
+    # Pass the chart_data to the template
+    return render(request, 'basic/test_statistics.html', {'test_id': test_id, 'chart_data': chart_data})
+
+
+@csrf_exempt
+def submit_all_responses(request):
     if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            responses_data = data.get("responses", [])
-
-            if not responses_data:
-                return JsonResponse({"error": "No responses provided."}, status=400)
-
-            with transaction.atomic():  # Ensures all updates succeed or none do
-                for response_entry in responses_data:
-                    response_id = response_entry.get("response_id")
-                    user_response = response_entry.get("response")
-                    latency = response_entry.get("latency")
-                    is_correct = response_entry.get("is_correct")
-
-                    response = get_object_or_404(Response, response_id=response_id)
-                    response.response = user_response
-                    response.latency = latency
-                    response.is_correct = is_correct
-                    response.save()
-
-                    test_session = response.test
-
-                stats = test_session.response_set.aggregate(
-                    avg_latency=models.Avg("latency"),
-                    total_responses=models.Count("response_id"),
-                    correct_responses=models.Count("response_id", filter=models.Q(is_correct=True))
-                )
-                test_session.avg_latency = stats["avg_latency"]
-                test_session.accuracy = (stats["correct_responses"] / stats["total_responses"]) * 100 if stats[
-                    "total_responses"] else 0
-                test_session.save()
-
-            return JsonResponse({"message": "Responses recorded successfully."})
-
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON data."}, status=400)
-
-    return JsonResponse({"error": "Invalid request method."}, status=405)
+        data = json.loads(request.body)
+        for item in data["responses"]:
+            response = Response.objects.get(response_id=item["response_id"])
+            response.response = item["response"]
+            response.latencies = item["latencies"]
+            response.is_correct = (item["response"] == response.stim.correct_response)
+            response.save()
+        return JsonResponse({"status": "success"})
 
 
 from django.http import JsonResponse
@@ -206,7 +193,7 @@ def get_responses(request):
     responses = Response.objects.filter(test_id=test_id).select_related('stim')
 
     data = [
-        {"response_id": r.response_id, "stimulus_text": r.stim.stimulus, "stimulus_type" : r.stim.type}
+        {"response_id": r.response_id, "stimulus_text": r.stim.stimulus, "stimulus_type": r.stim.type}
         for r in responses
     ]
 
@@ -277,8 +264,8 @@ def practice_test(request):
 
     return render(request, "basic/practice_test.html", {"test_id": test_id})
 
-def get_practice_responses(request):
 
+def get_practice_responses(request):
     practice_stimuli = Stimuli.objects.filter(type="Practice")[:2]
     data = [{"stimulus_text": s.stimulus} for s in practice_stimuli]
     return JsonResponse({"responses": data})
@@ -294,8 +281,6 @@ def practice_transition(request):
 
 def test_complete(request):
     return render(request, "basic/test_complete.html")
-
-
 
 
 def export_test_data(request):
@@ -316,11 +301,12 @@ def export_test_data(request):
             resp.response,
             resp.stim.correct_response,
             "Yes" if resp.is_correct else "No",
-            resp.latency
+            resp.latencies
         ])
 
     return response
 
+
 def testresults(request):
-     test_sessions = TestSession.objects.all()  # Retrieve all test sessions
-     return render(request, "basic/testresults.html", {"test_sessions": test_sessions})
+    test_sessions = TestSession.objects.all()  # Retrieve all test sessions
+    return render(request, "basic/testresults.html", {"test_sessions": test_sessions})
