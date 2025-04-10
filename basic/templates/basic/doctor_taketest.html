@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Session</title>
-    <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"/>
     <script>
         let responses = [];
         let currentIndex = 0;
@@ -90,34 +91,34 @@
     </script>
 </head>
 <body>
-    <h1>Test Session</h1>
-    <p id="stimulus"></p>
-    <p id="user-response">Your Response:</p>
+<h1>Test Session</h1>
+<p id="stimulus"></p>
+<p id="user-response">Your Response:</p>
 
-    <div class="button-container">
-        <div class="number-buttons">
-            <button onclick="submitResponse('1')">1</button>
-            <button onclick="submitResponse('2')">2</button>
-            <button onclick="submitResponse('3')">3</button>
-            <button onclick="submitResponse('4')">4</button>
-            <button onclick="submitResponse('5')">5</button>
-            <button onclick="submitResponse('6')">6</button>
-            <button onclick="submitResponse('7')">7</button>
-            
-            <button onclick="submitResponse('9')">9</button>
-            
-        </div>
+<div class="button-container">
+    <div class="number-buttons">
+        <button onclick="submitResponse('1')">1</button>
+        <button onclick="submitResponse('2')">2</button>
+        <button onclick="submitResponse('3')">3</button>
+        <button onclick="submitResponse('4')">4</button>
+        <button onclick="submitResponse('5')">5</button>
+        <button onclick="submitResponse('6')">6</button>
+        <button onclick="submitResponse('7')">7</button>
 
-        <div class="letter-buttons">
-            <button onclick="submitResponse('A')">A</button>
-            <button onclick="submitResponse('B')">B</button>
-            <button onclick="submitResponse('C')">C</button>
-            <button onclick="submitResponse('D')">D</button>
-            <button onclick="submitResponse('E')">E</button>
-            <button onclick="submitResponse('F')">F</button>
-            <button onclick="submitResponse('G')">G</button>
-            <button onclick="submitResponse('H')">H</button>
-        </div>
+        <button onclick="submitResponse('9')">9</button>
+
     </div>
+
+    <div class="letter-buttons">
+        <button onclick="submitResponse('A')">A</button>
+        <button onclick="submitResponse('B')">B</button>
+        <button onclick="submitResponse('C')">C</button>
+        <button onclick="submitResponse('D')">D</button>
+        <button onclick="submitResponse('E')">E</button>
+        <button onclick="submitResponse('F')">F</button>
+        <button onclick="submitResponse('G')">G</button>
+        <button onclick="submitResponse('H')">H</button>
+    </div>
+</div>
 </body>
 </html>

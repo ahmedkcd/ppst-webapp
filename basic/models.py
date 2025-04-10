@@ -5,7 +5,7 @@ from django.db.models import Avg
 
 # TestSession now references User instead of Doctor
 class TestSession(models.Model):
-    test_id = models.AutoField(primary_key=True)
+    test_id = models.TextField(primary_key=True)
     doctor = models.ForeignKey(User, on_delete=models.CASCADE)  # Link to built-in User model
     age = models.IntegerField()
     date = models.DateTimeField(null=True)

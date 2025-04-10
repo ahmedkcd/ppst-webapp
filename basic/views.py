@@ -1,5 +1,6 @@
 import csv
 import json
+import uuid
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -32,13 +33,13 @@ def doctor_user_login(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            # Authentication is successfull
+            # Authentication is successful
             login(request, user)
             return redirect("basic:doctor-dashboard")  # Redirecting to the dashboard
         else:
             # Authentication is denied
             messages.error(request, "Invalid username or password")
-            return redirect("basic:doctor-login")  # Redirecting to the login page, when refreshed
+            return  redirect("basic:doctor-login") # Redirecting to the login page, when refreshed
 
     return render(request, "basic/doctor_login.html")
 
@@ -46,49 +47,39 @@ def doctor_user_login(request):
 @login_required(login_url='/basic/')
 def doctor_dashboard(request):
     return render(request, 'basic/doctor_dashboard.html')
-
-
+    
 @login_required(login_url='/basic/')
 def doctor_results(request):
     test_sessions = TestSession.objects.filter(doctor=request.user)
     return render(request, 'basic/doctor_results.html', {'test_sessions': test_sessions})
-
-
+    
 @login_required(login_url='/basic/')
 def doctor_statistics(request):
     return render(request, 'basic/doctor_statistics.html')
-
-
+    
 @login_required(login_url='/basic/')
 def doctor_newtest(request):
     return render(request, "basic/doctor_newtest.html")
 
-
 def base(request):
     return render(request, "basic/base.html")
 
-
 def landing(request):
-    total_tests = TestSession.objects.count()  # Count all test sessions
-    total_doctors = User.objects.filter(testsession__isnull=False).distinct().count()  # Count unique doctors with tests
+     total_tests = TestSession.objects.count()  # Count all test sessions
+     total_doctors = User.objects.filter(testsession__isnull=False).distinct().count()  # Count unique doctors with tests
 
-    return render(request, "basic/landing.html", {
+     return render(request, "basic/landing.html", {
         "total_tests": total_tests,
         "total_doctors": total_doctors,
     })
-
-
 def doctor_logout_view(request):
-    logout(request)
-    return redirect('basic:landing')
+    logout(request)  
+    return redirect('basic:landing') 
 
 
 def test_page(request):
     return render(request, "basic/test_page.html")
 
-
-# def take_test(request):
-#   return render(request, "basic/take_test.html")
 
 def take_test(request):
     test_id = request.GET.get("test_id")
@@ -129,12 +120,15 @@ def generate_test(request):
     # Store the order as a comma-separated string
     stimuli_order_str = ",".join(map(str, selected_order))
 
+    test_uuid = str(uuid.uuid4())
+
     # Create the test session
     test_session = TestSession.objects.create(
         doctor=request.user,
         age=age,
         language=language,
-        stimuli_order=stimuli_order_str  # Store as text
+        stimuli_order=stimuli_order_str,
+        test_id=test_uuid,
     )
 
     # Generate responses
@@ -149,56 +143,32 @@ def generate_test(request):
             "stimulus": stimulus.stim_id,
         })
 
+    test_link = f"http://localhost:8000/basic/test/intro/?test_id={test_uuid}"
+
     return JsonResponse({
-        # "test_id": test_session.test_id,
-        # "language": test_session.language,
-        # "stimuli_order": stimuli_order_str,  # Return order for verification
-        # "responses": responses,
-        "link": f"http://localhost:8000/basic/test/intro/?test_id={test_session.test_id}"
+        "message": "Test generated successfully.",
+        "link": test_link,
+        "copy_paste": f"Copy this link to access the test:\n{test_link}"
     })
 
 
-@csrf_exempt  # Disable CSRF for simplicity (use proper authentication in production)
-def record_responses_bulk(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            responses_data = data.get("responses", [])
+def test_statistics(request, test_id):
+    test_session = get_object_or_404(TestSession, test_id=test_id)
+    responses = Response.objects.filter(test=test_session)
 
-            if not responses_data:
-                return JsonResponse({"error": "No responses provided."}, status=400)
+    total_responses = responses.count()
+    correct_responses = responses.filter(is_correct=True).count()
+    avg_latency = responses.aggregate(models.Avg('latencies'))['latencies__avg'] or 0
 
-            with transaction.atomic():  # Ensures all updates succeed or none do
-                for response_entry in responses_data:
-                    response_id = response_entry.get("response_id")
-                    user_response = response_entry.get("response")
-                    latency = response_entry.get("latency")
-                    is_correct = response_entry.get("is_correct")
+    accuracy = (correct_responses / total_responses) * 100 if total_responses else 0
 
-                    response = get_object_or_404(Response, response_id=response_id)
-                    response.response = user_response
-                    response.latency = latency
-                    response.is_correct = is_correct
-                    response.save()
+    chart_data = {
+        'labels': ['Accuracy (%)', 'Avg Latency (ms)', 'Total Responses'],
+        'values': [accuracy, avg_latency, total_responses]
+    }
 
-                    test_session = response.test
-
-                stats = test_session.response_set.aggregate(
-                    avg_latency=models.Avg("latency"),
-                    total_responses=models.Count("response_id"),
-                    correct_responses=models.Count("response_id", filter=models.Q(is_correct=True))
-                )
-                test_session.avg_latency = stats["avg_latency"]
-                test_session.accuracy = (stats["correct_responses"] / stats["total_responses"]) * 100 if stats[
-                    "total_responses"] else 0
-                test_session.save()
-
-            return JsonResponse({"message": "Responses recorded successfully."})
-
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON data."}, status=400)
-
-    return JsonResponse({"error": "Invalid request method."}, status=405)
+    # Pass the chart_data to the template
+    return render(request, 'basic/test_statistics.html', {'test_id': test_id, 'chart_data': chart_data})
 
 
 @csrf_exempt
@@ -305,11 +275,9 @@ def practice_countdown(request):
     test_id = request.GET.get("test_id")
     return render(request, "basic/practice_countdown.html", {"test_id": test_id})
 
-
 def practice_transition(request):
     test_id = request.GET.get("test_id")
     return render(request, "basic/practice_transition.html", {"test_id": test_id})
-
 
 def test_complete(request):
     return render(request, "basic/test_complete.html")
@@ -337,3 +305,8 @@ def export_test_data(request):
         ])
 
     return response
+
+
+def testresults(request):
+    test_sessions = TestSession.objects.all()  # Retrieve all test sessions
+    return render(request, "basic/testresults.html", {"test_sessions": test_sessions})
