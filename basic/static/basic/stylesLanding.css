@@ -14,7 +14,7 @@ body {
     justify-content: center;
     align-items: center;
     text-align: center;
-    overflow-x:hidden;
+    overflow-x: hidden;
 }
 
 .header {
@@ -29,7 +29,7 @@ body {
     align-items: center;
     padding-left: 20px;
     z-index: 1000;
-    overflow-x:hidden;
+    overflow-x: hidden;
 }
 
 .header-text {
@@ -74,7 +74,7 @@ h1 {
     margin-bottom: 20px;
     opacity: 0;
     transform: scale(0.8);
-    
+
 }
 
 .button-container {
@@ -155,7 +155,7 @@ h1 {
     color: #0d0d0d;
     text-align: center;
     height: 100vh;
-    
+
 }
 
 .stat {
@@ -184,12 +184,15 @@ h1 {
     h1 {
         font-size: 12vw;
     }
+
     .stats-section {
         gap: 50px;
     }
+
     .stat-number {
         font-size: 10vh;
     }
+
     .info-heading {
         font-size: 2.5rem;
     }
@@ -236,23 +239,27 @@ h1 {
         font-size: 8vw;
         margin-bottom: 15px;
     }
+
     .btn {
         font-size: 0.9rem;
     }
+
     .stat-number {
         font-size: 4rem;
     }
+
     .info-heading {
         font-size: 1.8rem;
     }
+
     .features-heading {
         font-size: 28px;
     }
 }
 
-.header a{
+.header a {
     text-decoration: none;
-    color:inherit;
+    color: inherit;
     transition: font-size 0.2s ease-in-out;
 }
 
