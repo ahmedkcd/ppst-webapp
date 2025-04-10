@@ -128,16 +128,22 @@
                 stimulusText = responses[currentIndex].stimulus_text;
                 charIndex = 0;
                 userInput = "";
+
+                // Show stimulus again
+                document.getElementById("stimulus").style.display = "block";
                 document.getElementById("buttons").style.display = "none";
                 document.getElementById("next-stimulus-btn").style.display = "none";
+
                 showNextCharacter();
             } else {
                 document.getElementById("stimulus").textContent = "Practice Complete!";
+                document.getElementById("stimulus").style.display = "block";
                 document.getElementById("buttons").style.display = "none";
                 document.getElementById("next-stimulus-btn").style.display = "none";
                 document.getElementById("next-btn").style.display = "block";
             }
         }
+
 
         function showNextCharacter() {
             const stimEl = document.getElementById("stimulus");
@@ -163,13 +169,26 @@
             const sound = document.getElementById("submitSound");
             sound.currentTime = 0;
             sound.play();
+
+            document.getElementById("stimulus").style.display = "none";
+            document.getElementById("buttons").style.display = "none";
+            document.getElementById("next-stimulus-btn").style.display = "none";
+
             currentIndex++;
             startCountdown();
         }
 
+
         function proceedToRealTest() {
-            window.location.href = `/basic/practice/transition/?test_id=${testId}`;
+            const audio = document.getElementById("buttonClick");
+            audio.currentTime = 0;
+            audio.play();
+
+            setTimeout(() => {
+                window.location.href = `/basic/practice/transition/?test_id=${testId}`;
+            }, 250);
         }
+
 
         window.onload = fetchPracticeStimuli;
     </script>
@@ -204,6 +223,8 @@
     <div class="proceed-btn-wrapper" id="next-btn">
         <button onclick="proceedToRealTest()">Proceed to Real Test</button>
     </div>
+    <audio id="buttonClick" src="{% static 'basic/sounds/intro-button.mp3' %}"></audio>
+
 </body>
 
 </html>
