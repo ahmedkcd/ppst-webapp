@@ -12,7 +12,7 @@ ENV/
 
 # Django-related files
 *.log
-db.sqlite3  # Ignore SQLite database (if using PostgreSQL, this is unnecessary)
+db.sqlite3  # Ignore SQLite database
 media/  # Ignore user-uploaded files (optional, unless stored externally)
 staticfiles/  # Collected static files (generated via `collectstatic`)
 

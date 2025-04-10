@@ -15,27 +15,40 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            margin: 0;
+            padding: 30px;
         }
 
         .transition-box {
             background-color: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 600px;
-            max-width: 90%;
+            border-radius: 18px;
+            padding: 60px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            width: 1000px;
+            max-width: 95%;
         }
 
         .transition-box h2 {
-            margin-bottom: 10px;
+            font-size: 3rem;
+            margin-bottom: 30px;
+        }
+
+        .transition-box p,
+        .transition-box li {
+            font-size: 1.75rem;
+            line-height: 2.2rem;
         }
 
         .transition-box ul {
-            padding-left: 20px;
+            padding-left: 30px;
+            margin-top: 20px;
+            margin-bottom: 30px;
         }
 
-        .transition-box ul li {
-            margin-bottom: 10px;
+        #countdown {
+            font-weight: bold;
+            font-size: 2rem;
+            color: #6c5ce7;
         }
     </style>
     <script>
@@ -55,23 +68,20 @@
             }, 1000);
         };
     </script>
-
-
 </head>
 
 <body>
-<div class="transition-box">
-    <h2>Practice Complete!</h2>
-    <p>You’ve completed the Practice Stimuli Test. Now, the real test will begin.</p>
-    <p><strong>What to Expect in the Real Test:</strong></p>
-    <ul>
-        <li>The format will be the same as the practice session.</li>
-        <li>Your responses will now be recorded for analysis.</li>
-        <li>Try to stay focused and respond as quickly and accurately as possible.</li>
-    </ul>
-    <p>Get ready! The test will begin automatically in <span id="countdown">15</span> seconds.</p>
-
-</div>
+    <div class="transition-box">
+        <h2>Practice Complete!</h2>
+        <p>You’ve completed the Practice Stimuli Test. Now, the real test will begin.</p>
+        <p><strong>What to Expect in the Real Test:</strong></p>
+        <ul>
+            <li>The format will be the same as the practice session.</li>
+            <li>Your responses will now be recorded for analysis.</li>
+            <li>Try to stay focused and respond as quickly and accurately as possible.</li>
+        </ul>
+        <p>Get ready! The test will begin automatically in <span id="countdown">15</span> seconds.</p>
+    </div>
 </body>
 
 </html>

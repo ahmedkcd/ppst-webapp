@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import models
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
@@ -38,7 +39,7 @@ def doctor_user_login(request):
         else:
             # Authentication is denied
             messages.error(request, "Invalid username or password")
-            return redirect("basic:doctor-login")  # Redirecting to the login page, when refreshed
+            return  redirect("basic:doctor-login") # Redirecting to the login page, when refreshed
 
     return render(request, "basic/doctor_login.html")
 
@@ -46,49 +47,39 @@ def doctor_user_login(request):
 @login_required(login_url='/basic/')
 def doctor_dashboard(request):
     return render(request, 'basic/doctor_dashboard.html')
-
-
+    
 @login_required(login_url='/basic/')
 def doctor_results(request):
     test_sessions = TestSession.objects.filter(doctor=request.user)
     return render(request, 'basic/doctor_results.html', {'test_sessions': test_sessions})
-
-
+    
 @login_required(login_url='/basic/')
 def doctor_statistics(request):
     return render(request, 'basic/doctor_statistics.html')
-
-
+    
 @login_required(login_url='/basic/')
 def doctor_newtest(request):
     return render(request, "basic/doctor_newtest.html")
 
-
 def base(request):
     return render(request, "basic/base.html")
 
-
 def landing(request):
-    total_tests = TestSession.objects.count()  # Count all test sessions
-    total_doctors = User.objects.filter(testsession__isnull=False).distinct().count()  # Count unique doctors with tests
+     total_tests = TestSession.objects.count()  # Count all test sessions
+     total_doctors = User.objects.filter(testsession__isnull=False).distinct().count()  # Count unique doctors with tests
 
-    return render(request, "basic/landing.html", {
+     return render(request, "basic/landing.html", {
         "total_tests": total_tests,
         "total_doctors": total_doctors,
     })
-
-
 def doctor_logout_view(request):
-    logout(request)
-    return redirect('basic:landing')
+    logout(request)  
+    return redirect('basic:landing') 
 
 
 def test_page(request):
     return render(request, "basic/test_page.html")
 
-
-# def take_test(request):
-#   return render(request, "basic/take_test.html")
 
 def take_test(request):
     test_id = request.GET.get("test_id")
@@ -178,6 +169,19 @@ def test_statistics(request, test_id):
 
     # Pass the chart_data to the template
     return render(request, 'basic/test_statistics.html', {'test_id': test_id, 'chart_data': chart_data})
+
+
+@csrf_exempt
+def submit_all_responses(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        for item in data["responses"]:
+            response = Response.objects.get(response_id=item["response_id"])
+            response.response = item["response"]
+            response.latencies = item["latencies"]
+            response.is_correct = (item["response"] == response.stim.correct_response)
+            response.save()
+        return JsonResponse({"status": "success"})
 
 
 from django.http import JsonResponse
@@ -271,11 +275,9 @@ def practice_countdown(request):
     test_id = request.GET.get("test_id")
     return render(request, "basic/practice_countdown.html", {"test_id": test_id})
 
-
 def practice_transition(request):
     test_id = request.GET.get("test_id")
     return render(request, "basic/practice_transition.html", {"test_id": test_id})
-
 
 def test_complete(request):
     return render(request, "basic/test_complete.html")
