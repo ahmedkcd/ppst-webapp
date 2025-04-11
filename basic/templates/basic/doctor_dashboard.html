@@ -1,10 +1,95 @@
-{% extends 'basic/base.html' %} {% block title %}Dashboard{% endblock %} {%block content %}
+{% extends 'basic/base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
 <h1>Dashboard</h1>
-<p>Welcome, {{user.username}}!</p>
-<h3>Quick Overview of Test</h3>
+<p>Welcome, {{ user.username }}!</p>
+
+<h3>Quick Overview of Tests:</h3>
 <ul>
-  <li>Active Tests: X</li>
-  <li>Pending Results: X</li>
-  <li>Completed Tests: X</li>
+  <li>Total Tests: {{ total_tests }}</li>
+  <li>Active Tests: {{ active_tests }}</li>
+  <li>Pending Tests: {{ pending_tests }}</li>
 </ul>
+
+<h4>Recent Completed Tests (Top 10):</h4>
+<ul>
+  {% for test in recent_tests %}
+    <li>{{ test.date|date:"M d, Y" }} - Accuracy: {{ test.accuracy|floatformat:2 }}%</li>
+  {% empty %}
+    <li>No recent tests available.</li>
+  {% endfor %}
+</ul>
+
+{% if scores %}
+  <h4>Accuracy Over Past 10 Tests:</h4>
+  <canvas id="testGraph"></canvas>
+  <style>
+    #testGraph {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+
+  <!-- ✅ Inject JSON data into the DOM -->
+  <script id="labels-data" type="application/json">{{ labels|safe }}</script>
+  <script id="scores-data" type="application/json">{{ scores|safe }}</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById("testGraph").getContext("2d");
+
+const labels = JSON.parse(document.getElementById("labels-data").textContent);
+const data = JSON.parse(document.getElementById("scores-data").textContent);
+
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [{
+      label: "Test Accuracy (%)",
+      data: data,
+      backgroundColor: "rgba(54, 162, 235, 0.6)",
+      borderColor: "rgba(54, 162, 235, 1)",
+      borderWidth: 1,
+      borderRadius: 6, // Rounded corners on bars
+      hoverBackgroundColor: "rgba(54, 162, 235, 0.8)"
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: {
+        display: true,
+        text: "Accuracy Over Last 10 Completed Tests"
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 100,
+        title: {
+          display: true,
+          text: "Accuracy (%)"
+        }
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Test Date"
+        }
+      }
+    }
+  }
+});
+</script>
+
+{% else %}
+  <p>No data available for chart.</p>
+{% endif %}
+
 {% endblock %}
