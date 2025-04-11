@@ -151,7 +151,6 @@ def generate_test(request):
         "copy_paste": f"Copy this link to access the test:\n{test_link}"
     })
 
-
 def test_statistics(request, test_id):
     test_session = get_object_or_404(TestSession, test_id=test_id)
     responses = Response.objects.filter(test=test_session)
@@ -164,10 +163,12 @@ def test_statistics(request, test_id):
 
     chart_data = {
         'labels': ['Accuracy (%)', 'Avg Latency (ms)', 'Total Responses'],
-        'values': [accuracy, avg_latency, total_responses]
+        'values': [accuracy, avg_latency, total_responses],
+        'accuracy': accuracy,
+        'avg_latency': avg_latency,
+        'total_responses': total_responses
     }
 
-    # Pass the chart_data to the template
     return render(request, 'basic/test_statistics.html', {'test_id': test_id, 'chart_data': chart_data})
 
 
