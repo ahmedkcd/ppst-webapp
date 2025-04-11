@@ -39,6 +39,5 @@ urlpatterns = [
     path('doctor-testpage', doctor_test_page, name='doctor-testpage'),
     path("testresults/", testresults, name="testresults"),
     path("export_test_data/", export_test_data, name="export_test_data"),
-    path("test_statistics/<int:test_id>/", test_statistics, name="test_statistics"),
-
-]
+    path("test_statistics/<str:test_id>/", test_statistics, name="test_statistics")
+    ]
