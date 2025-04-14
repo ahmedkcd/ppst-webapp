@@ -1,8 +1,10 @@
-import django
 import os
 from datetime import timedelta
-from django.utils import timezone
+
+import django
 from django.contrib.auth.models import User
+from django.utils import timezone
+
 from basic.models import TestSession, Stimuli, Response
 
 # Setup Django environment (useful if running outside `manage.py shell`)
@@ -15,6 +17,7 @@ for model in [TestSession, Stimuli, Response]:
 
 print("Existing data cleared.")
 
+
 # Ensure unique users
 def get_or_create_user(username, email):
     user, created = User.objects.get_or_create(username=username, defaults={"email": email})
@@ -23,6 +26,7 @@ def get_or_create_user(username, email):
         user.is_staff = False  # admin access
         user.save()
     return user
+
 
 # Create or retrieve sample doctors
 doctors = [
@@ -34,10 +38,12 @@ print(f"Doctors in database: {[doctor.username for doctor in doctors]}")
 
 # Create test sessions
 test_sessions = [
-    TestSession.objects.create(doctor=doctors[0], age=35, date=timezone.now(), duration=timedelta(minutes=30)),
-    TestSession.objects.create(doctor=doctors[1], age=40, date=timezone.now(), duration=timedelta(hours=1)),
-    TestSession.objects.create(doctor=doctors[0], age=47, date=timezone.now(), duration=timedelta(hours=1)),
-    TestSession.objects.create(doctor=doctors[1], age=38, date=timezone.now(), duration=timedelta(minutes=30)),
+    TestSession.objects.create(doctor=doctors[0], age=35, date=timezone.now(), duration=timedelta(minutes=30),
+                               test_id=1),
+    TestSession.objects.create(doctor=doctors[1], age=40, date=timezone.now(), duration=timedelta(hours=1), test_id=2),
+    TestSession.objects.create(doctor=doctors[0], age=47, date=timezone.now(), duration=timedelta(hours=1), test_id=3),
+    TestSession.objects.create(doctor=doctors[1], age=38, date=timezone.now(), duration=timedelta(minutes=30),
+                               test_id=4),
 ]
 
 print(f"Created test sessions: {[session.test_id for session in test_sessions]}")
@@ -60,7 +66,7 @@ stimuli_data = [
     ("G9R2", "29GR", 4, "AlphaNumeric"),
 
     # Alphanumeric (5-span)
-    ("RHL2M", "12HMR", 5, "AlphaNumeric"),
+    ("RH12M", "12HMR", 5, "AlphaNumeric"),
     ("B9Y4X", "49BXY", 5, "AlphaNumeric"),
     ("F5M1R", "15FMR", 5, "AlphaNumeric"),
 

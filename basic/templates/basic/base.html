@@ -1,152 +1,154 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{% block title %}Dashboard{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'basic/styles1.css' %}" />
+    <link rel="stylesheet" href="{% static 'basic/styles1.css' %}"/>
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+            rel="stylesheet"
     />
-  </head>
-  <body id="body-pd">
-    <header class="header" id="header">
-      <div class="header_toggle">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+<body id="body-pd">
+<header class="header" id="header">
+    <div class="header_toggle">
         <i class="bx bx-menu" id="header-toggle">☰</i>
-      </div>
+    </div>
 
-      <div class="header-text" id="header-text">PPST</div>
+    <div class="header-text" id="header-text">PPST</div>
 
-      <div class="profile-container">
+    <div class="profile-container">
         <div class="profile-icon" id="profile-icon">
-          {{ user.first_name|slice:":1" }}
+            {{ user.first_name|slice:":1" }}
         </div>
         <div class="profile-popup" id="profile-popup">
-          <p class="profile-welcome">Welcome</p>
-          <p class="profile-name">Dr.{{user.first_name}} {{user.last_name}}</p>
-          <form
-            id="logout-form"
-            method="POST"
-            action="{% url 'basic:doctor-logout' %}"
-          >
-            {% csrf_token %}
-            <button class="signout-btn" type="submit">Sign Out</button>
-          </form>
+            <p class="profile-welcome">Welcome</p>
+            <p class="profile-name">Dr.{{ user.first_name }} {{ user.last_name }}</p>
+            <form
+                    id="logout-form"
+                    method="POST"
+                    action="{% url 'basic:doctor-logout' %}"
+            >
+                {% csrf_token %}
+                <button class="signout-btn" type="submit">Sign Out</button>
+            </form>
         </div>
-      </div>
-    </header>
+    </div>
+</header>
 
-    <nav class="sidebar" id="nav-bar">
-      <ul>
+<nav class="sidebar" id="nav-bar">
+    <ul>
         <li
-          class="nav_item {% if request.path == '/basic/doctor-newtest' %}active{% endif %}"
+                class="nav_item {% if request.path == '/basic/doctor-newtest' %}active{% endif %}"
         >
-          <a href="{% url 'basic:doctor-newtest' %}">
+            <a href="{% url 'basic:doctor-newtest' %}">
             <span class="nav_icon" id="create-test">
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-6"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="size-6"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 4.5v15m7.5-7.5h-15"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 4.5v15m7.5-7.5h-15"
                 />
               </svg>
             </span>
-            <span class="nav_text"> Create New Test </span>
-          </a>
+                <span class="nav_text"> Create New Test </span>
+            </a>
         </li>
         <li
-          class="nav_item {% if request.path == '/basic/doctor-dashboard' %}active{% endif %}"
+                class="nav_item {% if request.path == '/basic/doctor-dashboard' %}active{% endif %}"
         >
-          <a href="{% url 'basic:doctor-dashboard' %}">
+            <a href="{% url 'basic:doctor-dashboard' %}">
             <span class="nav_icon">
               <img
-                src="{% static 'basic/icon.png' %}"
-                alt="Dashboard Icon"
-                class="icon-img"
+                      src="{% static 'basic/icon.png' %}"
+                      alt="Dashboard Icon"
+                      class="icon-img"
               />
             </span>
-            <span class="nav_text">Dashboard</span>
-          </a>
-        </li>
-
-        <li
-          class="nav_item {% if request.path == '/basic/doctor-results' %}active{% endif %}"
-        >
-          <a href="{% url 'basic:doctor-results' %}">
-            <span class="nav_icon">
-              <img
-                src="{% static 'basic/icon.png' %}"
-                alt="Results Icon"
-                class="icon-img"
-              />
-            </span>
-            <span class="nav_text">Results</span>
-          </a>
+                <span class="nav_text">Dashboard</span>
+            </a>
         </li>
 
         <li
-          class="nav_item {% if request.path == '/basic/doctor-statistics' %}active{% endif %}"
+                class="nav_item {% if request.path == '/basic/doctor-results' %}active{% endif %}"
         >
-          <a href="{% url 'basic:doctor-statistics' %}">
+            <a href="{% url 'basic:doctor-results' %}">
             <span class="nav_icon">
               <img
-                src="{% static 'basic/icon.png' %}"
-                alt="Statistics Icon"
-                class="icon-img"
+                      src="{% static 'basic/icon.png' %}"
+                      alt="Results Icon"
+                      class="icon-img"
               />
             </span>
-            <span class="nav_text">Statistics</span>
-          </a>
+                <span class="nav_text">Results</span>
+            </a>
         </li>
-      </ul>
-    </nav>
 
-    <main class="content">{% block content %}{% endblock %}</main>
+        <li
+                class="nav_item {% if request.path == '/basic/doctor-statistics' %}active{% endif %}"
+        >
+            <a href="{% url 'basic:doctor-statistics' %}">
+            <span class="nav_icon">
+              <img
+                      src="{% static 'basic/icon.png' %}"
+                      alt="Statistics Icon"
+                      class="icon-img"
+              />
+            </span>
+                <span class="nav_text">Statistics</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
+<main class="content">{% block content %}{% endblock %}</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
         const toggle = document.getElementById("header-toggle");
         const nav = document.getElementById("nav-bar");
         const bodypd = document.getElementById("body-pd");
         const header = document.getElementById("header"); // Reference to header
 
         if (toggle && nav && bodypd) {
-          toggle.addEventListener("click", () => {
-            nav.classList.toggle("show");
-            bodypd.classList.toggle("body-pd");
+            toggle.addEventListener("click", () => {
+                nav.classList.toggle("show");
+                bodypd.classList.toggle("body-pd");
 
-            // Adjust header width dynamically
-          });
+                // Adjust header width dynamically
+            });
         }
-      });
+    });
 
-      document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
         const profileIcon = document.getElementById("profile-icon");
         const profilePopup = document.getElementById("profile-popup");
 
         profileIcon.addEventListener("click", function () {
-          profilePopup.classList.toggle("show");
+            profilePopup.classList.toggle("show");
         });
 
         // Close popup when clicking outside
         document.addEventListener("click", function (event) {
-          if (
-            !profileIcon.contains(event.target) &&
-            !profilePopup.contains(event.target)
-          ) {
-            profilePopup.classList.remove("show");
-          }
+            if (
+                !profileIcon.contains(event.target) &&
+                !profilePopup.contains(event.target)
+            ) {
+                profilePopup.classList.remove("show");
+            }
         });
-      });
-    </script>
-  </body>
+    });
+</script>
+</body>
 </html>

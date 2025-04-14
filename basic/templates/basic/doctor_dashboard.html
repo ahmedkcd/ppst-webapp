@@ -31,7 +31,6 @@
     }
   </style>
 
-  <!-- ✅ Inject JSON data into the DOM -->
   <script id="labels-data" type="application/json">{{ labels|safe }}</script>
   <script id="scores-data" type="application/json">{{ scores|safe }}</script>
 
@@ -39,54 +38,54 @@
   <script>
     const ctx = document.getElementById("testGraph").getContext("2d");
 
-const labels = JSON.parse(document.getElementById("labels-data").textContent);
-const data = JSON.parse(document.getElementById("scores-data").textContent);
+    const labels = JSON.parse(document.getElementById("labels-data").textContent);
+    const data = JSON.parse(document.getElementById("scores-data").textContent);
 
-new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: labels,
-    datasets: [{
-      label: "Test Accuracy (%)",
-      data: data,
-      backgroundColor: "rgba(54, 162, 235, 0.6)",
-      borderColor: "rgba(54, 162, 235, 1)",
-      borderWidth: 1,
-      borderRadius: 6, // Rounded corners on bars
-      hoverBackgroundColor: "rgba(54, 162, 235, 0.8)"
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      title: {
-        display: true,
-        text: "Accuracy Over Last 10 Completed Tests"
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Test Accuracy (%)",
+          data: data,
+          backgroundColor: "rgba(54, 162, 235, 0.6)",
+          borderColor: "rgba(54, 162, 235, 1)",
+          borderWidth: 1,
+          borderRadius: 6,
+          hoverBackgroundColor: "rgba(54, 162, 235, 0.8)"
+        }]
       },
-      tooltip: {
-        mode: 'index',
-        intersect: false
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        max: 100,
-        title: {
-          display: true,
-          text: "Accuracy (%)"
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: "Accuracy Over Last 10 Completed Tests"
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: "Accuracy (%)"
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: "Test Date"
+            }
+          }
         }
-      },
-      x: {
-        title: {
-          display: true,
-          text: "Test Date"
-        }
       }
-    }
-  }
-});
-</script>
+    });
+  </script>
 
 {% else %}
   <p>No data available for chart.</p>

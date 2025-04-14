@@ -11,7 +11,7 @@ class TestSession(models.Model):
         ('total', 'Total'),
     ]
 
-    test_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # ✅ changed from AutoField to UUIDField
+    test_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     doctor = models.ForeignKey(User, on_delete=models.CASCADE)
     age = models.IntegerField()
     date = models.DateTimeField(null=True)
