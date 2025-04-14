@@ -8,7 +8,7 @@ class TestSession(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('active', 'Active'),
-        ('completed', 'Completed'),
+        ('total', 'Total'),
     ]
 
     test_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # ✅ changed from AutoField to UUIDField
