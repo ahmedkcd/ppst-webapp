@@ -5,6 +5,7 @@
 <h1>Dashboard</h1>
 <p>Welcome, {{ user.username }}!</p>
 
+<!-- Quick Overview Section -->
 <h3>Quick Overview of Tests:</h3>
 <ul>
   <li>Total Tests: {{ total_tests }}</li>
@@ -12,6 +13,17 @@
   <li>Pending Tests: {{ pending_tests }}</li>
 </ul>
 
+<!-- Filter and Search Section -->
+<h4>Filter Tests:</h4>
+<form method="GET" action="">
+  <label for="start_date">Start Date:</label>
+  <input type="date" name="start_date" id="start_date">
+  <label for="end_date">End Date:</label>
+  <input type="date" name="end_date" id="end_date">
+  <button type="submit">Apply Filters</button>
+</form>
+
+<!-- Recent Completed Tests Section -->
 <h4>Recent Completed Tests (Top 10):</h4>
 <ul>
   {% for test in recent_tests %}
@@ -21,6 +33,7 @@
   {% endfor %}
 </ul>
 
+<!-- Chart Section -->
 {% if scores %}
   <h4>Accuracy Over Past 10 Tests:</h4>
   <canvas id="testGraph"></canvas>
@@ -86,9 +99,34 @@
       }
     });
   </script>
-
 {% else %}
   <p>No data available for chart.</p>
 {% endif %}
+
+<!-- Export Data Section -->
+<h4>Export Data:</h4>
+<a href="{% url 'basic:export_test_data' %}" class="btn btn-primary">Export Test Data</a>
+
+<!-- Notifications Section -->
+<h4>Notifications:</h4>
+<ul>
+  <li>You have {{ pending_tests }} tests pending approval.</li>
+  <li>{{ upcoming_tests }} tests are scheduled for tomorrow.</li>
+</ul>
+
+<!-- Dark Mode Toggle -->
+<h4>Dark Mode:</h4>
+<button id="darkModeToggle">Toggle Dark Mode</button>
+<script>
+  document.getElementById('darkModeToggle').addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+  });
+</script>
+<style>
+  .dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+  }
+</style>
 
 {% endblock %}
