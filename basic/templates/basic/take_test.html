@@ -58,9 +58,9 @@
             color: gray;
         }
 
-        {#.proceed-btn-wrapper {#}
+        /* {#.proceed-btn-wrapper {#}
         {#    display: none;#}
-        {#    margin-top: 40px;#}
+        {#    margin-top: 40px;#} */
 
         .proceed-btn-wrapper button,
         #next-stimulus-btn {
@@ -159,7 +159,7 @@
                 stimEl.textContent = currentChar;
                 charIndex++;
                 const fileName = mapToAudio(currentChar);
-                audioEl.src = `/static/basic/${fileName}`;
+                audioEl.src = `/static/basic/english/${fileName}`;
                 audioEl.play().catch(err => console.error("Audio play error:", err))
                 setTimeout(showNextCharacter, 1500);
             } else {
@@ -172,23 +172,23 @@
 
         function mapToAudio(char) {
             const map = {
-                '1': 'One.mp3',
-                '2': 'Two.mp3',
-                '3': 'Three.mp3',
-                '4': 'Four.mp3',
-                '5': 'Five.mp3',
-                '6': 'Six.mp3',
-                '7': 'Seven.mp3',
-                '8': 'Eight.mp3',
-                '9': 'Nine.mp3',
-                'B': 'B (English).mp3',
-                'F': 'F (English).mp3',
-                'G': 'G (English).mp3',
-                'H': 'H (English).mp3',
-                'M': 'M (English).mp3',
-                'R': 'R (English).mp3',
-                'X': 'X (English).mp3',
-                'Y': 'Y (English).mp3'
+                '1': '1.mp3',
+                '2': '2.mp3',
+                '3': '3.mp3',
+                '4': '4.mp3',
+                '5': '5.mp3',
+                '6': '6.mp3',
+                '7': '7.mp3',
+                '8': '8.mp3',
+                '9': '9.mp3',
+                'B': 'B.mp3',
+                'F': 'F.mp3',
+                'G': 'G.mp3',
+                'H': 'H.mp3',
+                'M': 'M.mp3',
+                'R': 'R.mp3',
+                'X': 'X.mp3',
+                'Y': 'Y.mp3'
             };
             return map[char] || `${char}.m4a`;
         }
