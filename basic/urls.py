@@ -1,18 +1,19 @@
 from django.urls import path
 
 from .views import (
-    generate_test, test_page, login_view, dashboard, logout_view, test_intro, test_instructions, take_test,
+    generate_test, test_page, dashboard, doctor_user_login, logout_view, test_intro, test_instructions, take_test,
     get_responses, submit_response, submit_all_responses, practice_test, get_practice_responses,
     practice_countdown, practice_transition, test_complete, doctor_dashboard, doctor_logout_view,
-    doctor_newtest, doctor_results, doctor_statistics, doctor_test_page, doctor_user_login,
+    doctor_newtest, doctor_results, doctor_statistics, doctor_test_page,
     base, landing, testresults, export_test_data, test_statistics
 )
+
 
 app_name = "basic"
 
 urlpatterns = [
-    path("login/", login_view, name="login"),
     path("dashboard/", dashboard, name="dashboard"),
+    path("login/", doctor_user_login, name="login"),
     path("logout/", logout_view, name="logout"),
     path("test/intro/", test_intro, name="test_intro"),
     path("test/instructions/", test_instructions, name="test_instructions"),
