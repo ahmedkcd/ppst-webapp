@@ -5,51 +5,52 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>PPST - Doctor Portal</title>
-    <link
-            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
-            rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <link rel="stylesheet" href="{% static 'basic/styleslanding.css' %}"/>
 </head>
 
 <body>
+<!-- Header -->
 <header class="header">
-    <a href="#">
-        <div class="header-text">PPST</div>
-    </a>
+    <a href="#"><div class="header-text">PPST</div></a>
     <div class="header-dashboard">
-        <a
-                href="
-                        {% if user.is_authenticated %}{% url 'basic:doctor-dashboard' %}{% else %}{% url 'basic:doctor-login' %}{% endif %}"
-        >
+        {% if user.is_authenticated %}
+            <a href="{% url 'basic:doctor-dashboard' %}">
+        {% else %}
+            <a href="{% url 'basic:doctor-login' %}">
+        {% endif %}
             <button class="btn btn-header">Open Dashboard</button>
         </a>
     </div>
 </header>
 
+<!-- Landing Content -->
 <div class="landing">
     <h1>Welcome to PPST</h1>
     <div class="button-container">
         <button class="btn btn-secondary">Contact Admin</button>
-        <a
-                href="
-                        {% if user.is_authenticated %}{% url 'basic:doctor-dashboard' %}{% else %}{% url 'basic:doctor-login' %}{% endif %}"
-        >
-            <button class="btn btn-primary">
-                {% if user.is_authenticated %} Go to Dashboard {% else %} Login {% endif %}
-            </button>
-        </a>
+
+        {% if user.is_authenticated %}
+            <a href="{% url 'basic:doctor-dashboard' %}">
+                <button class="btn btn-primary">Go to Dashboard</button>
+            </a>
+        {% else %}
+            <a href="{% url 'basic:doctor-login' %}">
+                <button class="btn btn-primary">Login</button>
+            </a>
+        {% endif %}
     </div>
 </div>
 
+<!-- About Section -->
 <div class="info-section">
     <div class="info-container">
         <h2 class="info-heading">What is PPST?</h2>
         <p class="info-text">
             The Philadelphia Spanning Test (PPST) is a cognitive assessment designed to measure working
-            memory and executive function. In this test, participants are shown a sequence of numbers a
-            nd must rearrange them in ascending order. The difficulty increases as the number of
+            memory and executive function. In this test, participants are shown a sequence of numbers
+            and must rearrange them in ascending order. The difficulty increases as the number of
             digits grows, challenging memory capacity and processing speed. PPST is widely used in
             psychological research and cognitive studies to analyze attention, learning ability,
             and neurological conditions.
@@ -57,7 +58,7 @@
     </div>
 </div>
 
-<!-- Stats Section with Animation -->
+<!-- Stats Section -->
 <div class="stats-section">
     <div class="stat">
         <span class="stat-title">Total Tests Taken</span>
@@ -96,9 +97,9 @@
     </div>
 </div>
 
+<!-- Animation Script -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // GSAP animation for landing section
         gsap.to("h1", {
             opacity: 1,
             scale: 1,
@@ -114,17 +115,15 @@
             ease: "power2.out",
         });
 
-        // Number animation function
         function animateNumber(element, targetNumber, duration = 1500) {
             let startTime = null;
-            const startNumber = Math.floor(targetNumber * 0.1); // Start with a smaller number
-            const randomOffset = Math.floor(targetNumber * 0.2); // Random flickering range
+            const startNumber = Math.floor(targetNumber * 0.1);
+            const randomOffset = Math.floor(targetNumber * 0.2);
 
             function updateNumber(currentTime) {
                 if (!startTime) startTime = currentTime;
                 const elapsedTime = currentTime - startTime;
                 const progress = Math.min(elapsedTime / duration, 1);
-
 
                 const randomFlicker = Math.floor(Math.random() * randomOffset);
                 const currentNumber = Math.floor(
@@ -152,20 +151,19 @@
             });
         }
 
-        // Trigger animation when stats section enters view
         function handleScroll() {
             const statsSection = document.querySelector(".stats-section");
             if (statsSection) {
                 const rect = statsSection.getBoundingClientRect();
                 if (rect.top < window.innerHeight * 0.75) {
                     startAnimations();
-                    window.removeEventListener("scroll", handleScroll); // Will only be animated once
+                    window.removeEventListener("scroll", handleScroll);
                 }
             }
         }
 
         window.addEventListener("scroll", handleScroll);
-        handleScroll(); // Run immediately in case it's already in view
+        handleScroll();
     });
 </script>
 </body>
