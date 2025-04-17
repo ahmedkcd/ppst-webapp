@@ -32,7 +32,7 @@ urlpatterns = [
     path("base", base, name="base"),
     path("", landing, name='landing'),
     path('doctor-logout', doctor_logout_view, name='doctor-logout'),
-    path("testresults/", test_results, name="testresults"),
+    path("test_results/", test_results, name="test_results"),
     path("export_test_data/", export_test_data, name="export_test_data"),
     path("test_statistics/<str:test_id>/", test_statistics, name="test_statistics")
 ]

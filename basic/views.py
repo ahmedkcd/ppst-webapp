@@ -72,18 +72,6 @@ def doctor_logout_view(request):
     logout(request)
     return redirect('basic:landing')
 
-
-
-
-def take_test(request):
-    test_id = request.GET.get("test_id")
-    if not test_id:
-        return HttpResponse("Error: Test ID missing", status=400)
-
-    test = get_object_or_404(TestSession, pk=test_id)
-    return render(request, "basic/english_test/test.html", {"test": test})
-
-
 import random
 from .models import TestSession, Stimuli
 
@@ -226,6 +214,14 @@ def practice_transition(request):
     test_id = request.GET.get("test_id")
     return render(request, "basic/english_test/practice_transition.html", {"test_id": test_id})
 
+def take_test(request):
+    test_id = request.GET.get("test_id")
+    if not test_id:
+        return HttpResponse("Error: Test ID missing", status=400)
+
+    test = get_object_or_404(TestSession, pk=test_id)
+    return render(request, "basic/english_test/test.html", {"test": test})
+
 def test_complete(request):
     return render(request, "basic/english_test/test_complete.html")
 
@@ -254,4 +250,38 @@ def export_test_data(request):
 def test_results(request):
     test_sessions = TestSession.objects.all()  # Retrieve all test sessions
     return render(request, "basic/dashboard/test_results.html", {"test_sessions": test_sessions})
+
+def test_intro_sp(request):
+    test_id = request.GET.get("test_id", None)
+    return render(request, "basic/spanish_test/test_intro.html", {"test_id": test_id})
+
+def test_instructions_sp(request):
+    test_id = request.GET.get("test_id", None)
+    return render(request, "basic/spanish_test/test_instructions.html", {"test_id": test_id})
+
+def practice_test_sp(request):
+    test_id = request.GET.get("test_id")
+
+    return render(request, "basic/spanish_test/practice_test.html", {"test_id": test_id})
+
+def get_practice_responses_sp(request):
+    practice_stimuli = Stimuli.objects.filter(type="Practice")[:2]
+    data = [{"stimulus_text": s.stimulus} for s in practice_stimuli]
+    return JsonResponse({"responses": data})
+
+def practice_countdown_sp(request):
+    test_id = request.GET.get("test_id")
+    return render(request, "basic/spanish_test/practice_countdown.html", {"test_id": test_id})
+
+def practice_transition_sp(request):
+    test_id = request.GET.get("test_id")
+    return render(request, "basic/spanish_test/practice_transition.html", {"test_id": test_id})
+
+def take_test_sp(request):
+    test_id = request.GET.get("test_id")
+    if not test_id:
+        return HttpResponse("Error: Test ID missing", status=400)
+
+    test = get_object_or_404(TestSession, pk=test_id)
+    return render(request, "basic/spanish_test/test.html", {"test": test})
 
