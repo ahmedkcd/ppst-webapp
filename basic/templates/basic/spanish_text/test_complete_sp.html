@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Complete</title>
+    <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 30px;
+        }
+
+        .header {
+            background-color: #f7ecfc;
+            padding: 40px 60px;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #222;
+            border-radius: 12px;
+            margin-bottom: 60px;
+            text-align: center;
+            border: 2px solid #e0caff;
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.2);
+        }
+
+        .message {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+            font-size: 1.8rem;
+            line-height: 2.5rem;
+        }
+
+        .message p:last-child {
+            font-size: 1.7rem;
+            margin-top: 50px;
+            color: #444;
+        }
+
+        .audio-player {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">La prueba se ha completado con éxito</div>
+
+    <div class="message">
+        <p>Has completado la prueba exitosamente.</p>
+        <p>Tus resultados han sido enviados a tu médico.</p>
+        <p>Ahora puedes cerrar esta ventana.</p>
+    </div>
+
+
+    <div class="audio-player">
+        <audio controls autoplay>
+            <source src="{% static 'basic/PPST_TestCompleteFinal.mp3' %}" type="audio/mpeg">
+            Your browser does not support this audio file.
+        </audio>
+    </div>
+</body>
+
+</html>
