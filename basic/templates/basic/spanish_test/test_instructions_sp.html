@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPST Test - Instructions</title>
+    <title>PPST - Instrucciones</title>
     <style>
         body {
             margin: 0;
@@ -100,12 +100,12 @@
 
         <div class="audio-player">
             <audio controls autoplay>
-                <source src="{% static 'basic/PPST_Instructions.mp3' %}" type="audio/mpeg">
+                <source src="{% static 'basic/spanish/PPST_Instructions.mp3' %}" type="audio/mpeg">
                 Your browser does not support this audio file.
             </audio>
         </div>
 
-        <a href="/basic/practice-countdown/?test_id={{ test_id }}" class="btn"
+        <a href="{% url 'basic:practice_countdown_sp' %}?test_id={{ test_id }}" class="btn"
             onclick="playSoundAndNavigate(event)">Comenzar Práctica</a>
         <audio id="buttonPress" src="{% static 'basic/sounds/Intro-button.mp3' %}" preload="auto"></audio>
     </div>

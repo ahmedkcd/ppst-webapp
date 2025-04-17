@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transition to Real Test</title>
+    <title>Transición a la Prueba Real</title>
     <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}">
     <style>
         body {
@@ -69,7 +69,7 @@
 
                 if (timeLeft <= 0) {
                     clearInterval(countdown);
-                    window.location.href = `/basic/take-test/?test_id=${testId}`;
+                    window.location.href = `/basic/take-test-sp/?test_id=${testId}`;
                 }
             }, 1000);
         };
@@ -92,7 +92,7 @@
 
     <div class="audio-player">
         <audio controls autoplay>
-            <source src="{% static 'basic/PPST_PracticeComplete.mp3' %}" type="audio/mpeg">
+            <source src="{% static 'basic/spanish/PPST_PracticeComplete.mp3' %}" type="audio/mpeg">
             Your browser does not support this audio file.
         </audio>
     </div>

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 {% load static %}
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Practice Test Countdown</title>
+    <title>Cuenta Regresiva de la Prueba de Práctica</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -53,13 +53,13 @@
             const countdownElement = document.getElementById("countdown");
 
             const interval = setInterval(() => {
-                countdownElement.innerText = `Beginning Practice Stimuli Test in ${countdown}...`;
+                countdownElement.innerText = `Comenzando la Prueba de Estímulos de Práctica en ${countdown}...`;
                 countdown--;
 
                 if (countdown < 0) {
                     clearInterval(interval);
                     const testId = new URLSearchParams(window.location.search).get("test_id");
-                    window.location.href = `/basic/practice-test/?test_id=${testId}`;
+                    window.location.href = `/basic/practice-test-sp/?test_id=${testId}`;
                 }
             }, 1000);
         }
@@ -71,7 +71,7 @@
 <body>
     <div class="audio-player">
         <audio controls autoplay>
-            <source src="{% static 'basic/PPST_PracticeCountdownFinal.mp3' %}" type="audio/mpeg">
+            <source src="{% static 'basic/spanish/PPST_PracticeCountdownFinal.mp3' %}" type="audio/mpeg">
             Your browser does not support this audio file.
         </audio>
     </div>

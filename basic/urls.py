@@ -8,7 +8,7 @@ from .views import (
     doctor_logout_view, doctor_newtest, doctor_results, doctor_statistics,
     doctor_user_login, base, landing, test_results, export_test_data, test_statistics,
     test_intro_sp, test_instructions_sp, practice_test_sp, take_test_sp, practice_countdown_sp, practice_transition_sp,
-    test_complete_sp,
+    test_complete_sp, get_practice_responses_sp,
 )
 
 app_name = "basic"
@@ -50,4 +50,5 @@ urlpatterns = [
     path("practice-countdown-sp/", practice_countdown_sp, name="practice_countdown_sp"),
     path("practice/transition-sp/", practice_transition_sp, name="practice-transition_sp"),
     path("test/complete-sp/", test_complete_sp, name="test_complete_sp"),
+    path("get-practice-responses-sp", get_practice_responses_sp, name="get_practice_responses_sp"),
 ]

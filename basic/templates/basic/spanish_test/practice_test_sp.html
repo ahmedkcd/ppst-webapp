@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Practice Test</title>
+    <title>Prueba de Práctica</title>
 
     <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
@@ -99,7 +99,7 @@
         let testId = new URLSearchParams(window.location.search).get("test_id");
 
         async function fetchPracticeStimuli() {
-            const response = await fetch(`/basic/get-practice-responses`);
+            const response = await fetch(`/basic/get-practice-responses-sp`);
             const data = await response.json();
             responses = data.responses;
             startCountdown();
@@ -109,12 +109,12 @@
             let countdown = 3;
             const countdownEl = document.getElementById("countdown");
             countdownEl.style.display = "block";
-            countdownEl.textContent = `Get ready... ${countdown}`;
+            countdownEl.textContent = `Prepárate... ${countdown}`;
 
             const interval = setInterval(() => {
                 countdown--;
                 if (countdown > 0) {
-                    countdownEl.textContent = `Get ready... ${countdown}`;
+                    countdownEl.textContent = `Prepárate... ${countdown}`;
                 } else {
                     clearInterval(interval);
                     countdownEl.style.display = "none";
@@ -136,7 +136,7 @@
 
                 showNextCharacter();
             } else {
-                document.getElementById("stimulus").textContent = "Practice Complete!";
+                document.getElementById("stimulus").textContent = "¡Práctica Completada!";
                 document.getElementById("stimulus").style.display = "block";
                 document.getElementById("buttons").style.display = "none";
                 document.getElementById("next-stimulus-btn").style.display = "none";
@@ -212,7 +212,7 @@
             audio.play();
 
             setTimeout(() => {
-                window.location.href = `/basic/practice/transition/?test_id=${testId}`;
+                window.location.href = `/basic/practice/transition-sp/?test_id=${testId}`;
             }, 250);
         }
 
