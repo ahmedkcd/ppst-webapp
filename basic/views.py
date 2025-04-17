@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import models
-from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
@@ -44,16 +43,16 @@ def doctor_user_login(request):
 @login_required(login_url='/basic/')
 def doctor_dashboard(request):
     return render(request, 'basic/dashboard/doctor_dashboard.html')
-    
+
 @login_required(login_url='/basic/')
 def doctor_results(request):
     test_sessions = TestSession.objects.filter(doctor=request.user)
     return render(request, 'basic/dashboard/doctor_results.html', {'test_sessions': test_sessions})
-    
+
 @login_required(login_url='/basic/')
 def doctor_statistics(request):
     return render(request, 'basic/dashboard/doctor_statistics.html')
-    
+
 @login_required(login_url='/basic/')
 def doctor_newtest(request):
     return render(request, "basic/dashboard/doctor_newtest.html")
@@ -70,8 +69,8 @@ def landing(request):
         "total_doctors": total_doctors,
     })
 def doctor_logout_view(request):
-    logout(request)  
-    return redirect('basic:landing') 
+    logout(request)
+    return redirect('basic:landing')
 
 
 
@@ -86,7 +85,6 @@ def take_test(request):
 
 
 import random
-from django.contrib.auth.decorators import login_required
 from .models import TestSession, Stimuli
 
 
@@ -138,7 +136,10 @@ def generate_test(request):
             "stimulus": stimulus.stim_id,
         })
 
-    test_link = f"http://localhost:8000/basic/test/intro/?test_id={test_uuid}"
+    if language == 'en':
+        test_link = f"http://localhost:8000/basic/test/intro/?test_id={test_uuid}"
+    else:
+        test_link = f"http://localhost:8000/basic/spanish/test/intro/?test_id={test_uuid}"
 
     return JsonResponse({
         "message": "Test generated successfully.",
@@ -195,77 +196,27 @@ def get_responses(request):
 
     return JsonResponse({"responses": data})
 
-
-@csrf_exempt
-def submit_response(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        response_id = data.get("response_id")
-        user_response = data.get("response")
-        latencies = data.get("latencies", "")
-
-        try:
-            response = Response.objects.get(pk=response_id)
-            response.response = user_response
-            response.latencies = latencies
-            response.is_correct = (user_response == response.stim.correct_response)
-            response.save()
-            return JsonResponse({"status": "success"})
-        except Response.DoesNotExist:
-            return JsonResponse({"error": "Response not found"}, status=404)
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
-
-
-def login_view(request):
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect("basic:dashboard")
-        else:
-            return render(request, "basic/login.html", {"error": "Invalid credentials"})
-    return render(request, "basic/login.html")
-
-
 def logout_view(request):
     logout(request)
     return redirect("basic:login")
 
-
-@login_required
-def dashboard(request):
-    return render(request, "basic/dashboard.html", {"doctor_name": request.user.username})
-
-
-# def test_intro(request):
-#     return render(request, "basic/test_intro.html")
 def test_intro(request):
     test_id = request.GET.get("test_id", None)
     return render(request, "basic/english_test/test_intro.html", {"test_id": test_id})
 
-
-# def test_instructions(request):
-#     return render(request, "basic/test_instructions.html")
 def test_instructions(request):
     test_id = request.GET.get("test_id", None)
     return render(request, "basic/english_test/test_instructions.html", {"test_id": test_id})
 
-
-# practice segment work
 def practice_test(request):
     test_id = request.GET.get("test_id")
 
     return render(request, "basic/english_test/practice_test.html", {"test_id": test_id})
 
-
 def get_practice_responses(request):
     practice_stimuli = Stimuli.objects.filter(type="Practice")[:2]
     data = [{"stimulus_text": s.stimulus} for s in practice_stimuli]
     return JsonResponse({"responses": data})
-
 
 def practice_countdown(request):
     test_id = request.GET.get("test_id")
@@ -277,7 +228,6 @@ def practice_transition(request):
 
 def test_complete(request):
     return render(request, "basic/english_test/test_complete.html")
-
 
 def export_test_data(request):
     test_id = request.GET.get("test_id")
@@ -301,8 +251,7 @@ def export_test_data(request):
         ])
 
     return response
-
-
-def testresults(request):
+def test_results(request):
     test_sessions = TestSession.objects.all()  # Retrieve all test sessions
-    return render(request, "basic/dashboard/testresults.html", {"test_sessions": test_sessions})
+    return render(request, "basic/dashboard/test_results.html", {"test_sessions": test_sessions})
+
