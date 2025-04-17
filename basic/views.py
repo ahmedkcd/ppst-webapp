@@ -16,11 +16,8 @@ from basic.models import User
 
 
 def doctor_login_view(request):
-    return render(request, 'basic/doctor_login.html')
+    return render(request, 'basic/dashboard/doctor_login.html')
 
-
-def doctor_test_page(request):
-    return render(request, 'basic/doctor_taketest.html')
 
 
 def doctor_user_login(request):
@@ -41,34 +38,34 @@ def doctor_user_login(request):
             messages.error(request, "Invalid username or password")
             return  redirect("basic:doctor-login") # Redirecting to the login page, when refreshed
 
-    return render(request, "basic/doctor_login.html")
+    return render(request, "basic/dashboard/doctor_login.html")
 
 
 @login_required(login_url='/basic/')
 def doctor_dashboard(request):
-    return render(request, 'basic/doctor_dashboard.html')
+    return render(request, 'basic/dashboard/doctor_dashboard.html')
     
 @login_required(login_url='/basic/')
 def doctor_results(request):
     test_sessions = TestSession.objects.filter(doctor=request.user)
-    return render(request, 'basic/doctor_results.html', {'test_sessions': test_sessions})
+    return render(request, 'basic/dashboard/doctor_results.html', {'test_sessions': test_sessions})
     
 @login_required(login_url='/basic/')
 def doctor_statistics(request):
-    return render(request, 'basic/doctor_statistics.html')
+    return render(request, 'basic/dashboard/doctor_statistics.html')
     
 @login_required(login_url='/basic/')
 def doctor_newtest(request):
-    return render(request, "basic/doctor_newtest.html")
+    return render(request, "basic/dashboard/doctor_newtest.html")
 
 def base(request):
-    return render(request, "basic/base.html")
+    return render(request, "basic/dashboard/base.html")
 
 def landing(request):
      total_tests = TestSession.objects.count()  # Count all test sessions
      total_doctors = User.objects.filter(testsession__isnull=False).distinct().count()  # Count unique doctors with tests
 
-     return render(request, "basic/landing.html", {
+     return render(request, "basic/dashboard/landing.html", {
         "total_tests": total_tests,
         "total_doctors": total_doctors,
     })
@@ -77,8 +74,6 @@ def doctor_logout_view(request):
     return redirect('basic:landing') 
 
 
-def test_page(request):
-    return render(request, "basic/test_page.html")
 
 
 def take_test(request):
@@ -87,7 +82,7 @@ def take_test(request):
         return HttpResponse("Error: Test ID missing", status=400)
 
     test = get_object_or_404(TestSession, pk=test_id)
-    return render(request, "basic/take_test.html", {"test": test})
+    return render(request, "basic/english_test/test.html", {"test": test})
 
 
 import random
@@ -169,7 +164,7 @@ def test_statistics(request, test_id):
         'total_responses': total_responses
     }
 
-    return render(request, 'basic/test_statistics.html', {'test_id': test_id, 'chart_data': chart_data})
+    return render(request, 'basic/dashboard/test_statistics.html', {'test_id': test_id, 'chart_data': chart_data})
 
 
 @csrf_exempt
@@ -249,21 +244,21 @@ def dashboard(request):
 #     return render(request, "basic/test_intro.html")
 def test_intro(request):
     test_id = request.GET.get("test_id", None)
-    return render(request, "basic/test_intro.html", {"test_id": test_id})
+    return render(request, "basic/english_test/test_intro.html", {"test_id": test_id})
 
 
 # def test_instructions(request):
 #     return render(request, "basic/test_instructions.html")
 def test_instructions(request):
     test_id = request.GET.get("test_id", None)
-    return render(request, "basic/test_instructions.html", {"test_id": test_id})
+    return render(request, "basic/english_test/test_instructions.html", {"test_id": test_id})
 
 
 # practice segment work
 def practice_test(request):
     test_id = request.GET.get("test_id")
 
-    return render(request, "basic/practice_test.html", {"test_id": test_id})
+    return render(request, "basic/english_test/practice_test.html", {"test_id": test_id})
 
 
 def get_practice_responses(request):
@@ -274,14 +269,14 @@ def get_practice_responses(request):
 
 def practice_countdown(request):
     test_id = request.GET.get("test_id")
-    return render(request, "basic/practice_countdown.html", {"test_id": test_id})
+    return render(request, "basic/english_test/practice_countdown.html", {"test_id": test_id})
 
 def practice_transition(request):
     test_id = request.GET.get("test_id")
-    return render(request, "basic/practice_transition.html", {"test_id": test_id})
+    return render(request, "basic/english_test/practice_transition.html", {"test_id": test_id})
 
 def test_complete(request):
-    return render(request, "basic/test_complete.html")
+    return render(request, "basic/english_test/test_complete.html")
 
 
 def export_test_data(request):
@@ -310,4 +305,4 @@ def export_test_data(request):
 
 def testresults(request):
     test_sessions = TestSession.objects.all()  # Retrieve all test sessions
-    return render(request, "basic/testresults.html", {"test_sessions": test_sessions})
+    return render(request, "basic/dashboard/testresults.html", {"test_sessions": test_sessions})
