@@ -127,7 +127,7 @@ def generate_test(request):
     if language == 'en':
         test_link = f"http://localhost:8000/basic/test/intro/?test_id={test_uuid}"
     else:
-        test_link = f"http://localhost:8000/basic/spanish/test/intro/?test_id={test_uuid}"
+        test_link = f"http://localhost:8000/basic/test/intro-sp/?test_id={test_uuid}"
 
     return JsonResponse({
         "message": "Test generated successfully.",
@@ -253,16 +253,16 @@ def test_results(request):
 
 def test_intro_sp(request):
     test_id = request.GET.get("test_id", None)
-    return render(request, "basic/spanish_test/test_intro.html", {"test_id": test_id})
+    return render(request, "basic/spanish_test/test_intro_sp.html", {"test_id": test_id})
 
 def test_instructions_sp(request):
     test_id = request.GET.get("test_id", None)
-    return render(request, "basic/spanish_test/test_instructions.html", {"test_id": test_id})
+    return render(request, "basic/spanish_test/test_instructions_sp.html", {"test_id": test_id})
 
 def practice_test_sp(request):
     test_id = request.GET.get("test_id")
 
-    return render(request, "basic/spanish_test/practice_test.html", {"test_id": test_id})
+    return render(request, "basic/spanish_test/practice_test_sp.html", {"test_id": test_id})
 
 def get_practice_responses_sp(request):
     practice_stimuli = Stimuli.objects.filter(type="Practice")[:2]
@@ -271,11 +271,11 @@ def get_practice_responses_sp(request):
 
 def practice_countdown_sp(request):
     test_id = request.GET.get("test_id")
-    return render(request, "basic/spanish_test/practice_countdown.html", {"test_id": test_id})
+    return render(request, "basic/spanish_test/practice_countdown_sp.html", {"test_id": test_id})
 
 def practice_transition_sp(request):
     test_id = request.GET.get("test_id")
-    return render(request, "basic/spanish_test/practice_transition.html", {"test_id": test_id})
+    return render(request, "basic/spanish_test/practice_transition_sp.html", {"test_id": test_id})
 
 def take_test_sp(request):
     test_id = request.GET.get("test_id")
@@ -283,5 +283,8 @@ def take_test_sp(request):
         return HttpResponse("Error: Test ID missing", status=400)
 
     test = get_object_or_404(TestSession, pk=test_id)
-    return render(request, "basic/spanish_test/test.html", {"test": test})
+    return render(request, "basic/spanish_test/test_sp.html", {"test": test})
+
+def test_complete_sp(request):
+    return render(request, "basic/english_test/test_complete_sp.html")
 
