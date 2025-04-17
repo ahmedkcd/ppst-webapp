@@ -1,9 +1,7 @@
 import os
-from datetime import timedelta
 
 import django
 from django.contrib.auth.models import User
-from django.utils import timezone
 
 from basic.models import TestSession, Stimuli, Response
 
@@ -27,28 +25,17 @@ def get_or_create_user(username, email):
         user.save()
     return user
 
-
-# Create or retrieve sample doctors
 doctors = [
     get_or_create_user("dr_smith", "drsmith@example.com"),
     get_or_create_user("dr_jones", "drjones@example.com"),
+    get_or_create_user("dr_matt", "drmatt@example.com"),
+    get_or_create_user("dr_atilla", "dratilla@example.com"),
+    get_or_create_user("dr_tuch", "drtuch@example.com"),
+    get_or_create_user("dr_rossi", "drrossi@example.com"),
 ]
 
 print(f"Doctors in database: {[doctor.username for doctor in doctors]}")
 
-# Create test sessions
-test_sessions = [
-    TestSession.objects.create(doctor=doctors[0], age=35, date=timezone.now(), duration=timedelta(minutes=30),
-                               test_id=1),
-    TestSession.objects.create(doctor=doctors[1], age=40, date=timezone.now(), duration=timedelta(hours=1), test_id=2),
-    TestSession.objects.create(doctor=doctors[0], age=47, date=timezone.now(), duration=timedelta(hours=1), test_id=3),
-    TestSession.objects.create(doctor=doctors[1], age=38, date=timezone.now(), duration=timedelta(minutes=30),
-                               test_id=4),
-]
-
-print(f"Created test sessions: {[session.test_id for session in test_sessions]}")
-
-# Create stimuli data
 stimuli_data = [
     # Numeric (4-span)
     ("7613", "1367", 4, "Numeric"),
@@ -82,63 +69,90 @@ stimuli = [
 
 print(f"Created stimuli: {[stim.stim_id for stim in stimuli]}")
 
-# Create responses for a fully completed test session with some incorrect answers
-responses = [
-    # Test Session 1
-    Response.objects.create(test=test_sessions[0], stim=stimuli[0], response="1234", latencies=2.1, is_correct=True),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[1], response="5893", latencies=2.5, is_correct=False),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[2], response="1367", latencies=2.0, is_correct=True),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[3], response="14859", latencies=2.3, is_correct=False),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[4], response="02367", latencies=2.8, is_correct=True),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[5], response="90341", latencies=1.9, is_correct=False),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[6], response="12AB", latencies=2.2, is_correct=True),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[7], response="4MX8", latencies=2.7, is_correct=False),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[8], response="39CD", latencies=1.8, is_correct=True),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[9], response="27KLM", latencies=2.4, is_correct=True),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[10], response="4X8YY", latencies=3.0, is_correct=False),
-    Response.objects.create(test=test_sessions[0], stim=stimuli[11], response="15PQR", latencies=2.6, is_correct=True),
-    # Test Session 2
-    Response.objects.create(test=test_sessions[1], stim=stimuli[0], response="1234", latencies=2.2, is_correct=True),
-    Response.objects.create(test=test_sessions[1], stim=stimuli[1], response="2589", latencies=2.6, is_correct=False),
-    Response.objects.create(test=test_sessions[1], stim=stimuli[2], response="1367", latencies=2.4, is_correct=True),
-    Response.objects.create(test=test_sessions[1], stim=stimuli[3], response="14859", latencies=3.1, is_correct=False),
-    Response.objects.create(test=test_sessions[1], stim=stimuli[4], response="02367", latencies=2.7, is_correct=True),
-    Response.objects.create(test=test_sessions[1], stim=stimuli[5], response="01349", latencies=2.9, is_correct=False),
-    Response.objects.create(test=test_sessions[1], stim=stimuli[6], response="12AB", latencies=2.3, is_correct=True),
-    Response.objects.create(test=test_sessions[1], stim=stimuli[7], response="47MX", latencies=2.8, is_correct=True),
-    Response.objects.create(test=test_sessions[1], stim=stimuli[8], response="39CD", latencies=3.0, is_correct=False),
-    Response.objects.create(test=test_sessions[1], stim=stimuli[9], response="27KLM", latencies=3.2, is_correct=False),
-    Response.objects.create(test=test_sessions[1], stim=stimuli[10], response="48XYZ", latencies=2.5, is_correct=False),
-    Response.objects.create(test=test_sessions[1], stim=stimuli[11], response="15PQR", latencies=2.6, is_correct=True),
-    # Test Session 3
-    Response.objects.create(test=test_sessions[2], stim=stimuli[0], response="1234", latencies=2.1, is_correct=True),
-    Response.objects.create(test=test_sessions[2], stim=stimuli[1], response="2589", latencies=2.4, is_correct=True),
-    Response.objects.create(test=test_sessions[2], stim=stimuli[2], response="1367", latencies=2.3, is_correct=True),
-    Response.objects.create(test=test_sessions[2], stim=stimuli[3], response="14589", latencies=3.0, is_correct=True),
-    Response.objects.create(test=test_sessions[2], stim=stimuli[4], response="02367", latencies=2.6, is_correct=True),
-    Response.objects.create(test=test_sessions[2], stim=stimuli[5], response="01349", latencies=2.7, is_correct=False),
-    Response.objects.create(test=test_sessions[2], stim=stimuli[6], response="12AB", latencies=2.2, is_correct=True),
-    Response.objects.create(test=test_sessions[2], stim=stimuli[7], response="47MX", latencies=2.5, is_correct=True),
-    Response.objects.create(test=test_sessions[2], stim=stimuli[8], response="39CD", latencies=2.9, is_correct=True),
-    Response.objects.create(test=test_sessions[2], stim=stimuli[9], response="27KLM", latencies=3.1, is_correct=True),
-    Response.objects.create(test=test_sessions[2], stim=stimuli[10], response="48XYZ", latencies=3.2, is_correct=True),
-    Response.objects.create(test=test_sessions[2], stim=stimuli[11], response="15PQR", latencies=2.6, is_correct=False),
-    # Test Session 4
-    Response.objects.create(test=test_sessions[3], stim=stimuli[0], response="1234", latencies=2.0, is_correct=True),
-    Response.objects.create(test=test_sessions[3], stim=stimuli[1], response="2589", latencies=2.5, is_correct=False),
-    Response.objects.create(test=test_sessions[3], stim=stimuli[2], response="1367", latencies=2.6, is_correct=True),
-    Response.objects.create(test=test_sessions[3], stim=stimuli[3], response="14859", latencies=2.8, is_correct=False),
-    Response.objects.create(test=test_sessions[3], stim=stimuli[4], response="02367", latencies=3.0, is_correct=True),
-    Response.objects.create(test=test_sessions[3], stim=stimuli[5], response="01349", latencies=2.9, is_correct=True),
-    Response.objects.create(test=test_sessions[3], stim=stimuli[6], response="12AB", latencies=2.3, is_correct=True),
-    Response.objects.create(test=test_sessions[3], stim=stimuli[7], response="47MX", latencies=2.4, is_correct=False),
-    Response.objects.create(test=test_sessions[3], stim=stimuli[8], response="39CD", latencies=2.6, is_correct=False),
-    Response.objects.create(test=test_sessions[3], stim=stimuli[9], response="27KLM", latencies=2.7, is_correct=True),
-    Response.objects.create(test=test_sessions[3], stim=stimuli[10], response="48XYZ", latencies=2.8, is_correct=True),
-    Response.objects.create(test=test_sessions[3], stim=stimuli[11], response="15PQR", latencies=3.1, is_correct=True),
-]
+import random
+import uuid
+from random import randrange
+from datetime import timedelta, datetime
+from django.utils import timezone
 
-print(f"Created responses: {[resp.response_id for resp in responses]}")
+
+def random_date(): # https://stackoverflow.com/questions/553303/how-to-generate-a-random-date-between-two-other-dates
+    """
+    This function will return a random datetime between two datetime
+    objects.
+    """
+    d1 = datetime.strptime('1/1/2023 1:30 PM', '%m/%d/%Y %I:%M %p')
+    d2 = datetime.strptime('1/1/2024 4:50 AM', '%m/%d/%Y %I:%M %p')
+    d1 = timezone.make_aware(d1)
+    d2 = timezone.make_aware(d2)
+    delta = d2 - d1
+    int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
+    random_second = randrange(int_delta)
+    return d1 + timedelta(seconds=random_second)
+
+
+test_sessions = []
+all_stimuli = Stimuli.objects.exclude(type="Practice")
+test_orders = [
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        [3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8],
+        [6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 4, 5],
+        [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+]
+languages = ["en", "sp"]
+
+
+for i in range(100):
+    doctor = doctors[i % len(doctors)]
+    age = random.randint(30, 90)
+    duration = timedelta(minutes=random.randint(20, 60))
+    date = random_date()
+    test_uuid = str(uuid.uuid4())
+    language = random.choice(languages)
+
+    selected_order = random.choice(test_orders)
+    stimuli_list = list(all_stimuli)
+    ordered_stimuli = [stimuli_list[i] for i in selected_order]
+    stimuli_order_str = ",".join(map(str, selected_order))
+
+
+    session = TestSession.objects.create(
+        doctor=doctor,
+        age=age,
+        date=date,
+        duration=duration,
+        test_id=test_uuid,
+        stimuli_order=stimuli_order_str,
+        language=language
+    )
+    test_sessions.append(session)
+
+    # Create responses for each stimulus
+    for stim in ordered_stimuli:
+        # Random chance of being correct
+        is_correct = random.choice([True, False])
+        if is_correct:
+            response_text = stim.correct_response
+        else:
+            # Generate a wrong response of same length
+            chars = '12345679BHGFMRXY'
+            response_text = ''.join(random.choices(chars, k=len(stim.correct_response)))
+            # make sure it's not accidentally correct
+            if response_text == stim.correct_response:
+                response_text = ''.join(random.choices(chars, k=len(stim.correct_response)))
+
+        latency = round(random.uniform(1.5, 3.5), 2)
+
+        Response.objects.create(
+            test=session,
+            stim=stim,
+            response=response_text,
+            latencies=latency,
+            is_correct=is_correct
+        )
+
+print(f" Created {len(test_sessions)} test sessions with responses.")
+
 
 # Verify queries
 tasks = TestSession.objects.filter(doctor=doctors[0])
@@ -147,4 +161,4 @@ print(f"Tests assigned to Dr. Smith: {[t.test_id for t in tasks]}")
 responses = Response.objects.filter(test=test_sessions[0])
 print(f"Responses for Test {test_sessions[0].test_id}: {[r.response for r in responses]}")
 
-print("✅ Database populated successfully!")
+print(" Database populated successfully!")
