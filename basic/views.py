@@ -286,5 +286,5 @@ def take_test_sp(request):
     return render(request, "basic/spanish_test/test_sp.html", {"test": test})
 
 def test_complete_sp(request):
-    return render(request, "basic/english_test/test_complete_sp.html")
+    return render(request, "basic/spanish_test/test_complete_sp.html")
 
