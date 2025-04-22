@@ -1,0 +1,172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>PPST - Doctor Portal</title>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+            rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="{% static 'basic/stylesLanding.css' %}"/>
+</head>
+
+<body>
+<header class="header">
+    <a href="#">
+        <div class="header-text">PPST</div>
+    </a>
+    <div class="header-dashboard">
+        <a
+                href="
+                        {% if user.is_authenticated %}{% url 'basic:doctor-dashboard' %}{% else %}{% url 'basic:doctor-login' %}{% endif %}"
+        >
+            <button class="btn btn-header">Open Dashboard</button>
+        </a>
+    </div>
+</header>
+
+<div class="landing">
+    <h1>Welcome to PPST</h1>
+    <div class="button-container">
+        <button class="btn btn-secondary">Contact Admin</button>
+        <a
+                href="
+                        {% if user.is_authenticated %}{% url 'basic:doctor-dashboard' %}{% else %}{% url 'basic:doctor-login' %}{% endif %}"
+        >
+            <button class="btn btn-primary">
+                {% if user.is_authenticated %} Go to Dashboard {% else %} Login {% endif %}
+            </button>
+        </a>
+    </div>
+</div>
+
+<div class="info-section">
+    <div class="info-container">
+        <h2 class="info-heading">What is PPST?</h2>
+        <p class="info-text">
+            The Philadelphia Spanning Test (PPST) is a cognitive assessment designed to measure working
+            memory and executive function. In this test, participants are shown a sequence of numbers a
+            nd must rearrange them in ascending order. The difficulty increases as the number of
+            digits grows, challenging memory capacity and processing speed. PPST is widely used in
+            psychological research and cognitive studies to analyze attention, learning ability,
+            and neurological conditions.
+        </p>
+    </div>
+</div>
+
+<!-- Stats Section with Animation -->
+<div class="stats-section">
+    <div class="stat">
+        <span class="stat-title">Total Tests Taken</span>
+        <span class="stat-number" data-target="{{ total_tests }}">0</span>
+    </div>
+    <div class="stat">
+        <span class="stat-title">Registered Doctors</span>
+        <span class="stat-number" data-target="{{ total_doctors }}">0</span>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="features-section">
+    <h3 class="features-title">FEATURES</h3>
+    <h2 class="features-heading">
+        Flexible for Doctors. <br/>
+        Easy for Patients.
+    </h2>
+    <div class="features-container">
+        <div class="feature">
+            <span class="feature-icon">🌐</span>
+            <h4 class="feature-title">Multilingual</h4>
+            <p class="feature-description">
+                The PPST web app supports English and Spanish, making it accessible to a wider audience.
+                More languages will be added in future updates to enhance inclusivity and usability.
+            </p>
+        </div>
+        <div class="feature">
+            <span class="feature-icon">📊</span>
+            <h4 class="feature-title">Doctor Analytics</h4>
+            <p class="feature-description">
+                Doctors can access detailed statistics on patient performance and sitewide trends,
+                helping them track progress and make informed assessments.
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // GSAP animation for landing section
+        gsap.to("h1", {
+            opacity: 1,
+            scale: 1,
+            duration: 1,
+            ease: "elastic.out(1, 0.5)",
+        });
+
+        gsap.to(".button-container", {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            delay: 0.5,
+            ease: "power2.out",
+        });
+
+        // Number animation function
+        function animateNumber(element, targetNumber, duration = 1500) {
+            let startTime = null;
+            const startNumber = Math.floor(targetNumber * 0.1); // Start with a smaller number
+            const randomOffset = Math.floor(targetNumber * 0.2); // Random flickering range
+
+            function updateNumber(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const elapsedTime = currentTime - startTime;
+                const progress = Math.min(elapsedTime / duration, 1);
+
+
+                const randomFlicker = Math.floor(Math.random() * randomOffset);
+                const currentNumber = Math.floor(
+                    startNumber +
+                    (targetNumber - startNumber) * progress +
+                    randomFlicker * (1 - progress)
+                );
+
+                element.textContent = currentNumber.toLocaleString();
+
+                if (progress < 1) {
+                    requestAnimationFrame(updateNumber);
+                } else {
+                    element.textContent = targetNumber.toLocaleString();
+                }
+            }
+
+            requestAnimationFrame(updateNumber);
+        }
+
+        function startAnimations() {
+            document.querySelectorAll(".stat-number").forEach((stat) => {
+                const targetNumber = parseInt(stat.getAttribute("data-target"));
+                animateNumber(stat, targetNumber);
+            });
+        }
+
+        // Trigger animation when stats section enters view
+        function handleScroll() {
+            const statsSection = document.querySelector(".stats-section");
+            if (statsSection) {
+                const rect = statsSection.getBoundingClientRect();
+                if (rect.top < window.innerHeight * 0.75) {
+                    startAnimations();
+                    window.removeEventListener("scroll", handleScroll); // Will only be animated once
+                }
+            }
+        }
+
+        window.addEventListener("scroll", handleScroll);
+        handleScroll(); // Run immediately in case it's already in view
+    });
+</script>
+</body>
+</html>
