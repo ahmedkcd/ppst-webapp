@@ -12,6 +12,9 @@ from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 
+from django.db.models import Avg, Count
+from django.db.models.functions import TruncDay
+
 from basic.models import User
 
 
@@ -311,3 +314,44 @@ def export_test_data(request):
 def testresults(request):
     test_sessions = TestSession.objects.all()  # Retrieve all test sessions
     return render(request, "basic/testresults.html", {"test_sessions": test_sessions})
+
+
+def aggregated_statistics(request):
+    # Chart 1: Average Latency per Day
+    latency_data = (
+        TestSession.objects
+        .exclude(avg_latency__isnull=True)
+        .annotate(day=TruncDay("date"))
+        .values("day")
+        .annotate(avg_latency=Avg("avg_latency"))
+        .order_by("day")
+    )
+
+    # Chart 2: Accuracy per Day
+    accuracy_data = (
+        TestSession.objects
+        .exclude(accuracy__isnull=True)
+        .annotate(day=TruncDay("date"))
+        .values("day")
+        .annotate(avg_accuracy=Avg("accuracy"))
+        .order_by("day")
+    )
+
+    # Chart 3: Number of Tests per Doctor
+    doctor_data = (
+        TestSession.objects
+        .values("doctor__username")
+        .annotate(test_count=Count("test_id"))
+        .order_by("-test_count")
+    )
+
+    context = {
+        "latency_labels": [entry["day"].strftime("%Y-%m-%d") for entry in latency_data],
+        "latency_values": [entry["avg_latency"] for entry in latency_data],
+        "accuracy_labels": [entry["day"].strftime("%Y-%m-%d") for entry in accuracy_data],
+        "accuracy_values": [entry["avg_accuracy"] for entry in accuracy_data],
+        "doctor_labels": [entry["doctor__username"] for entry in doctor_data],
+        "doctor_values": [entry["test_count"] for entry in doctor_data],
+    }
+
+    return render(request, "basic/aggregated_statistics.html", context)
