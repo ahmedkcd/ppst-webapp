@@ -1,0 +1,86 @@
+{% extends "basic/base.html" %}
+
+{% block title %}Aggregated Statistics{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4 text-center">📊 Aggregated Statistics Dashboard</h1>
+
+    <div class="mb-5">
+        <h2>📈 Average Latency per Day</h2>
+        <canvas id="latencyChart" height="100"></canvas>
+    </div>
+
+    <div class="mb-5">
+        <h2>🎯 Accuracy per Day</h2>
+        <canvas id="accuracyChart" height="100"></canvas>
+    </div>
+
+    <div class="mb-5">
+        <h2>👥 Number of Tests per Doctor</h2>
+        <canvas id="doctorChart" height="100"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const latencyLabels = {{ latency_labels|safe }};
+    const latencyValues = {{ latency_values|safe }};
+    const accuracyLabels = {{ accuracy_labels|safe }};
+    const accuracyValues = {{ accuracy_values|safe }};
+    const doctorLabels = {{ doctor_labels|safe }};
+    const doctorValues = {{ doctor_values|safe }};
+
+    new Chart(document.getElementById('latencyChart'), {
+        type: 'line',
+        data: {
+            labels: latencyLabels,
+            datasets: [{
+                label: 'Avg Latency (ms)',
+                data: latencyValues,
+                borderWidth: 2,
+                borderColor: 'blue',
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: { responsive: true }
+    });
+
+    new Chart(document.getElementById('accuracyChart'), {
+        type: 'line',
+        data: {
+            labels: accuracyLabels,
+            datasets: [{
+                label: 'Avg Accuracy',
+                data: accuracyValues,
+                borderWidth: 2,
+                borderColor: 'green',
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: { responsive: true }
+    });
+
+    new Chart(document.getElementById('doctorChart'), {
+        type: 'bar',
+        data: {
+            labels: doctorLabels,
+            datasets: [{
+                label: 'Number of Tests',
+                data: doctorValues,
+                borderWidth: 2,
+                backgroundColor: 'orange'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+{% endblock %}
