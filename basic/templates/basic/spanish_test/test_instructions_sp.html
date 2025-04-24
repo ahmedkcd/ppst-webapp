@@ -3,112 +3,157 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPST - Instrucciones</title>
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            background-color: #f4f4f9;
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PPST - Instrucciones</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background-color: #f4f4f9;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
 
-        .instruction-box {
-            max-width: 950px;
-            background-color: white;
-            padding: 40px 50px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
+    .instruction-box {
+      max-width: 950px;
+      background-color: white;
+      padding: 40px 50px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+      max-height: 90vh;
+    }
 
-        h1 {
-            font-size: 40px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
+    h1 {
+      font-size: 40px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
 
-        h2 {
-            font-size: 30px;
-            margin-top: 30px;
-            margin-bottom: 10px;
-        }
+    h2 {
+      font-size: 30px;
+      margin-top: 30px;
+      margin-bottom: 10px;
+    }
 
-        p {
-            font-size: 24px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
+    p, li {
+      font-size: 24px;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
 
-        li {
-            font-size: 24px;
-            line-height: 1.6;
-            margin-bottom: 10px;
-        }
+    .btn {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 14px 28px;
+      font-size: 24px;
+      background-color: #D6A3FB;
+      color: black;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
 
-        .btn {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 14px 28px;
-            font-size: 24px;
-            background-color: #D6A3FB;
-            color: black;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: background-color 0.3s ease;
-        }
+    .btn:hover {
+      background-color: #c18df4;
+    }
 
-        .btn:hover {
-            background-color: #c18df4;
-        }
-    </style>
-    <script>
-        function playSoundAndNavigate(event) {
-            event.preventDefault();
-            const audio = document.getElementById("buttonPress");
-            const destination = event.currentTarget.href;
+    #muteButton {
+      position: absolute;
+      top: 1%;
+      right: 1%;
+      background-color: #ffffff;
+      padding: 12px;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      z-index: 10;
+    }
 
-            audio.currentTime = 0;
-            audio.play();
+    #muteButton:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+    }
 
-            setTimeout(() => {
-                window.location.href = destination;
-            }, 200);
-        }
-    </script>
+    #muteButton svg {
+      width: 26px;
+      height: 26px;
+      stroke: #c288f3;
+    }
+  </style>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const audio = document.getElementById("instructionAudio");
+      const isMuted = localStorage.getItem("ppst-muted") === "true";
+      audio.muted = isMuted;
+      updateMuteIcon(isMuted);
+    });
+
+    function toggleMute() {
+      const audio = document.getElementById("instructionAudio");
+      const isMuted = !audio.muted;
+      audio.muted = isMuted;
+      localStorage.setItem("ppst-muted", isMuted);
+      updateMuteIcon(isMuted);
+    }
+
+    function updateMuteIcon(isMuted) {
+      const muteIcon = document.getElementById("muteIcon");
+      muteIcon.innerHTML = isMuted
+        ? `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#c288f3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587 A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>`
+        : `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="#c288f3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587 A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.364 18.364a9 9 0 0 0 0-12.728"/></svg>`;
+    }
+
+    function playSoundAndNavigate(event) {
+      event.preventDefault();
+      const audio = document.getElementById("buttonPress");
+      const destination = event.currentTarget.href;
+      audio.currentTime = 0;
+      audio.play();
+      setTimeout(() => {
+        window.location.href = destination;
+      }, 200);
+    }
+  </script>
 </head>
 
 <body>
-    <div class="instruction-box">
-        <h1>Prueba de Estímulos de Práctica - PPST - Instrucciones</h1>
-        <p>¡Bienvenido! Esta sesión de práctica te ayudará a familiarizarte con la prueba.</p>
+  <!-- 🔇 Mute/Unmute Button -->
+  <button onclick="toggleMute()" id="muteButton">
+    <span id="muteIcon"></span>
+  </button>
 
-        <h2>Cómo Funciona:</h2>
-        <ul>
-            <li>Verás un conjunto de letras y números.</li>
-            <li>Debes ordenarlos en orden ascendente numérico y alfabético.</li>
-            <li>Ejemplo: Si ves "B 3 A 1", ingresa "1 3 A B".</li>
-            <li>Presiona "Enviar" para pasar al siguiente conjunto.</li>
-        </ul>
+  <div class="instruction-box">
+    <h1>Prueba de Estímulos de Práctica - PPST - Instrucciones</h1>
+    <p>¡Bienvenido! Esta sesión de práctica te ayudará a familiarizarte con la prueba.</p>
 
-        <h2>Próximos Pasos:</h2>
-        <p>Presiona "Comenzar Práctica" cuando estés listo. <br> Después de esto, comenzará la prueba real.</p>
+    <h2>Cómo Funciona:</h2>
+    <ul>
+      <li>Verás un conjunto de letras y números.</li>
+      <li>Debes ordenarlos en orden ascendente numérico y alfabético.</li>
+      <li>Ejemplo: Si ves "B 3 A 1", ingresa "1 3 A B".</li>
+      <li>Presiona "Enviar" para pasar al siguiente conjunto.</li>
+    </ul>
 
+    <h2>Próximos Pasos:</h2>
+    <p>Presiona "Comenzar Práctica" cuando estés listo. <br> Después de esto, comenzará la prueba real.</p>
 
-        <div class="audio-player">
-            <audio controls autoplay>
-                <source src="{% static 'basic/spanish/PPST_Instructions.mp3' %}" type="audio/mpeg">
-                Your browser does not support this audio file.
-            </audio>
-        </div>
-
-        <a href="{% url 'basic:practice_countdown_sp' %}?test_id={{ test_id }}" class="btn"
-            onclick="playSoundAndNavigate(event)">Comenzar Práctica</a>
-        <audio id="buttonPress" src="{% static 'basic/sounds/Intro-button.mp3' %}" preload="auto"></audio>
+    <div class="audio-player" id="audioWrapper">
+      <audio id="instructionAudio" autoplay>
+        <source src="{% static 'basic/spanish/PPST_Instructions.mp3' %}" type="audio/mpeg">
+        Tu navegador no admite archivos de audio.
+      </audio>
     </div>
-</body>
 
+    <a href="{% url 'basic:practice_countdown_sp' %}?test_id={{ test_id }}" class="btn"
+       onclick="playSoundAndNavigate(event)">Comenzar Práctica</a>
+    <audio id="buttonPress" src="{% static 'basic/sounds/Intro-button.mp3' %}" preload="auto"></audio>
+  </div>
+</body>
 </html>
