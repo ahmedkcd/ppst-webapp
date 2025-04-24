@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.db.models import Avg, Count
 from django.db.models.functions import TruncDay
+from collections import defaultdict
 
 from basic.models import User
 
@@ -317,41 +318,64 @@ def testresults(request):
 
 
 def aggregated_statistics(request):
-    # Chart 1: Average Latency per Day
-    latency_data = (
-        TestSession.objects
-        .exclude(avg_latency__isnull=True)
-        .annotate(day=TruncDay("date"))
-        .values("day")
-        .annotate(avg_latency=Avg("avg_latency"))
-        .order_by("day")
+    # Parse latencies (stored as text) and group by stimulus
+    responses = (
+        Response.objects
+        .exclude(latencies__isnull=True)
+        .select_related("stim")
     )
 
-    # Chart 2: Accuracy per Day
-    accuracy_data = (
-        TestSession.objects
-        .exclude(accuracy__isnull=True)
-        .annotate(day=TruncDay("date"))
-        .values("day")
-        .annotate(avg_accuracy=Avg("accuracy"))
-        .order_by("day")
+    stim_sums = defaultdict(list)
+
+    for r in responses:
+        try:
+            latency = float(r.latencies.strip())
+            stim_sums[r.stim.stimulus].append(latency)
+        except (ValueError, AttributeError):
+            continue  # skip invalid entries
+
+    stim_latency_data = [
+        {"stim__stimulus": stim, "avg_latency": sum(vals)/len(vals)}
+        for stim, vals in stim_sums.items()
+    ]
+
+    # Overall correctness of responses
+    correctness_data = (
+        Response.objects
+        .exclude(is_correct__isnull=True)
+        .values("is_correct")
+        .annotate(count=Count("response_id"))
+        .order_by("is_correct")
     )
 
-    # Chart 3: Number of Tests per Doctor
+    # Number of tests per doctor
     doctor_data = (
         TestSession.objects
         .values("doctor__username")
         .annotate(test_count=Count("test_id"))
         .order_by("-test_count")
     )
+    correct_counts = (
+        Response.objects
+        .exclude(is_correct__isnull=True)
+        .values("is_correct")
+        .annotate(count=Count("response_id"))
+    )
 
+    # Print results
+    for entry in correct_counts:
+        label = "Correct" if entry["is_correct"] else "Incorrect"
+        print(f"{label} responses: {entry['count']}")
+
+    # Final context (unchanged variable names)
     context = {
-        "latency_labels": [entry["day"].strftime("%Y-%m-%d") for entry in latency_data],
-        "latency_values": [entry["avg_latency"] for entry in latency_data],
-        "accuracy_labels": [entry["day"].strftime("%Y-%m-%d") for entry in accuracy_data],
-        "accuracy_values": [entry["avg_accuracy"] for entry in accuracy_data],
+        "stim_labels": [entry["stim__stimulus"] for entry in stim_latency_data],
+        "stim_latencies": [entry["avg_latency"] for entry in stim_latency_data],
+        "correct_labels": ["Correct" if entry["is_correct"] else "Incorrect" for entry in correctness_data],
+        "correct_counts": [entry["count"] for entry in correctness_data],
         "doctor_labels": [entry["doctor__username"] for entry in doctor_data],
         "doctor_values": [entry["test_count"] for entry in doctor_data],
     }
 
     return render(request, "basic/aggregated_statistics.html", context)
+
