@@ -4,64 +4,77 @@
 
 {% block content %}
 <div class="container py-4">
-    <h1 class="mb-4 text-center">📊 Aggregated Statistics Dashboard</h1>
+    <h1 class="mb-4 text-center fs-4">Aggregated Statistics Dashboard</h1>
 
-    <div class="mb-5">
-        <h2>📈 Average Latency per Day</h2>
-        <canvas id="latencyChart" height="100"></canvas>
+    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; margin-bottom: 2rem;">
+        <div style="flex: 2; min-width: 300px;">
+            <h2 class="fs-5">Average Latency per Stimulus</h2>
+            <canvas id="stimChart" height="100"></canvas>
+        </div>
+
+        <div style="flex: 1; min-width: 250px;">
+            <h2 class="fs-6 text-center">Test Correctness</h2>
+            <canvas id="correctnessChart" style="width: 250px; height: 250px;"></canvas>
+        </div>
     </div>
+    
+    
+    
 
-    <div class="mb-5">
-        <h2>🎯 Accuracy per Day</h2>
-        <canvas id="accuracyChart" height="100"></canvas>
-    </div>
-
-    <div class="mb-5">
-        <h2>👥 Number of Tests per Doctor</h2>
-        <canvas id="doctorChart" height="100"></canvas>
+    <!-- Doctor Chart -->
+    <div class="mb-4">
+        <h2 class="fs-5">Number of Tests per Doctor</h2>
+        <canvas id="doctorChart" height="70"></canvas>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
-    const latencyLabels = {{ latency_labels|safe }};
-    const latencyValues = {{ latency_values|safe }};
-    const accuracyLabels = {{ accuracy_labels|safe }};
-    const accuracyValues = {{ accuracy_values|safe }};
+    const stimLabels = {{ stim_labels|safe }};
+    const stimLatencies = {{ stim_latencies|safe }};
+    const correctLabels = {{ correct_labels|safe }};
+    const correctCounts = {{ correct_counts|safe }};
     const doctorLabels = {{ doctor_labels|safe }};
     const doctorValues = {{ doctor_values|safe }};
 
-    new Chart(document.getElementById('latencyChart'), {
-        type: 'line',
+    new Chart(document.getElementById('stimChart'), {
+        type: 'bar',
         data: {
-            labels: latencyLabels,
+            labels: stimLabels,
             datasets: [{
                 label: 'Avg Latency (ms)',
-                data: latencyValues,
-                borderWidth: 2,
-                borderColor: 'blue',
-                tension: 0.1,
-                fill: false
+                data: stimLatencies,
+                backgroundColor: 'skyblue',
+                borderWidth: 1
             }]
         },
-        options: { responsive: true }
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { font: { size: 10 } } }
+            },
+            scales: {
+                x: { ticks: { font: { size: 10 } } },
+                y: { ticks: { font: { size: 10 } } }
+            }
+        }
     });
 
-    new Chart(document.getElementById('accuracyChart'), {
-        type: 'line',
+    new Chart(document.getElementById('correctnessChart'), {
+        type: 'pie',
         data: {
-            labels: accuracyLabels,
+            labels: correctLabels,
             datasets: [{
-                label: 'Avg Accuracy',
-                data: accuracyValues,
-                borderWidth: 2,
-                borderColor: 'green',
-                tension: 0.1,
-                fill: false
+                data: correctCounts,
+                backgroundColor: ['red', 'green']
             }]
         },
-        options: { responsive: true }
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { font: { size: 10 } } }
+            }
+        }
     });
 
     new Chart(document.getElementById('doctorChart'), {
@@ -71,14 +84,21 @@
             datasets: [{
                 label: 'Number of Tests',
                 data: doctorValues,
-                borderWidth: 2,
-                backgroundColor: 'orange'
+                backgroundColor: 'orange',
+                borderWidth: 1
             }]
         },
         options: {
             responsive: true,
+            plugins: {
+                legend: { labels: { font: { size: 10 } } }
+            },
             scales: {
-                y: { beginAtZero: true }
+                x: { ticks: { font: { size: 10 } } },
+                y: {
+                    beginAtZero: true,
+                    ticks: { font: { size: 10 } }
+                }
             }
         }
     });
