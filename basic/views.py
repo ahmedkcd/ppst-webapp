@@ -136,24 +136,70 @@ def generate_test(request):
     })
 
 def test_statistics(request, test_id):
-    test_session = get_object_or_404(TestSession, test_id=test_id)
-    responses = Response.objects.filter(test=test_session)
+    responses = Response.objects.filter(test_id=test_id)
 
-    total_responses = responses.count()
-    correct_responses = responses.filter(is_correct=True).count()
-    avg_latency = responses.aggregate(models.Avg('latencies'))['latencies__avg'] or 0
+    # Initialize variables to accumulate total latencies
+    total_first_response_latency = 0
+    total_all_latencies = 0
+    total_latencies = 0  # Track the total number of latencies
 
-    accuracy = (correct_responses / total_responses) * 100 if total_responses else 0
+    # Initialize counters for correct and incorrect responses
+    correct_responses = 0
+    incorrect_responses = 0
 
+    # Loop through responses and their latencies
+    for response in responses:
+        latencies_string = response.latencies  # Assuming this is a string like "1129,570,506,459"
+        
+        if latencies_string:
+            # Split the comma-separated string into a list of strings
+            latencies = latencies_string.split(',')
+            
+            # Convert the latencies to integers
+            latencies = [int(latency) for latency in latencies]
+
+            # First latency (first response)
+            first_response_latency = latencies[0]  
+
+            # Sum of all latencies (total response latency)
+            total_response_latency = sum(latencies)  
+
+            # Accumulate the latencies
+            total_first_response_latency += first_response_latency
+            total_all_latencies += total_response_latency
+            total_latencies += len(latencies)  # Add the number of latencies in this response
+
+        # Count correct and incorrect responses
+        if response.is_correct:
+            correct_responses += 1
+        else:
+            incorrect_responses += 1
+
+    # Calculate averages
+    avg_first_response_latency = total_first_response_latency / len(responses) if len(responses) else 0
+    avg_total_response_latency = total_all_latencies / total_latencies if total_latencies else 0
+
+    # Prepare chart data for the bar chart
     chart_data = {
-        'labels': ['Accuracy (%)', 'Avg Latency (ms)', 'Total Responses'],
-        'values': [accuracy, avg_latency, total_responses],
-        'accuracy': accuracy,
-        'avg_latency': avg_latency,
-        'total_responses': total_responses
+        "labels": ["Average First Response Latency", "Average Total Response Latency"],
+        "values": [avg_first_response_latency, avg_total_response_latency],
     }
 
-    return render(request, 'basic/dashboard/test_statistics.html', {'test_id': test_id, 'chart_data': chart_data})
+    # Prepare chart data for the pie chart
+    pie_chart_data = {
+        "labels": ["Correct Responses", "Incorrect Responses"],
+        "values": [correct_responses, incorrect_responses],
+    }
+
+    return render(request, 'basic/dashboard/test_statistics.html', {
+        "test_id": test_id,
+        "chart_data": chart_data,
+        "pie_chart_data": pie_chart_data,
+    })
+
+
+
+
 
 
 @csrf_exempt
