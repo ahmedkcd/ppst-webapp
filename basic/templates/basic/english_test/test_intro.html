@@ -49,32 +49,181 @@
         a.btn:hover {
             background-color: #c288f3;
         }
+        #audioPrompt {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-out;
+}
+
+#audioPrompt .popup {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    animation: popIn 0.3s ease-out;
+}
+
+#audioPrompt h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+#audioPrompt p {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+#audioPrompt button {
+    background-color: #D6A3FB;
+    color: black;
+    font-size: 18px;
+    padding: 14px 26px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#audioPrompt button:hover {
+    background-color: #c288f3;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+#muteButton {
+    position: absolute;
+    top: 1%;
+    right: 1%;
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#muteButton:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+#muteButton svg {
+    width: 30px;
+    height: 30px;
+    stroke: #c288f3;
+}
+
+
     </style>
     <script>
+        function enableAudio() {
+            const audio = document.querySelector(".audio-player audio");
+            audio.play().then(() => {
+                document.getElementById("audioPrompt").style.display = "none";
+            }).catch(err => {
+                console.log("Audio playback failed: ", err);
+            });
+        }
+    
         function playSoundAndNavigate(event) {
             event.preventDefault();
             const audio = document.getElementById("buttonPress");
             const destination = event.currentTarget.href;
-
+    
             audio.currentTime = 0;
             audio.play();
-
+    
             setTimeout(() => {
                 window.location.href = destination;
             }, 300);
         }
+
+        function toggleMute() {
+    const audio = document.getElementById("introAudio");
+    const muteIcon = document.getElementById("muteIcon");
+
+    audio.muted = !audio.muted;
+
+    if (audio.muted) {
+        muteIcon.innerHTML = `
+            <!-- SOUND OFF ICON -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="#c288f3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-volume-x-icon lucide-volume-x">
+                <path
+                    d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+                <line x1="22" x2="16" y1="9" y2="15" />
+                <line x1="16" x2="22" y1="9" y2="15" />
+            </svg>`;
+    } else {
+        muteIcon.innerHTML = `
+            <!-- SOUND ON ICON -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="#c288f3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-volume2-icon lucide-volume-2">
+                <path
+                    d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+                <path d="M16 9a5 5 0 0 1 0 6" />
+                <path d="M19.364 18.364a9 9 0 0 0 0-12.728" />
+            </svg>`;
+    }
+}
+
     </script>
+    
 
 
 </head>
 
 <body>
+    <div id="audioPrompt">
+        <div class="popup">
+            <h2>Enable Audio</h2>
+            <p>Click the button below to enable sound for the test introduction.</p>
+            <button onclick="enableAudio()">Enable Audio</button>
+        </div>
+    </div>
+
+    <!-- ✅ Mute/Unmute Button (now correctly positioned at top-right) -->
+    <button onclick="toggleMute()" id="muteButton">
+        <span id="muteIcon">
+            <!-- SOUND ON ICON (Default) -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="#c288f3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-volume2-icon lucide-volume-2">
+                <path
+                    d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+                <path d="M16 9a5 5 0 0 1 0 6" />
+                <path d="M19.364 18.364a9 9 0 0 0 0-12.728" />
+            </svg>
+        </span>
+    </button>
+
     <h1>Philadelphia Pointing Span Test (PPST)</h1>
     <p>Welcome to the Philadelphia Pointing Span Test (PPST). This test measures your cognitive span and processing
         speed by evaluating how well you can recall and reorder presented stimuli.</p>
 
-    <div class="audio-player">
-        <audio controls autoplay>
+    <div class="audio-player" style="position: relative; width: 100%;">
+        <audio id="introAudio" autoplay>
             <source src="{% static 'basic/PPST_Welcome-Final.mp3' %}" type="audio/mpeg">
             Your browser does not support this audio file.
         </audio>
@@ -85,5 +234,6 @@
 
     <audio id="buttonPress" src="{% static 'basic/sounds/Intro-button.mp3' %}" preload="auto"></audio>
 </body>
+
 
 </html>
