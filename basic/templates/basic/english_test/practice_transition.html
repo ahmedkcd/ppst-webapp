@@ -3,99 +3,161 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transition to Real Test</title>
-    <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}">
-    <style>
-        body {
-            background-color: #f4f4f9;
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            padding: 30px;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transition to Real Test</title>
+  <link rel="stylesheet" href="{% static 'basic/stylesTest.css' %}">
+  <style>
+    body {
+      background-color: #f4f4f9;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 30px;
+    }
+
+    .transition-box {
+      background-color: white;
+      border-radius: 18px;
+      padding: 60px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      width: 1000px;
+      max-width: 95%;
+    }
+
+    .transition-box h2 {
+      font-size: 3rem;
+      margin-bottom: 30px;
+    }
+
+    .transition-box p,
+    .transition-box li {
+      font-size: 1.75rem;
+      line-height: 2.2rem;
+    }
+
+    .transition-box ul {
+      padding-left: 30px;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    #countdown {
+      font-weight: bold;
+      font-size: 2rem;
+      color: #6c5ce7;
+    }
+
+    #muteButton {
+      position: absolute;
+      top: 1%;
+      right: 1%;
+      background-color: #ffffff;
+      padding: 12px;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      z-index: 10;
+    }
+
+    #muteButton:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+    }
+
+    #muteButton svg {
+      width: 26px;
+      height: 26px;
+      stroke: #c288f3;
+    }
+  </style>
+
+  <script>
+    // Inject and configure audio BEFORE page renders fully
+    const isMuted = localStorage.getItem("ppst-muted") === "true";
+    const audio = document.createElement("audio");
+    audio.id = "transitionAudio";
+    audio.autoplay = true;
+    audio.muted = isMuted;
+    audio.innerHTML = `
+      <source src="{% static 'basic/PPST_PracticeComplete.mp3' %}" type="audio/mpeg">
+      Your browser does not support this audio file.
+    `;
+
+    document.addEventListener("DOMContentLoaded", function () {
+      document.body.appendChild(audio);
+      updateMuteIcon(isMuted);
+
+      let timeLeft = 20;
+      const countdownElement = document.getElementById("countdown");
+      const testId = new URLSearchParams(window.location.search).get("test_id");
+
+      const countdown = setInterval(() => {
+        timeLeft--;
+        countdownElement.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          window.location.href = `/basic/take-test/?test_id=${testId}`;
         }
+      }, 1000);
+    });
 
-        .transition-box {
-            background-color: white;
-            border-radius: 18px;
-            padding: 60px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-            width: 1000px;
-            max-width: 95%;
-        }
+    function toggleMute() {
+      const audio = document.getElementById("transitionAudio");
+      const isNowMuted = !audio.muted;
+      audio.muted = isNowMuted;
+      localStorage.setItem("ppst-muted", isNowMuted);
+      updateMuteIcon(isNowMuted);
+    }
 
-        .transition-box h2 {
-            font-size: 3rem;
-            margin-bottom: 30px;
-        }
-
-        .transition-box p,
-        .transition-box li {
-            font-size: 1.75rem;
-            line-height: 2.2rem;
-        }
-
-        .transition-box ul {
-            padding-left: 30px;
-            margin-top: 20px;
-            margin-bottom: 30px;
-        }
-
-        #countdown {
-            font-weight: bold;
-            font-size: 2rem;
-            color: #6c5ce7;
-        }
-
-        .audio-player {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-        }
-    </style>
-    <script>
-        window.onload = function () {
-            let timeLeft = 20;
-            const countdownElement = document.getElementById("countdown");
-            const testId = new URLSearchParams(window.location.search).get("test_id");
-
-            const countdown = setInterval(() => {
-                timeLeft--;
-                countdownElement.textContent = timeLeft;
-
-                if (timeLeft <= 0) {
-                    clearInterval(countdown);
-                    window.location.href = `/basic/take-test/?test_id=${testId}`;
-                }
-            }, 1000);
-        };
-    </script>
+    function updateMuteIcon(isMuted) {
+      const muteIcon = document.getElementById("muteIcon");
+      muteIcon.innerHTML = isMuted
+        ? `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+              stroke="#c288f3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587
+            A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1
+            0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383
+            3.384A.705.705 0 0 0 11 19.298z"/>
+            <line x1="22" x2="16" y1="9" y2="15"/>
+            <line x1="16" x2="22" y1="9" y2="15"/>
+          </svg>`
+        : `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+              stroke="#c288f3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413
+            7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1
+            1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1
+            .997.413l3.383 3.384A.705.705 0 0 0
+            11 19.298z"/>
+            <path d="M16 9a5 5 0 0 1 0 6"/>
+            <path d="M19.364 18.364a9 9 0 0 0 0-12.728"/>
+          </svg>`;
+    }
+  </script>
 </head>
 
 <body>
-    <div class="transition-box">
-        <h2>Practice Complete!</h2>
-        <p>You’ve completed the Practice Stimuli Test. Now, the real test will begin.</p>
-        <p><strong>What to Expect in the Real Test:</strong></p>
-        <ul>
-            <li>The format will be the same as the practice session.</li>
-            <li>Your responses will now be recorded for analysis.</li>
-            <li>Try to stay focused and respond as quickly and accurately as possible.</li>
-        </ul>
-        <p>Get ready! The test will begin automatically in <span id="countdown">20</span> seconds.</p>
-    </div>
+  <!-- Mute Toggle -->
+  <button onclick="toggleMute()" id="muteButton">
+    <span id="muteIcon"></span>
+  </button>
 
-    <div class="audio-player">
-        <audio controls autoplay>
-            <source src="{% static 'basic/PPST_PracticeComplete.mp3' %}" type="audio/mpeg">
-            Your browser does not support this audio file.
-        </audio>
-    </div>
-
+  <div class="transition-box">
+    <h2>Practice Complete!</h2>
+    <p>You’ve completed the Practice Stimuli Test. Now, the real test will begin.</p>
+    <p><strong>What to Expect in the Real Test:</strong></p>
+    <ul>
+      <li>The format will be the same as the practice session.</li>
+      <li>Your responses will now be recorded for analysis.</li>
+      <li>Try to stay focused and respond as quickly and accurately as possible.</li>
+    </ul>
+    <p>Get ready! The test will begin automatically in <span id="countdown">20</span> seconds.</p>
+  </div>
 </body>
 
 </html>

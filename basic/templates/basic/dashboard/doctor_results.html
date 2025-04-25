@@ -70,10 +70,12 @@
                                 Download
                             </button>
                             <!--View Button -->
-                            <button onclick="showDetails('{{ test.doctor.username }}', '{{ test.age }}', '{{ test.date }}', '{{ test.duration }}', '{{ test.avg_latency }}', '{{ test.accuracy }}')"
-                                    class="bg-[var(--button-purple)] text-white px-4 py-2 rounded">
-                                View
-                            </button>
+                            
+<a href="/basic/test_statistics/{{ test.test_id }}/"
+class="bg-[var(--button-purple)] text-white px-2 py-2 rounded flex items-center justify-center">
+View Statistics
+</a>
+
                         </div>
                     </div>
                 {% empty %}

@@ -36,9 +36,85 @@
 
         pre {
             background: #ecf0f1;
-            padding: 10px;
-            border-radius: 5px;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    white-space: pre-wrap;      /* Allows text wrapping */
+    word-break: break-word;     /* Ensures long words or links break correctly */
+    max-width: 100%;     
         }
+
+        .custom-toast {
+        position: fixed;
+        bottom: 100%;
+        left: 53%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        z-index: 9999;
+        font-size: 14px;
+    }
+
+    .custom-toast.show {
+        opacity: 1;
+        bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .sidebar.show ~ .main-content {
+        display: none !important;
+    }
+        .main-content {
+            padding: 20px;
+        }
+
+        .card {
+            padding: 16px;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+        }
+
+        .btn-generate {
+            font-size: 1rem;
+            padding: 10px;
+        }
+
+        pre {
+            font-size: 0.85rem;
+        }
+
+        .btn.btn-secondary {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .main-content {
+            padding: 15px;
+        }
+
+        .card {
+            padding: 12px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+        }
+
+        .btn-generate {
+            font-size: 0.95rem;
+        }
+
+        .custom-toast {
+            font-size: 13px;
+        }
+    }
     </style>
     </head>
 
@@ -74,7 +150,7 @@
         function generateTest() {
             const age = document.getElementById("age").value;
             if (!age) {
-                alert("Please enter an age");
+                showToast("Please enter an age");
                 return;
             }
             const language = document.getElementById("language").value;
@@ -83,7 +159,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
-                        alert(data.error);
+                        showToast(data.error);
                         return;
                     }
 
@@ -96,8 +172,24 @@
         function copyToClipboard() {
             const linkText = document.getElementById("test-link").textContent;
             navigator.clipboard.writeText(linkText).then(() => {
-                alert("Copied to clipboard!");
+                showToast("Copied to clipboard!");
             }).catch(err => console.error("Error copying text: ", err));
         }
+
+        function showToast(message) {
+    const toast = document.createElement("div");
+    toast.className = "custom-toast";
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+   
+    setTimeout(() => toast.classList.add("show"), 100);
+
+    
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => document.body.removeChild(toast), 500);
+    }, 2500);
+}
     </script>
 {% endblock %}

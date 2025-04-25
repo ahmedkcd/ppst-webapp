@@ -162,7 +162,7 @@ def test_statistics(request, test_id):
             latencies = latencies_string.split(',')
             
             # Convert the latencies to integers
-            latencies = [int(latency) for latency in latencies]
+            latencies = [int(float(latency)) for latency in latencies] 
 
             # First latency (first response)
             first_response_latency = latencies[0]  
