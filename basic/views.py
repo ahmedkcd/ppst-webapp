@@ -1,20 +1,19 @@
-import csv
 import json
 import uuid
+from collections import defaultdict
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.db import models
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
-
 from openpyxl import Workbook
-from openpyxl.styles import Font
 from openpyxl.chart import PieChart, BarChart, Reference
 from openpyxl.chart.label import DataLabelList
+from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 
 from basic.models import User
@@ -156,19 +155,19 @@ def test_statistics(request, test_id):
     # Loop through responses and their latencies
     for response in responses:
         latencies_string = response.latencies  # Assuming this is a string like "1129,570,506,459"
-        
+
         if latencies_string:
             # Split the comma-separated string into a list of strings
             latencies = latencies_string.split(',')
-            
+
             # Convert the latencies to integers
             latencies = [int(float(latency)) for latency in latencies] 
 
             # First latency (first response)
-            first_response_latency = latencies[0]  
+            first_response_latency = latencies[0]
 
             # Sum of all latencies (total response latency)
-            total_response_latency = sum(latencies)  
+            total_response_latency = sum(latencies)
 
             # Accumulate the latencies
             total_first_response_latency += first_response_latency
@@ -350,7 +349,7 @@ def export_test_data(request):
          try:
             total_latency += float(resp.latencies)
          except ValueError:
-            pass  
+            pass
 
     for col in range(1, len(headers)+1):
         raw_sheet.column_dimensions[get_column_letter(col)].width = 20
@@ -381,14 +380,14 @@ def export_test_data(request):
         try:
             latency_map[r.stim.stimulus].append(float(r.latencies))
         except ValueError:
-            continue 
+            continue
 
     latency_rows_start = stat_sheet.max_row + 1
     for stim, latencies in latency_map.items():
         avg = sum(latencies)/len(latencies)
         stat_sheet.append([stim, avg])
 
-    # Charts 
+    # Charts
 
     # Pie Chart
     pie = PieChart()
@@ -426,3 +425,67 @@ def export_test_data(request):
     response = HttpResponse(output, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     response["Content-Disposition"] = f'attachment; filename="test_{test_id}_report.xlsx"'
     return response
+
+
+def aggregated_statistics(request):
+    # Parse latencies (stored as text) and group by stimulus
+    responses = (
+        Response.objects
+        .exclude(latencies__isnull=True)
+        .select_related("stim")
+    )
+
+    stim_sums = defaultdict(list)
+
+    for r in responses:
+        try:
+            latency = float(r.latencies.strip())
+            stim_sums[r.stim.stimulus].append(latency)
+        except (ValueError, AttributeError):
+            continue  # skip invalid entries
+
+    stim_latency_data = [
+        {"stim__stimulus": stim, "avg_latency": sum(vals)/len(vals)}
+        for stim, vals in stim_sums.items()
+    ]
+
+    # Overall correctness of responses
+    correctness_data = (
+        Response.objects
+        .exclude(is_correct__isnull=True)
+        .values("is_correct")
+        .annotate(count=Count("response_id"))
+        .order_by("is_correct")
+    )
+
+    # Number of tests per doctor
+    doctor_data = (
+        TestSession.objects
+        .values("doctor__username")
+        .annotate(test_count=Count("test_id"))
+        .order_by("-test_count")
+    )
+    correct_counts = (
+        Response.objects
+        .exclude(is_correct__isnull=True)
+        .values("is_correct")
+        .annotate(count=Count("response_id"))
+    )
+
+    # Print results
+    for entry in correct_counts:
+        label = "Correct" if entry["is_correct"] else "Incorrect"
+        print(f"{label} responses: {entry['count']}")
+
+    # Final context (unchanged variable names)
+    context = {
+        "stim_labels": [entry["stim__stimulus"] for entry in stim_latency_data],
+        "stim_latencies": [entry["avg_latency"] for entry in stim_latency_data],
+        "correct_labels": ["Correct" if entry["is_correct"] else "Incorrect" for entry in correctness_data],
+        "correct_counts": [entry["count"] for entry in correctness_data],
+        "doctor_labels": [entry["doctor__username"] for entry in doctor_data],
+        "doctor_values": [entry["test_count"] for entry in doctor_data],
+    }
+
+    return render(request, "basic/aggregated_statistics.html", context)
+
