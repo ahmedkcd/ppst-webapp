@@ -487,5 +487,5 @@ def aggregated_statistics(request):
         "doctor_values": [entry["test_count"] for entry in doctor_data],
     }
 
-    return render(request, "basic/aggregated_statistics.html", context)
+    return render(request, "basic/dashboard/aggregated_statistics.html", context)
 
