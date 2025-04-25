@@ -1,24 +1,36 @@
 import os
-import random
-from datetime import timedelta
-
-# ✅ Set Django settings before importing anything Django-specific
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "basic.settings")
 import django
+import random
+import uuid
+from random import randrange
+from datetime import timedelta, datetime
+from django.utils import timezone
+from django.contrib.auth.models import User
+
+# Setup Django environment
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "djangoproject.settings")
 django.setup()
 
-# ✅ Django imports after setup
-from django.contrib.auth.models import User
-from django.utils import timezone
 from basic.models import TestSession, Stimuli, Response
 
-# 🧹 Delete existing test-related data (except users)
-for model in [TestSession, Stimuli, Response]:
-    model.objects.all().delete()
-print("🧼 Existing test data cleared.")
+# 🔍 Clean up ONLY rows with valid UUIDs
+def clean_database():
+    print("Cleaning old data...")
+    for model in [TestSession, Stimuli, Response]:
+        for obj in model.objects.all():
+            if hasattr(obj, 'test_id'):
+                try:
+                    uuid.UUID(str(obj.test_id))
+                    obj.delete()
+                except ValueError:
+                    print(f"Skipped bad UUID: {obj.test_id}")
+            else:
+                obj.delete()
+    print("Cleaned up valid entries.")
 
+clean_database()
 
-# 👩‍⚕️ Ensure doctors exist
+# Ensure unique users
 def get_or_create_user(username, email):
     user, created = User.objects.get_or_create(username=username, defaults={"email": email})
     if created:
@@ -30,80 +42,98 @@ def get_or_create_user(username, email):
 doctors = [
     get_or_create_user("dr_smith", "drsmith@example.com"),
     get_or_create_user("dr_jones", "drjones@example.com"),
+    get_or_create_user("dr_matt", "drmatt@example.com"),
+    get_or_create_user("dr_atilla", "dratilla@example.com"),
+    get_or_create_user("dr_tuch", "drtuch@example.com"),
+    get_or_create_user("dr_rossi", "drrossi@example.com"),
 ]
-print(f"👩‍⚕️ Doctors available: {[doctor.username for doctor in doctors]}")
 
+print(f"Doctors in database: {[doctor.username for doctor in doctors]}")
 
-# 🧪 Create test sessions (UUIDs auto-assigned, so we do NOT set test_id manually)
-test_sessions = []
-for i in range(4):
-    session = TestSession.objects.create(
-        doctor=doctors[i % 2],
-        age=30 + i,
-        date=timezone.now() - timedelta(days=i),
-        duration=timedelta(minutes=25 + i * 5),
-        status="completed"
-    )
-    test_sessions.append(session)
-
-print(f"🧾 Created test sessions: {[str(session.test_id) for session in test_sessions]}")
-
-
-# 🎯 Manually defined stimuli
 stimuli_data = [
-    ("7613", "1367", 4, "Numeric"),
-    ("4231", "1234", 4, "Numeric"),
-    ("5279", "2579", 4, "Numeric"),
-    ("19457", "14579", 5, "Numeric"),
-    ("36279", "23679", 5, "Numeric"),
-    ("91347", "13479", 5, "Numeric"),
-    ("B1H3", "13BH", 4, "AlphaNumeric"),
-    ("M4X7", "47MX", 4, "AlphaNumeric"),
-    ("G9R2", "29GR", 4, "AlphaNumeric"),
-    ("RH12M", "12HMR", 5, "AlphaNumeric"),
-    ("B9Y4X", "49BXY", 5, "AlphaNumeric"),
-    ("F5M1R", "15FMR", 5, "AlphaNumeric"),
+    ("7613", "1367", 4, "Numeric"), ("4231", "1234", 4, "Numeric"), ("5279", "2579", 4, "Numeric"),
+    ("19457", "14579", 5, "Numeric"), ("36279", "23679", 5, "Numeric"), ("91347", "13479", 5, "Numeric"),
+    ("B1H3", "13BH", 4, "AlphaNumeric"), ("M4X7", "47MX", 4, "AlphaNumeric"), ("G9R2", "29GR", 4, "AlphaNumeric"),
+    ("RH12M", "12HMR", 5, "AlphaNumeric"), ("B9Y4X", "49BXY", 5, "AlphaNumeric"), ("F5M1R", "15FMR", 5, "AlphaNumeric"),
+    ("B129", "129B", 4, "Practice"), ("HG97", "79GH", 4, "Practice"),
 ]
 
-# 💾 Create stimuli in DB
 stimuli = [
     Stimuli.objects.create(stimulus=s[0], correct_response=s[1], span=s[2], type=s[3])
     for s in stimuli_data
 ]
-print(f"📚 Created {len(stimuli)} stimuli.")
 
+print(f"Created stimuli: {[stim.stim_id for stim in stimuli]}")
 
-# 📝 Create randomized responses
-responses = []
-for test in test_sessions:
-    for stim in stimuli:
-        is_correct = random.choices([True, False], weights=[0.7, 0.3])[0]
+def random_date():
+    d1 = datetime.strptime('1/1/2023 1:30 PM', '%m/%d/%Y %I:%M %p')
+    d2 = datetime.strptime('1/1/2024 4:50 AM', '%m/%d/%Y %I:%M %p')
+    d1 = timezone.make_aware(d1)
+    d2 = timezone.make_aware(d2)
+    delta = d2 - d1
+    int_delta = (delta.days * 86400) + delta.seconds
+    return d1 + timedelta(seconds=randrange(int_delta))
+
+test_sessions = []
+all_stimuli = Stimuli.objects.exclude(type="Practice")
+test_orders = [
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    [3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8],
+    [6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 4, 5],
+    [11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+]
+languages = ["en", "sp"]
+
+for i in range(100):
+    doctor = doctors[i % len(doctors)]
+    age = random.randint(30, 90)
+    duration = timedelta(minutes=random.randint(20, 60))
+    date = random_date()
+    test_uuid = str(uuid.uuid4())
+    language = random.choice(languages)
+
+    selected_order = random.choice(test_orders)
+    stimuli_list = list(all_stimuli)
+    ordered_stimuli = [stimuli_list[i] for i in selected_order]
+    stimuli_order_str = ",".join(map(str, selected_order))
+
+    session = TestSession.objects.create(
+        doctor=doctor,
+        age=age,
+        date=date,
+        duration=duration,
+        test_id=test_uuid,
+        stimuli_order=stimuli_order_str,
+        language=language
+    )
+    test_sessions.append(session)
+
+    for stim in ordered_stimuli:
+        is_correct = random.choice([True, False])
         if is_correct:
-            user_response = stim.correct_response
+            response_text = stim.correct_response
         else:
-            scrambled = list(stim.correct_response)
-            random.shuffle(scrambled)
-            user_response = ''.join(scrambled)
-            if user_response == stim.correct_response:
-                user_response += "X"
-
+            chars = '12345679BHGFMRXY'
+            response_text = ''.join(random.choices(chars, k=len(stim.correct_response)))
+            if response_text == stim.correct_response:
+                response_text = ''.join(random.choices(chars, k=len(stim.correct_response)))
         latency = round(random.uniform(1.5, 3.5), 2)
 
-        response = Response.objects.create(
-            test=test,
+        Response.objects.create(
+            test=session,
             stim=stim,
-            response=user_response,
-            latencies=[latency],
+            response=response_text,
+            latencies=latency,
             is_correct=is_correct
         )
 
-        responses.append(response)
+print(f"✅ Created {len(test_sessions)} test sessions with responses.")
 
-    # 📊 Update statistics on the session after creating all responses
-    test.calculate_statistics()
-    print(f"📊 Test {str(test.test_id)} — Accuracy: {test.accuracy:.2f}%, Avg Latency: {test.avg_latency:.2f}s")
+# Verify
+tasks = TestSession.objects.filter(doctor=doctors[0])
+print(f"🧪 Tests assigned to Dr. Smith: {[t.test_id for t in tasks]}")
 
+responses = Response.objects.filter(test=test_sessions[0])
+print(f"📊 Responses for Test {test_sessions[0].test_id}: {[r.response for r in responses]}")
 
-# ✅ Final success message
-print(f"✅ Total responses created: {len(responses)}")
-print("🎉 Fixture loaded successfully!")
+print("🎉 Database populated successfully!")

@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPST Test - Introduction</title>
+    <style>
+        body {
+            background-color: #f4f4f9;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            max-width: 1000px;
+        }
+
+        p {
+            max-width: 800px;
+            font-size: 27px;
+            line-height: 1.6;
+            margin: 10px auto;
+        }
+
+        a.btn {
+            margin-top: 30px;
+            padding: 18px 32px;
+            font-size: 24px;
+            border: none;
+            background-color: #D6A3FB;
+            text-decoration: none;
+            color: black;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        a.btn:hover {
+            background-color: #c288f3;
+        }
+    </style>
+    <script>
+        function playSoundAndNavigate(event) {
+            event.preventDefault();
+            const audio = document.getElementById("buttonPress");
+            const destination = event.currentTarget.href;
+
+            audio.currentTime = 0;
+            audio.play();
+
+            setTimeout(() => {
+                window.location.href = destination;
+            }, 300);
+        }
+    </script>
+
+
+</head>
+
+<body>
+    <h1>Philadelphia Pointing Span Test (PPST)</h1>
+    <p>Welcome to the Philadelphia Pointing Span Test (PPST). This test measures your cognitive span and processing
+        speed by evaluating how well you can recall and reorder presented stimuli.</p>
+
+    <div class="audio-player">
+        <audio controls autoplay>
+            <source src="{% static 'basic/PPST_Welcome-Final.mp3' %}" type="audio/mpeg">
+            Your browser does not support this audio file.
+        </audio>
+    </div>
+
+    <a href="{% url 'basic:test_instructions' %}?test_id={{ test_id }}" class="btn"
+        onclick="playSoundAndNavigate(event)">Next</a>
+
+    <audio id="buttonPress" src="{% static 'basic/sounds/Intro-button.mp3' %}" preload="auto"></audio>
+</body>
+
+</html>
