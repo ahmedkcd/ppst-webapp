@@ -1,25 +1,20 @@
-import csv
 import json
 import uuid
+from collections import defaultdict
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.db import models
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
-
 from openpyxl import Workbook
-from openpyxl.styles import Font
 from openpyxl.chart import PieChart, BarChart, Reference
 from openpyxl.chart.label import DataLabelList
+from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
-
-from django.db.models import Avg, Count
-from django.db.models.functions import TruncDay
-from collections import defaultdict
 
 from basic.models import User
 
@@ -430,11 +425,6 @@ def export_test_data(request):
     response = HttpResponse(output, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     response["Content-Disposition"] = f'attachment; filename="test_{test_id}_report.xlsx"'
     return response
-
-
-def testresults(request):
-    test_sessions = TestSession.objects.all()  # Retrieve all test sessions
-    return render(request, "basic/testresults.html", {"test_sessions": test_sessions})
 
 
 def aggregated_statistics(request):
