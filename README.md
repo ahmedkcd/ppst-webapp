@@ -28,15 +28,19 @@ cd ppst-webapp
 ### 3️⃣ Set Up a Virtual Environment
 
 Using **venv**:
+
 python -m venv venv
+
 source venv/bin/activate # On Windows: venv\Scripts\activate
 
 
 ---
 
-### 4️⃣ Install Django
+### 4️⃣ Install Django and Openpyxl 
 
 pip install django
+
+pip install openpyxl
 
 ---
 
@@ -46,7 +50,12 @@ python manage.py makemigrations
 
 python manage.py migrate
 
-python manage.py shell < fixture.py
+#### Load Fixture
+python manage.py shell
+
+exec(open('fixture.py').read())
+
+exit()
 
 python manage.py createsuperuser # Follow prompts to set up an admin user
 

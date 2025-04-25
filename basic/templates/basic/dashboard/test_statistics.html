@@ -1,0 +1,146 @@
+{% extends 'basic/dashboard/base.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+
+<style>
+    body {
+        background-color: #f4f7f6;
+        font-family: Arial, sans-serif;
+    }
+
+    .dashboard-container {
+        padding: 20px;
+    }
+
+    .chart-section {
+        margin-bottom: 40px;
+    }
+</style>
+
+{% block title %} Test Statistics {% endblock %}
+
+{% block content %}
+<body>
+    <div class="dashboard-container">
+        <h1>Test Statistics for Test ID: {{ test_id }}</h1>
+        
+        <div style="white-space: nowrap;">
+            <!-- Pie Chart -->
+            <div style="display: inline-block; width: 400px; vertical-align: top; margin-right: 20px;">
+                <canvas id="pieChart" width="400" height="400"></canvas>
+            </div>
+
+            <!-- Bar Chart -->
+            <div style="display: inline-block; width: 600px; vertical-align: top; margin-left: 20px;">
+                <canvas id="statisticsChart" width="600" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+    
+
+<script>
+    const chartData = {{ chart_data|safe }};
+    const ctx = document.getElementById('statisticsChart').getContext('2d');
+
+    const statisticsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                label: 'Average Latencies (ms)',
+                data: chartData.values.map(value => value),
+                backgroundColor: 'rgba(128, 0, 128, 0.2)',
+                borderColor: 'rgba(128, 0, 128, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                datalabels: {
+                    display: true,
+                    color: 'black',
+                    font: {
+                        size: 16,
+                        family: 'Arial',
+                        weight: 'bold'
+                    },
+                    formatter: function (value) {
+                        const formatted = value % 1 === 0 ? value.toFixed(0) : value.toFixed(2);
+                        return `${formatted} ms`;
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Milliseconds'
+                    }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+</script>
+
+<script>
+    const pieChartData = {{ pie_chart_data|safe }};
+    const filteredValues = [];
+    const filteredLabels = [];
+    const filteredColors = [];
+
+    const pieColors = ['rgba(128, 0, 128, 0.2)', 'rgba(255, 0, 0, 0.2)'];
+    const total = pieChartData.values.reduce((a, b) => a + b, 0);
+
+    for (let i = 0; i < pieChartData.values.length; i++) {
+        if (pieChartData.values[i] > 0) {
+            filteredValues.push(pieChartData.values[i]);
+            filteredLabels.push(pieChartData.labels[i]);
+            filteredColors.push(pieColors[i]);
+        }
+    }
+
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    const pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: filteredLabels,
+            datasets: [{
+                data: filteredValues,
+                backgroundColor: filteredColors,
+                borderColor: ['rgba(128, 0, 128, 1)', 'rgba(255, 0, 0, 1)'],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                datalabels: {
+                    display: true,
+                    color: 'black',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    },
+                    formatter: function (value, context) {
+                        const label = context.chart.data.labels[context.dataIndex];
+                        return `${value}/${total} ${label}`;
+                    }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+</script>
+</body>
+{% endblock %}

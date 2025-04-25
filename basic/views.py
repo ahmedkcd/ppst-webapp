@@ -6,11 +6,16 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import models
-from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
+
+from openpyxl import Workbook
+from openpyxl.styles import Font
+from openpyxl.chart import PieChart, BarChart, Reference
+from openpyxl.chart.label import DataLabelList
+from openpyxl.utils import get_column_letter
 
 from django.db.models import Avg, Count
 from django.db.models.functions import TruncDay
@@ -20,11 +25,8 @@ from basic.models import User
 
 
 def doctor_login_view(request):
-    return render(request, 'basic/doctor_login.html')
+    return render(request, 'basic/dashboard/doctor_login.html')
 
-
-def doctor_test_page(request):
-    return render(request, 'basic/doctor_taketest.html')
 
 
 def doctor_user_login(request):
@@ -45,57 +47,42 @@ def doctor_user_login(request):
             messages.error(request, "Invalid username or password")
             return  redirect("basic:doctor-login") # Redirecting to the login page, when refreshed
 
-    return render(request, "basic/doctor_login.html")
+    return render(request, "basic/dashboard/doctor_login.html")
 
 
 @login_required(login_url='/basic/')
 def doctor_dashboard(request):
-    return render(request, 'basic/doctor_dashboard.html')
-    
+    return render(request, 'basic/dashboard/doctor_dashboard.html')
+
 @login_required(login_url='/basic/')
 def doctor_results(request):
     test_sessions = TestSession.objects.filter(doctor=request.user)
-    return render(request, 'basic/doctor_results.html', {'test_sessions': test_sessions})
-    
+    return render(request, 'basic/dashboard/doctor_results.html', {'test_sessions': test_sessions})
+
 @login_required(login_url='/basic/')
 def doctor_statistics(request):
-    return render(request, 'basic/doctor_statistics.html')
-    
+    return render(request, 'basic/dashboard/doctor_statistics.html')
+
 @login_required(login_url='/basic/')
 def doctor_newtest(request):
-    return render(request, "basic/doctor_newtest.html")
+    return render(request, "basic/dashboard/doctor_newtest.html")
 
 def base(request):
-    return render(request, "basic/base.html")
+    return render(request, "basic/dashboard/base.html")
 
 def landing(request):
      total_tests = TestSession.objects.count()  # Count all test sessions
      total_doctors = User.objects.filter(testsession__isnull=False).distinct().count()  # Count unique doctors with tests
 
-     return render(request, "basic/landing.html", {
+     return render(request, "basic/dashboard/landing.html", {
         "total_tests": total_tests,
         "total_doctors": total_doctors,
     })
 def doctor_logout_view(request):
-    logout(request)  
-    return redirect('basic:landing') 
-
-
-def test_page(request):
-    return render(request, "basic/test_page.html")
-
-
-def take_test(request):
-    test_id = request.GET.get("test_id")
-    if not test_id:
-        return HttpResponse("Error: Test ID missing", status=400)
-
-    test = get_object_or_404(TestSession, pk=test_id)
-    return render(request, "basic/take_test.html", {"test": test})
-
+    logout(request)
+    return redirect('basic:landing')
 
 import random
-from django.contrib.auth.decorators import login_required
 from .models import TestSession, Stimuli
 
 
@@ -147,7 +134,10 @@ def generate_test(request):
             "stimulus": stimulus.stim_id,
         })
 
-    test_link = f"http://localhost:8000/basic/test/intro/?test_id={test_uuid}"
+    if language == 'en':
+        test_link = f"http://localhost:8000/basic/test/intro/?test_id={test_uuid}"
+    else:
+        test_link = f"http://localhost:8000/basic/test/intro-sp/?test_id={test_uuid}"
 
     return JsonResponse({
         "message": "Test generated successfully.",
@@ -156,24 +146,70 @@ def generate_test(request):
     })
 
 def test_statistics(request, test_id):
-    test_session = get_object_or_404(TestSession, test_id=test_id)
-    responses = Response.objects.filter(test=test_session)
+    responses = Response.objects.filter(test_id=test_id)
 
-    total_responses = responses.count()
-    correct_responses = responses.filter(is_correct=True).count()
-    avg_latency = responses.aggregate(models.Avg('latencies'))['latencies__avg'] or 0
+    # Initialize variables to accumulate total latencies
+    total_first_response_latency = 0
+    total_all_latencies = 0
+    total_latencies = 0  # Track the total number of latencies
 
-    accuracy = (correct_responses / total_responses) * 100 if total_responses else 0
+    # Initialize counters for correct and incorrect responses
+    correct_responses = 0
+    incorrect_responses = 0
 
+    # Loop through responses and their latencies
+    for response in responses:
+        latencies_string = response.latencies  # Assuming this is a string like "1129,570,506,459"
+
+        if latencies_string:
+            # Split the comma-separated string into a list of strings
+            latencies = latencies_string.split(',')
+
+            # Convert the latencies to integers
+            latencies = [int(latency) for latency in latencies]
+
+            # First latency (first response)
+            first_response_latency = latencies[0]
+
+            # Sum of all latencies (total response latency)
+            total_response_latency = sum(latencies)
+
+            # Accumulate the latencies
+            total_first_response_latency += first_response_latency
+            total_all_latencies += total_response_latency
+            total_latencies += len(latencies)  # Add the number of latencies in this response
+
+        # Count correct and incorrect responses
+        if response.is_correct:
+            correct_responses += 1
+        else:
+            incorrect_responses += 1
+
+    # Calculate averages
+    avg_first_response_latency = total_first_response_latency / len(responses) if len(responses) else 0
+    avg_total_response_latency = total_all_latencies / total_latencies if total_latencies else 0
+
+    # Prepare chart data for the bar chart
     chart_data = {
-        'labels': ['Accuracy (%)', 'Avg Latency (ms)', 'Total Responses'],
-        'values': [accuracy, avg_latency, total_responses],
-        'accuracy': accuracy,
-        'avg_latency': avg_latency,
-        'total_responses': total_responses
+        "labels": ["Average First Response Latency", "Average Total Response Latency"],
+        "values": [avg_first_response_latency, avg_total_response_latency],
     }
 
-    return render(request, 'basic/test_statistics.html', {'test_id': test_id, 'chart_data': chart_data})
+    # Prepare chart data for the pie chart
+    pie_chart_data = {
+        "labels": ["Correct Responses", "Incorrect Responses"],
+        "values": [correct_responses, incorrect_responses],
+    }
+
+    return render(request, 'basic/dashboard/test_statistics.html', {
+        "test_id": test_id,
+        "chart_data": chart_data,
+        "pie_chart_data": pie_chart_data,
+    })
+
+
+
+
 
 
 @csrf_exempt
@@ -204,111 +240,195 @@ def get_responses(request):
 
     return JsonResponse({"responses": data})
 
-
-@csrf_exempt
-def submit_response(request):
-    if request.method == "POST":
-        data = json.loads(request.body)
-        response_id = data.get("response_id")
-        user_response = data.get("response")
-        latencies = data.get("latencies", "")
-
-        try:
-            response = Response.objects.get(pk=response_id)
-            response.response = user_response
-            response.latencies = latencies
-            response.is_correct = (user_response == response.stim.correct_response)
-            response.save()
-            return JsonResponse({"status": "success"})
-        except Response.DoesNotExist:
-            return JsonResponse({"error": "Response not found"}, status=404)
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
-
-
-def login_view(request):
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect("basic:dashboard")
-        else:
-            return render(request, "basic/login.html", {"error": "Invalid credentials"})
-    return render(request, "basic/login.html")
-
-
 def logout_view(request):
     logout(request)
     return redirect("basic:login")
 
-
-@login_required
-def dashboard(request):
-    return render(request, "basic/dashboard.html", {"doctor_name": request.user.username})
-
-
-# def test_intro(request):
-#     return render(request, "basic/test_intro.html")
 def test_intro(request):
     test_id = request.GET.get("test_id", None)
-    return render(request, "basic/test_intro.html", {"test_id": test_id})
+    return render(request, "basic/english_test/test_intro.html", {"test_id": test_id})
 
-
-# def test_instructions(request):
-#     return render(request, "basic/test_instructions.html")
 def test_instructions(request):
     test_id = request.GET.get("test_id", None)
-    return render(request, "basic/test_instructions.html", {"test_id": test_id})
+    return render(request, "basic/english_test/test_instructions.html", {"test_id": test_id})
 
-
-# practice segment work
 def practice_test(request):
     test_id = request.GET.get("test_id")
 
-    return render(request, "basic/practice_test.html", {"test_id": test_id})
-
+    return render(request, "basic/english_test/practice_test.html", {"test_id": test_id})
 
 def get_practice_responses(request):
     practice_stimuli = Stimuli.objects.filter(type="Practice")[:2]
     data = [{"stimulus_text": s.stimulus} for s in practice_stimuli]
     return JsonResponse({"responses": data})
 
-
 def practice_countdown(request):
     test_id = request.GET.get("test_id")
-    return render(request, "basic/practice_countdown.html", {"test_id": test_id})
+    return render(request, "basic/english_test/practice_countdown.html", {"test_id": test_id})
 
 def practice_transition(request):
     test_id = request.GET.get("test_id")
-    return render(request, "basic/practice_transition.html", {"test_id": test_id})
+    return render(request, "basic/english_test/practice_transition.html", {"test_id": test_id})
+
+def take_test(request):
+    test_id = request.GET.get("test_id")
+    if not test_id:
+        return HttpResponse("Error: Test ID missing", status=400)
+
+    test = get_object_or_404(TestSession, pk=test_id)
+    return render(request, "basic/english_test/test.html", {"test": test})
 
 def test_complete(request):
-    return render(request, "basic/test_complete.html")
+    return render(request, "basic/english_test/test_complete.html")
 
+def test_results(request):
+    test_sessions = TestSession.objects.all()  # Retrieve all test sessions
+    return render(request, "basic/dashboard/test_results.html", {"test_sessions": test_sessions})
+
+def test_intro_sp(request):
+    test_id = request.GET.get("test_id", None)
+    return render(request, "basic/spanish_test/test_intro_sp.html", {"test_id": test_id})
+
+def test_instructions_sp(request):
+    test_id = request.GET.get("test_id", None)
+    return render(request, "basic/spanish_test/test_instructions_sp.html", {"test_id": test_id})
+
+def practice_test_sp(request):
+    test_id = request.GET.get("test_id")
+
+    return render(request, "basic/spanish_test/practice_test_sp.html", {"test_id": test_id})
+
+def get_practice_responses_sp(request):
+    practice_stimuli = Stimuli.objects.filter(type="Practice")[:2]
+    data = [{"stimulus_text": s.stimulus} for s in practice_stimuli]
+    return JsonResponse({"responses": data})
+
+def practice_countdown_sp(request):
+    test_id = request.GET.get("test_id")
+    return render(request, "basic/spanish_test/practice_countdown_sp.html", {"test_id": test_id})
+
+def practice_transition_sp(request):
+    test_id = request.GET.get("test_id")
+    return render(request, "basic/spanish_test/practice_transition_sp.html", {"test_id": test_id})
+
+def take_test_sp(request):
+    test_id = request.GET.get("test_id")
+    if not test_id:
+        return HttpResponse("Error: Test ID missing", status=400)
+
+    test = get_object_or_404(TestSession, pk=test_id)
+    return render(request, "basic/spanish_test/test_sp.html", {"test": test})
+
+def test_complete_sp(request):
+    return render(request, "basic/spanish_test/test_complete_sp.html")
 
 def export_test_data(request):
     test_id = request.GET.get("test_id")
     responses = Response.objects.filter(test_id=test_id).select_related("stim")
 
-    response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = f'attachment; filename="test_{test_id}_data.csv"'
+    wb = Workbook()
 
-    writer = csv.writer(response)
+    #Sheet 1: Raw Data
+    raw_sheet = wb.active
+    raw_sheet.title = "Raw Data"
 
-    writer.writerow(["Response ID", "Stimulus", "User Response", "Correct Response", "Is Correct", "Latencies"])
+    headers = ["Response ID", "Stimulus", "User Response", "Correct Response", "Is Correct", "Latency"]
+    raw_sheet.append(headers)
+
+    correct_count = 0
+    total_latency = 0
 
     for resp in responses:
-        writer.writerow([
+        is_correct_str = "Yes" if resp.is_correct else "No"
+        raw_sheet.append([
             resp.response_id,
             resp.stim.stimulus,
             resp.response,
             resp.stim.correct_response,
-            "Yes" if resp.is_correct else "No",
+            is_correct_str,
             resp.latencies
         ])
+        if resp.is_correct:
+            correct_count = correct_count + 1
+        if resp.latencies:
+         try:
+            total_latency += float(resp.latencies)
+         except ValueError:
+            pass
 
+    for col in range(1, len(headers)+1):
+        raw_sheet.column_dimensions[get_column_letter(col)].width = 20
+
+    # Sheet 2: Stats/Graphs
+    stat_sheet = wb.create_sheet("Statistics")
+
+    total_responses = responses.count()
+    accuracy_percent = (correct_count / total_responses) * 100 if total_responses else 0
+    avg_latency = (total_latency / total_responses) if total_responses else 0
+
+    stat_sheet.append(["Total Responses", total_responses])
+    stat_sheet.append(["Correct Answers", correct_count])
+    stat_sheet.append(["Accuracy (%)", accuracy_percent])
+    stat_sheet.append(["Average Latency (ms)", avg_latency])
+    stat_sheet.append([])
+    stat_sheet.append(["Correctness Distribution", "Count"])
+    stat_sheet.append(["Correct", correct_count])
+    stat_sheet.append(["Incorrect", total_responses - correct_count])
+    stat_sheet.append([])
+    stat_sheet.append(["Stimulus", "Avg Latency"])
+
+    # Avg latency per stimulus
+    from collections import defaultdict
+    latency_map = defaultdict(list)
+    for r in responses:
+     if r.latencies is not None:
+        try:
+            latency_map[r.stim.stimulus].append(float(r.latencies))
+        except ValueError:
+            continue
+
+    latency_rows_start = stat_sheet.max_row + 1
+    for stim, latencies in latency_map.items():
+        avg = sum(latencies)/len(latencies)
+        stat_sheet.append([stim, avg])
+
+    # Charts
+
+    # Pie Chart
+    pie = PieChart()
+    labels = Reference(stat_sheet, min_col=1, min_row=7, max_row=8)
+    data = Reference(stat_sheet, min_col=2, min_row=7, max_row=8)
+    pie.add_data(data, titles_from_data=False)
+    pie.set_categories(labels)
+    pie.title = "Correct vs Incorrect"
+    pie.dataLabels = DataLabelList()
+    pie.dataLabels.showVal = True
+    stat_sheet.add_chart(pie, "E2")
+
+    # Bar Chart
+    latency_chart = BarChart()
+    latency_chart.title = "Avg Latency per Stimulus"
+    latency_chart.x_axis.title = "Stimulus"
+    latency_chart.y_axis.title = "Latency (ms)"
+    labels_start = latency_rows_start
+    labels_end = stat_sheet.max_row
+    labels = Reference(stat_sheet, min_col=1, min_row=labels_start, max_row=labels_end)
+    data = Reference(stat_sheet, min_col=2, min_row=labels_start-1, max_row=labels_end)
+    latency_chart.add_data(data, titles_from_data=True)
+    latency_chart.set_categories(labels)
+    latency_chart.dataLabels = DataLabelList()
+    latency_chart.dataLabels.showVal = True
+    stat_sheet.add_chart(latency_chart, "E20")
+
+    #Response
+
+    from io import BytesIO
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    response = HttpResponse(output, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response["Content-Disposition"] = f'attachment; filename="test_{test_id}_report.xlsx"'
     return response
 
 
