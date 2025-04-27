@@ -392,6 +392,8 @@ def export_test_data(request):
 
     latency_rows_start = stat_sheet.max_row + 1
     for stim, latencies in latency_map.items():
+        if not latencies:
+            continue
         avg = sum(latencies)/len(latencies)
         stat_sheet.append([stim, avg])
 
@@ -466,13 +468,6 @@ def aggregated_statistics(request):
         .order_by("is_correct")
     )
 
-    # Number of tests per doctor
-    doctor_data = (
-        TestSession.objects
-        .values("doctor__username")
-        .annotate(test_count=Count("test_id"))
-        .order_by("-test_count")
-    )
     correct_counts = (
         Response.objects
         .exclude(is_correct__isnull=True)
@@ -491,8 +486,6 @@ def aggregated_statistics(request):
         "stim_latencies": [entry["avg_latency"] for entry in stim_latency_data],
         "correct_labels": ["Correct" if entry["is_correct"] else "Incorrect" for entry in correctness_data],
         "correct_counts": [entry["count"] for entry in correctness_data],
-        "doctor_labels": [entry["doctor__username"] for entry in doctor_data],
-        "doctor_values": [entry["test_count"] for entry in doctor_data],
     }
 
     return render(request, "basic/dashboard/aggregated_statistics.html", context)
