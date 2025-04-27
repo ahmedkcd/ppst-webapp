@@ -17,15 +17,6 @@
             <canvas id="correctnessChart" style="width: 250px; height: 250px;"></canvas>
         </div>
     </div>
-    
-    
-    
-
-    <!-- Doctor Chart -->
-    <div class="mb-4">
-        <h2 class="fs-5">Number of Tests per Doctor</h2>
-        <canvas id="doctorChart" height="70"></canvas>
-    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -77,30 +68,5 @@
         }
     });
 
-    new Chart(document.getElementById('doctorChart'), {
-        type: 'bar',
-        data: {
-            labels: doctorLabels,
-            datasets: [{
-                label: 'Number of Tests',
-                data: doctorValues,
-                backgroundColor: 'orange',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { labels: { font: { size: 10 } } }
-            },
-            scales: {
-                x: { ticks: { font: { size: 10 } } },
-                y: {
-                    beginAtZero: true,
-                    ticks: { font: { size: 10 } }
-                }
-            }
-        }
-    });
 </script>
 {% endblock %}
