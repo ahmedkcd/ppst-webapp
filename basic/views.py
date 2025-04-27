@@ -10,6 +10,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 from openpyxl import Workbook
 from openpyxl.chart import PieChart, BarChart, Reference
 from openpyxl.chart.label import DataLabelList
@@ -115,6 +116,7 @@ def generate_test(request):
         language=language,
         stimuli_order=stimuli_order_str,
         test_id=test_uuid,
+        date=timezone.now(),
     )
 
     # Generate responses
