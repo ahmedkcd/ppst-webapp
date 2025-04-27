@@ -9,6 +9,7 @@ from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from openpyxl import Workbook
 from openpyxl.chart import PieChart, BarChart, Reference
@@ -211,6 +212,13 @@ def test_statistics(request, test_id):
 def submit_all_responses(request):
     if request.method == "POST":
         data = json.loads(request.body)
+        test_id = data["test_id"]
+
+        test = TestSession.objects.get(test_id=test_id)
+        test.state = "complete"
+        test.date = timezone.now()
+        test.save()
+
         for item in data["responses"]:
             response = Response.objects.get(response_id=item["response_id"])
             response.response = item["response"]
