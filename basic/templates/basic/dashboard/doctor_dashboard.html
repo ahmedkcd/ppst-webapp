@@ -1,10 +1,105 @@
-{% extends 'basic/dashboard/base.html' %} {% block title %}Dashboard{% endblock %} {% block content %}
-    <h1>Dashboard</h1>
-    <p>Welcome, {{ user.username }}!</p>
-    <h3>Quick Overview of Test</h3>
-    <ul>
-        <li>Active Tests: X</li>
-        <li>Pending Results: X</li>
-        <li>Completed Tests: X</li>
+{% extends 'basic/dashboard/base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="p-6 max-w-4xl mx-auto space-y-6 mt-8">
+
+  <h1 class="text-3xl font-bold">Dashboard</h1>
+  <p class="text-gray-600 dark:text-gray-300">Welcome, <strong>{{ user.username }}</strong>!</p>
+
+  <!-- Overview -->
+  <div class="bg-white dark:bg-gray-800 text-black dark:text-white rounded-lg shadow p-4">
+    <h2 class="text-xl font-semibold mb-2">Quick Overview of Tests</h2>
+    <ul class="list-disc pl-6 space-y-1">
+      <li>Total Tests Completed: {{ completed_tests }}</li>
+      <li>Active Tests Listed: {{ active_tests }}</li>
+      <li>Pending Tests Listed: {{ pending_tests }}</li>
     </ul>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="bg-white dark:bg-gray-800 text-black dark:text-white rounded-lg shadow p-4">
+    <h2 class="text-lg font-semibold mb-2">Filter Tests</h2>
+    <form method="get" class="space-x-2">
+      <label for="start">Start Date:</label>
+      <input type="date" name="start" class="border rounded p-1 dark:bg-gray-700 dark:text-white">
+      <label for="end">End Date:</label>
+      <input type="date" name="end" class="border rounded p-1 dark:bg-gray-700 dark:text-white">
+      <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Apply Filters</button>
+    </form>
+  </div>
+
+  <!-- Recent Tests -->
+  <div class="bg-white dark:bg-gray-800 text-black dark:text-white rounded-lg shadow p-4">
+    <h2 class="text-lg font-semibold">Recent Completed Tests (Top 10)</h2>
+    <ul>
+      {% for test in recent_tests %}
+        <li>{{ test.test_id }} — {{ test.language }} — {{ test.date|date:"M d, Y" }}</li>
+      {% empty %}
+        <li>No recent tests available.</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Chart Section -->
+  <div class="bg-white dark:bg-gray-800 text-black dark:text-white rounded-lg shadow p-4">
+    <h2 class="text-lg font-semibold mb-4">Test Language Distribution</h2>
+    <canvas id="languageChart" width="400" height="200"></canvas>
+  </div>
+
+  <!-- Notifications -->
+    <div class="bg-white dark:bg-gray-800 text-black dark:text-white rounded-lg shadow p-4"></div> 
+    <h2 class="text-lg font-semibold mb-4">Notifications</h2>
+  <ul>
+      {% if pending_tests > 0 %}
+        <li>You have {{ pending_tests }} test(s) pending approval.</li>
+      {% else %}
+        <li>No pending tests.</li>
+      {% endif %}
+      <li>Tests are scheduled.</li>
+    </ul>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('languageChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: 'Tests by Language',
+                data: {{ chart_data|safe }},
+                backgroundColor: ['#3B82F6', '#F59E0B', '#10B981']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Tests'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Language'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+
 {% endblock %}

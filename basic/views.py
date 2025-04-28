@@ -44,10 +44,32 @@ def doctor_user_login(request):
 
     return render(request, "basic/dashboard/doctor_login.html")
 
-
 @login_required(login_url='/basic/')
 def doctor_dashboard(request):
-    return render(request, 'basic/dashboard/doctor_dashboard.html')
+    test_sessions = TestSession.objects.filter(doctor=request.user)
+
+    completed_tests = test_sessions.count()
+    active_tests = test_sessions.filter(duration__isnull=False).count()
+    pending_tests = test_sessions.filter(duration__isnull=True).count()
+
+    # Get recent 10 completed tests
+    recent_tests = test_sessions.filter(duration__isnull=False).order_by('-date')[:10]
+
+    # Chart data: language distribution
+    language_counts = test_sessions.values('language').annotate(count=Count('test_id'))
+
+    chart_labels = [entry['language'] for entry in language_counts]
+    chart_data = [entry['count'] for entry in language_counts]
+
+    return render(request, 'basic/dashboard/doctor_dashboard.html', {
+        'completed_tests': completed_tests,
+        'active_tests': active_tests,
+        'pending_tests': pending_tests,
+        'recent_tests': recent_tests,
+        'chart_labels': json.dumps(chart_labels),
+        'chart_data': json.dumps(chart_data),
+    })
+
 
 @login_required(login_url='/basic/')
 def doctor_results(request):
