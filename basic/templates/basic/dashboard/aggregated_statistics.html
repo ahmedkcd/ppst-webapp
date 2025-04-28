@@ -25,8 +25,8 @@
     const stimLatencies = {{ stim_latencies|safe }};
     const correctLabels = {{ correct_labels|safe }};
     const correctCounts = {{ correct_counts|safe }};
-    const doctorLabels = {{ doctor_labels|safe }};
-    const doctorValues = {{ doctor_values|safe }};
+    const ageLabels = {{ age_labels|safe }};
+    const ageAccuracy = {{ age_accuracy|safe }};
 
     new Chart(document.getElementById('stimChart'), {
         type: 'bar',
@@ -64,6 +64,40 @@
             responsive: true,
             plugins: {
                 legend: { labels: { font: { size: 10 } } }
+            }
+        }
+    });
+
+     new Chart(document.getElementById('agePerformanceChart'), {
+        type: 'line',
+        data: {
+            labels: ageLabels,
+            datasets: [{
+                label: 'Average Accuracy (%)',
+                data: ageAccuracy,
+                fill: false,
+                borderColor: 'teal',
+                tension: 0.3,
+                pointRadius: 4,
+                pointBackgroundColor: 'teal'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { font: { size: 12 } } }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: 'Age' },
+                    ticks: { font: { size: 10 } }
+                },
+                y: {
+                    title: { display: true, text: 'Accuracy (%)' },
+                    min: 0,
+                    max: 100,
+                    ticks: { font: { size: 10 } }
+                }
             }
         }
     });
