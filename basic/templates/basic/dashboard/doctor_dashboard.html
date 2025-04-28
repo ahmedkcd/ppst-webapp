@@ -22,17 +22,17 @@
     <h2 class="text-lg font-semibold mb-2">Filter Tests</h2>
     <form method="get" class="space-x-2">
       <label for="start">Start Date:</label>
-      <input type="date" name="start" class="border rounded p-1 dark:bg-gray-700 dark:text-white">
+      <input type="date" id="start" name="start" class="border rounded p-1 dark:bg-gray-700 dark:text-white">
       <label for="end">End Date:</label>
-      <input type="date" name="end" class="border rounded p-1 dark:bg-gray-700 dark:text-white">
+      <input type="date" id="end" name="end" class="border rounded p-1 dark:bg-gray-700 dark:text-white">
       <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Apply Filters</button>
     </form>
   </div>
 
   <!-- Recent Tests -->
   <div class="bg-white dark:bg-gray-800 text-black dark:text-white rounded-lg shadow p-4">
-    <h2 class="text-lg font-semibold">Recent Completed Tests (Top 10)</h2>
-    <ul>
+    <h2 class="text-lg font-semibold mb-2">Recent Completed Tests (Top 10)</h2>
+    <ul class="list-disc pl-6 space-y-1">
       {% for test in recent_tests %}
         <li>{{ test.test_id }} — {{ test.language }} — {{ test.date|date:"M d, Y" }}</li>
       {% empty %}
@@ -48,9 +48,9 @@
   </div>
 
   <!-- Notifications -->
-    <div class="bg-white dark:bg-gray-800 text-black dark:text-white rounded-lg shadow p-4"></div> 
+  <div class="bg-white dark:bg-gray-800 text-black dark:text-white rounded-lg shadow p-4">
     <h2 class="text-lg font-semibold mb-4">Notifications</h2>
-  <ul>
+    <ul class="list-disc pl-6 space-y-1">
       {% if pending_tests > 0 %}
         <li>You have {{ pending_tests }} test(s) pending approval.</li>
       {% else %}
@@ -65,40 +65,43 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const ctx = document.getElementById('languageChart').getContext('2d');
-    const chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: {{ chart_labels|safe }},
-            datasets: [{
-                label: 'Tests by Language',
-                data: {{ chart_data|safe }},
-                backgroundColor: ['#3B82F6', '#F59E0B', '#10B981']
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: { enabled: true }
+    const canvas = document.getElementById('languageChart');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ chart_labels|safe }},
+                datasets: [{
+                    label: 'Tests by Language',
+                    data: {{ chart_data|safe }},
+                    backgroundColor: ['#3B82F6', '#F59E0B', '#10B981']
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Number of Tests'
-                    }
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true }
                 },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Language'
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Tests'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Language'
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    }
 });
 </script>
 
