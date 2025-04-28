@@ -148,6 +148,8 @@ for i in range(100):
         latencies = [round(random.uniform(100, 5000)) for _ in range(len(stim.correct_response))]
         latencies_str = ",".join(map(str, latencies))  # Convert latencies to comma-separated string
 
+        avg_latency = float(latencies_str)
+
         Response.objects.create(
             test=session,
             stim=stim,

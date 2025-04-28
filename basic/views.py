@@ -228,7 +228,9 @@ def submit_all_responses(request):
             response.response = item["response"]
             response.latencies = item["latencies"]
             try:
-                response.avg_latency = float(item["latencies"])
+                latency = float(item["latencies"] )
+                amount = len(item["latencies"])
+                response.avg_latency = latency / amount
             except (ValueError, TypeError):
                 pass  # skip if invalid
 
