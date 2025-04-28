@@ -315,10 +315,6 @@ def take_test(request):
 def test_complete(request):
     return render(request, "basic/english_test/test_complete.html")
 
-def test_results(request):
-    test_sessions = TestSession.objects.all()  # Retrieve all test sessions
-    return render(request, "basic/dashboard/test_results.html", {"test_sessions": test_sessions})
-
 def test_intro_sp(request):
     test_id = request.GET.get("test_id", None)
     return render(request, "basic/spanish_test/test_intro_sp.html", {"test_id": test_id})
