@@ -5,7 +5,7 @@ from collections import defaultdict
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import Count, Avg
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
@@ -219,12 +219,36 @@ def submit_all_responses(request):
         test.date = timezone.now()
         test.save()
 
+        correct_count = 0
+        total_latency = 0
+        latency_count = 0
+
         for item in data["responses"]:
             response = Response.objects.get(response_id=item["response_id"])
             response.response = item["response"]
             response.latencies = item["latencies"]
+
+            # Determine correctness
             response.is_correct = (item["response"] == response.stim.correct_response)
+            if response.is_correct:
+                correct_count += 1
+
+            # Handle latency (make sure it's a number)
+            try:
+                latency = float(item["latencies"])
+                total_latency += latency
+                latency_count += 1
+            except (ValueError, TypeError):
+                pass  # skip if invalid
+
             response.save()
+
+        # Now update the TestSession's performance stats
+        total_responses = len(data["responses"])
+        test.accuracy = correct_count / total_responses if total_responses > 0 else None
+        test.avg_latency = total_latency / latency_count if latency_count > 0 else None
+        test.save()
+
         return JsonResponse({"status": "success"})
 
 
@@ -335,7 +359,7 @@ def export_test_data(request):
     raw_sheet = wb.active
     raw_sheet.title = "Raw Data"
 
-    headers = ["Response ID", "Stimulus", "User Response", "Correct Response", "Is Correct", "Latency"]
+    headers = ["Response ID", "Stimulus", "User Response", "Correct Response", "Is Correct", "Latencies"]
     raw_sheet.append(headers)
 
     correct_count = 0
@@ -353,11 +377,6 @@ def export_test_data(request):
         ])
         if resp.is_correct:
             correct_count = correct_count + 1
-        if resp.latencies:
-         try:
-            total_latency += float(resp.latencies)
-         except ValueError:
-            pass
 
     for col in range(1, len(headers)+1):
         raw_sheet.column_dimensions[get_column_letter(col)].width = 20
@@ -408,6 +427,7 @@ def export_test_data(request):
     pie.title = "Correct vs Incorrect"
     pie.dataLabels = DataLabelList()
     pie.dataLabels.showVal = True
+    pie.dataLabels.showSerName = False  # Hide series names
     stat_sheet.add_chart(pie, "E2")
 
     # Bar Chart
@@ -415,14 +435,26 @@ def export_test_data(request):
     latency_chart.title = "Avg Latency per Stimulus"
     latency_chart.x_axis.title = "Stimulus"
     latency_chart.y_axis.title = "Latency (ms)"
+
+
     labels_start = latency_rows_start
     labels_end = stat_sheet.max_row
     labels = Reference(stat_sheet, min_col=1, min_row=labels_start, max_row=labels_end)
     data = Reference(stat_sheet, min_col=2, min_row=labels_start-1, max_row=labels_end)
+
     latency_chart.add_data(data, titles_from_data=True)
     latency_chart.set_categories(labels)
+
     latency_chart.dataLabels = DataLabelList()
-    latency_chart.dataLabels.showVal = True
+    latency_chart.dataLabels.showVal = True # Shows latency number
+    latency_chart.dataLabels.showCatName = False  # Hide category names
+    latency_chart.dataLabels.showLegendKey = False  # Hide legend keys if any
+    latency_chart.dataLabels.showSerName = False  # Hide series names
+    latency_chart.legend.position = 'b'
+
+    latency_chart.width = 30  # Width in Excel units (~ centimeters)
+    latency_chart.height = 15  # Height in Excel units (~ centimeters)
+
     stat_sheet.add_chart(latency_chart, "E20")
 
     #Response
@@ -480,12 +512,28 @@ def aggregated_statistics(request):
         label = "Correct" if entry["is_correct"] else "Incorrect"
         print(f"{label} responses: {entry['count']}")
 
-    # Final context (unchanged variable names)
+    age_data = (
+        TestSession.objects
+        .exclude(accuracy__isnull=True)
+        .values("age")
+        .annotate(avg_accuracy=Avg("accuracy"))
+        .order_by("age")
+    )
+
+    age_labels = [entry["age"] for entry in age_data]
+    age_accuracy = [
+        round(entry["avg_accuracy"] * 100, 2) if entry["avg_accuracy"] is not None else 0
+        for entry in age_data
+    ]
+
+    # Final context (now including new chart data)
     context = {
         "stim_labels": [entry["stim__stimulus"] for entry in stim_latency_data],
         "stim_latencies": [entry["avg_latency"] for entry in stim_latency_data],
         "correct_labels": ["Correct" if entry["is_correct"] else "Incorrect" for entry in correctness_data],
         "correct_counts": [entry["count"] for entry in correctness_data],
+        "age_labels": age_labels,
+        "age_accuracy": age_accuracy,
     }
 
     return render(request, "basic/dashboard/aggregated_statistics.html", context)
