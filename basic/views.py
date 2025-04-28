@@ -470,8 +470,17 @@ def export_test_data(request):
 
 
 
+from collections import defaultdict
+from django.db.models import Count, Avg
+from django.shortcuts import render
+from .models import Response, TestSession
+
+from collections import defaultdict
+from django.db.models import Count, Avg
+from django.shortcuts import render
+from .models import Response, TestSession
+
 def aggregated_statistics(request):
-    # Parse latencies (stored as text) and group by stimulus
     responses = (
         Response.objects
         .exclude(latencies__isnull=True)
@@ -482,52 +491,57 @@ def aggregated_statistics(request):
 
     for r in responses:
         try:
-            latency = float(r.latencies.strip())
-            stim_sums[r.stim.stimulus].append(latency)
+            stim_sums[r.stim.stimulus].append(r.avg_latency)
         except (ValueError, AttributeError):
-            continue  # skip invalid entries
+            continue
 
     stim_latency_data = [
-        {"stim__stimulus": stim, "avg_latency": sum(vals)/len(vals)}
+        {"stim__stimulus": stim, "avg_latency": sum(vals) / len(vals)}
         for stim, vals in stim_sums.items()
     ]
 
-    # Overall correctness of responses
     correctness_data = (
         Response.objects
         .exclude(is_correct__isnull=True)
         .values("is_correct")
         .annotate(count=Count("response_id"))
-        .order_by("is_correct")
+        .order_by("-is_correct")
     )
 
-    correct_counts = (
-        Response.objects
-        .exclude(is_correct__isnull=True)
-        .values("is_correct")
-        .annotate(count=Count("response_id"))
-    )
-
-    # Print results
-    for entry in correct_counts:
-        label = "Correct" if entry["is_correct"] else "Incorrect"
-        print(f"{label} responses: {entry['count']}")
-
-    age_data = (
+    # Group ages into 10-year buckets
+    test_sessions = (
         TestSession.objects
+        .exclude(age__isnull=True)
         .exclude(accuracy__isnull=True)
-        .values("age")
-        .annotate(avg_accuracy=Avg("accuracy"))
-        .order_by("age")
+        .exclude(avg_latency__isnull=True)
+        .values("age", "accuracy", "avg_latency")
     )
 
-    age_labels = [entry["age"] for entry in age_data]
-    age_accuracy = [
-        round(entry["avg_accuracy"] * 100, 2) if entry["avg_accuracy"] is not None else 0
-        for entry in age_data
-    ]
 
-    # Final context (now including new chart data)
+    age_brackets_accuracy = defaultdict(list)
+    age_brackets_latency = defaultdict(list)
+
+    for session in test_sessions:
+        age = session["age"]
+        bracket = (age // 10) * 10  # Grouping into 0-9, 10-19, etc.
+        age_brackets_accuracy[bracket].append(session["accuracy"])
+        age_brackets_latency[bracket].append(session["avg_latency"])
+
+    age_labels = []
+    age_accuracy = []
+    age_latency = []
+
+    for bracket in sorted(age_brackets_accuracy.keys()):
+        accuracies = age_brackets_accuracy[bracket]
+        latencies = age_brackets_latency[bracket]
+
+        avg_accuracy = sum(accuracies) / len(accuracies) if accuracies else 0
+        avg_latency = sum(latencies) / len(latencies) if latencies else 0
+
+        age_labels.append(f"{bracket}-{bracket + 9}")
+        age_accuracy.append(round(avg_accuracy * 100, 2))
+        age_latency.append(round(avg_latency, 2))
+
     context = {
         "stim_labels": [entry["stim__stimulus"] for entry in stim_latency_data],
         "stim_latencies": [entry["avg_latency"] for entry in stim_latency_data],
@@ -535,6 +549,7 @@ def aggregated_statistics(request):
         "correct_counts": [entry["count"] for entry in correctness_data],
         "age_labels": age_labels,
         "age_accuracy": age_accuracy,
+        "age_latency": age_latency,
     }
 
     return render(request, "basic/dashboard/aggregated_statistics.html", context)

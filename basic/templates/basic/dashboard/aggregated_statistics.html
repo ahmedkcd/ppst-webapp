@@ -13,10 +13,21 @@
         </div>
 
         <div style="flex: 1; min-width: 250px;">
-            <h2 class="fs-6 text-center">Test Correctness</h2>
+            <h2 class="fs-6 text-center">Total Test Accuracy</h2>
             <canvas id="correctnessChart" style="width: 250px; height: 250px;"></canvas>
         </div>
     </div>
+
+    <div style="margin-top: 3rem;">
+        <h2 class="fs-5">Average Accuracy by Age Group</h2>
+        <canvas id="agePerformanceChart" height="100"></canvas>
+    </div>
+
+    <div style="margin-top: 3rem;">
+    <h2 class="fs-5">Average Test Latency by Age Group</h2>
+        <canvas id="ageLatencyChart" height="100"></canvas>
+    </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -27,6 +38,8 @@
     const correctCounts = {{ correct_counts|safe }};
     const ageLabels = {{ age_labels|safe }};
     const ageAccuracy = {{ age_accuracy|safe }};
+    const ageLatency = {{ age_latency|safe }};
+
 
     new Chart(document.getElementById('stimChart'), {
         type: 'bar',
@@ -41,9 +54,7 @@
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { labels: { font: { size: 10 } } }
-            },
+            plugins: { legend: { display: false }},
             scales: {
                 x: { ticks: { font: { size: 10 } } },
                 y: { ticks: { font: { size: 10 } } }
@@ -57,39 +68,35 @@
             labels: correctLabels,
             datasets: [{
                 data: correctCounts,
-                backgroundColor: ['red', 'green']
+                backgroundColor: ['green', 'red']
             }]
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { labels: { font: { size: 10 } } }
-            }
+            plugins: { legend: { labels: { font: { size: 10 } } }}
         }
     });
 
      new Chart(document.getElementById('agePerformanceChart'), {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: ageLabels,
             datasets: [{
                 label: 'Average Accuracy (%)',
                 data: ageAccuracy,
-                fill: false,
-                borderColor: 'teal',
-                tension: 0.3,
-                pointRadius: 4,
-                pointBackgroundColor: 'teal'
+                backgroundColor: 'lightgreen',
+                borderColor: 'green',
+                borderWidth: 1
             }]
         },
         options: {
             responsive: true,
             plugins: {
-                legend: { labels: { font: { size: 12 } } }
+                legend: { display: false }
             },
             scales: {
                 x: {
-                    title: { display: true, text: 'Age' },
+                    title: { display: true, text: 'Age Bracket' },
                     ticks: { font: { size: 10 } }
                 },
                 y: {
@@ -102,5 +109,34 @@
         }
     });
 
+     new Chart(document.getElementById('ageLatencyChart'), {
+        type: 'bar',
+        data: {
+            labels: ageLabels,
+            datasets: [{
+                label: 'Average Latency (ms)',
+                data: ageLatency,
+                backgroundColor: 'lightcoral',
+                borderColor: 'red',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: 'Age Bracket' },
+                    ticks: { font: { size: 10 } }
+                },
+                y: {
+                    title: { display: true, text: 'Latency (ms)' },
+                    ticks: { font: { size: 10 } }
+                }
+            }
+        }
+    });
 </script>
 {% endblock %}
