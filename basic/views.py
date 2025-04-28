@@ -357,6 +357,7 @@ def test_complete_sp(request):
 
 def export_test_data(request):
     test_id = request.GET.get("test_id")
+    test_session = get_object_or_404(TestSession, pk=test_id)
     responses = Response.objects.filter(test_id=test_id).select_related("stim")
 
     wb = Workbook()
@@ -365,7 +366,7 @@ def export_test_data(request):
     raw_sheet = wb.active
     raw_sheet.title = "Raw Data"
 
-    headers = ["Response ID", "Stimulus", "User Response", "Correct Response", "Is Correct", "Latencies"]
+    headers = ["Response ID", "Stimulus", "User Response", "Correct Response", "Is Correct", "Latencies", "Average Latency"]
     raw_sheet.append(headers)
 
     correct_count = 0
@@ -379,7 +380,8 @@ def export_test_data(request):
             resp.response,
             resp.stim.correct_response,
             is_correct_str,
-            resp.latencies
+            resp.latencies,
+            resp.avg_latency,
         ])
         if resp.is_correct:
             correct_count = correct_count + 1
@@ -392,7 +394,7 @@ def export_test_data(request):
 
     total_responses = responses.count()
     accuracy_percent = (correct_count / total_responses) * 100 if total_responses else 0
-    avg_latency = (total_latency / total_responses) if total_responses else 0
+    avg_latency = test_session.avg_latency if test_session.avg_latency else 0
 
     stat_sheet.append(["Total Responses", total_responses])
     stat_sheet.append(["Correct Answers", correct_count])

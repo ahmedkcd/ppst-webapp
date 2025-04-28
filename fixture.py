@@ -148,14 +148,17 @@ for i in range(100):
         latencies = [round(random.uniform(100, 5000)) for _ in range(len(stim.correct_response))]
         latencies_str = ",".join(map(str, latencies))  # Convert latencies to comma-separated string
 
-        avg_latency = float(latencies_str)
+        latency = sum(latencies)
+        amount = len(latencies)
+        avg_latency = latency / amount
 
         Response.objects.create(
             test=session,
             stim=stim,
             response=response_text,
             latencies=latencies_str,
-            is_correct=is_correct
+            is_correct=is_correct,
+            avg_latency=avg_latency
         )
 
         if is_correct:
