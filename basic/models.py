@@ -39,6 +39,7 @@ class Response(models.Model):
     stim = models.ForeignKey(Stimuli, on_delete=models.CASCADE)
     response = models.TextField(null=True)
     latencies = models.TextField(null=True)
+    avg_latency = models.FloatField(null=True)
     is_correct = models.BooleanField(null=True)
 
     def __str__(self):

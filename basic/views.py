@@ -227,6 +227,10 @@ def submit_all_responses(request):
             response = Response.objects.get(response_id=item["response_id"])
             response.response = item["response"]
             response.latencies = item["latencies"]
+            try:
+                response.avg_latency = float(item["latencies"])
+            except (ValueError, TypeError):
+                pass  # skip if invalid
 
             # Determine correctness
             response.is_correct = (item["response"] == response.stim.correct_response)
