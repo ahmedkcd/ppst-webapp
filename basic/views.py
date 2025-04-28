@@ -52,7 +52,7 @@ def doctor_dashboard(request):
 
 @login_required(login_url='/basic/')
 def doctor_results(request):
-    test_sessions = TestSession.objects.filter(doctor=request.user)
+    test_sessions = TestSession.objects.filter(doctor=request.user).order_by('-date')
     return render(request, 'basic/dashboard/doctor_results.html', {'test_sessions': test_sessions})
 
 @login_required(login_url='/basic/')
@@ -116,6 +116,7 @@ def generate_test(request):
         language=language,
         stimuli_order=stimuli_order_str,
         test_id=test_uuid,
+        date=timezone.now(),
     )
 
     # Generate responses

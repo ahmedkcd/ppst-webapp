@@ -62,7 +62,7 @@
             <div class="mt-6 w-1/2 space-y-3">
                 {% for test in test_sessions %}
                     <div class="test-item bg-white p-4 rounded shadow flex justify-between items-center">
-                        <span>Test #{{ test.test_id }} - Dr. {{ test.doctor.username }}</span>
+                        <span>{{ test.date }} -  {{ test.state }}</span>
                         <div class="flex gap-2">
                             <!-- Download Button -->
                             <button onclick="exportTestData('{{ test.test_id }}')"

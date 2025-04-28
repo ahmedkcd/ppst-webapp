@@ -105,7 +105,6 @@ languages = ["en", "sp"]
 for i in range(100):
     doctor = doctors[i % len(doctors)]
     age = random.randint(30, 90)
-    duration = timedelta(minutes=random.randint(20, 60))
     date = random_date()
     test_uuid = str(uuid.uuid4())
     language = random.choice(languages)
@@ -120,10 +119,10 @@ for i in range(100):
         doctor=doctor,
         age=age,
         date=date,
-        duration=duration,
         test_id=test_uuid,
         stimuli_order=stimuli_order_str,
-        language=language
+        language=language,
+        state="complete"
     )
     test_sessions.append(session)
 
@@ -169,7 +168,8 @@ for i in range(100):
     if latency_count > 0:
         session.avg_latency = total_latency / latency_count
     if latency_count > 0:  # same as total responses
-        session.accuracy = correct_count / latency_count
+        session.accuracy = correct_count / 12
+    session.duration = total_latency
     session.save()
 
 print(f" Created {len(test_sessions)} test sessions with responses.")

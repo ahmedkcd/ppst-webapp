@@ -9,11 +9,11 @@ class TestSession(models.Model):
     doctor = models.ForeignKey(User, on_delete=models.CASCADE)  # Link to built-in User model
     age = models.IntegerField()
     date = models.DateTimeField(null=True)
-    duration = models.DurationField(null=True)
+    duration = models.IntegerField(null=True)
     avg_latency = models.FloatField(null=True)
     accuracy = models.FloatField(null=True)
     stimuli_order = models.TextField(null=True)
-    state = models.TextField(default="ready")
+    state = models.TextField(default="incomplete")
     language = models.TextField(default="en")
 
     def __str__(self):
