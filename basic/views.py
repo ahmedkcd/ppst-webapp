@@ -1,21 +1,22 @@
 import json
 import uuid
-from collections import defaultdict
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Avg
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
+from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
 from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
 from openpyxl.chart import PieChart, BarChart, Reference
 from openpyxl.chart.label import DataLabelList
-from openpyxl.styles import Font
-from openpyxl.utils import get_column_letter
+from collections import defaultdict
+from io import BytesIO
 
 from basic.models import User
 
@@ -352,22 +353,22 @@ def take_test_sp(request):
 def test_complete_sp(request):
     return render(request, "basic/spanish_test/test_complete_sp.html")
 
+
 def export_test_data(request):
     test_id = request.GET.get("test_id")
     test_session = get_object_or_404(TestSession, pk=test_id)
-    responses = Response.objects.filter(test_id=test_id).select_related("stim")
+    responses = Response.objects.filter(test=test_session).select_related("stim")
 
     wb = Workbook()
 
-    #Sheet 1: Raw Data
+    # Sheet 1: Raw Data
     raw_sheet = wb.active
     raw_sheet.title = "Raw Data"
 
-    headers = ["Response ID", "Stimulus", "User Response", "Correct Response", "Is Correct", "Latencies", "Average Latency"]
+    headers = ["Response ID", "Stimulus", "User Response", "Correct Response", "Is Correct", "Latencies (ms)", "Average Latency (ms)"]
     raw_sheet.append(headers)
 
     correct_count = 0
-    total_latency = 0
 
     for resp in responses:
         is_correct_str = "Yes" if resp.is_correct else "No"
@@ -378,15 +379,16 @@ def export_test_data(request):
             resp.stim.correct_response,
             is_correct_str,
             resp.latencies,
-            resp.avg_latency,
+            resp.avg_latency if resp.avg_latency is not None else "",
         ])
         if resp.is_correct:
-            correct_count = correct_count + 1
+            correct_count += 1
 
-    for col in range(1, len(headers)+1):
+    # Autofit columns
+    for col in range(1, len(headers) + 1):
         raw_sheet.column_dimensions[get_column_letter(col)].width = 20
 
-    # Sheet 2: Stats/Graphs
+    # Sheet 2: Statistics
     stat_sheet = wb.create_sheet("Statistics")
 
     total_responses = responses.count()
@@ -395,76 +397,69 @@ def export_test_data(request):
 
     stat_sheet.append(["Total Responses", total_responses])
     stat_sheet.append(["Correct Answers", correct_count])
-    stat_sheet.append(["Accuracy (%)", accuracy_percent])
+    stat_sheet.append(["Accuracy (%)", round(accuracy_percent, 2)])
     stat_sheet.append(["Average Latency (ms)", avg_latency])
     stat_sheet.append([])
     stat_sheet.append(["Correctness Distribution", "Count"])
     stat_sheet.append(["Correct", correct_count])
     stat_sheet.append(["Incorrect", total_responses - correct_count])
     stat_sheet.append([])
-    stat_sheet.append(["Stimulus", "Avg Latency"])
+    stat_sheet.append(["Stimulus", "Avg Latency (ms)"])
 
-    # Avg latency per stimulus
-    from collections import defaultdict
+    # Average latency per stimulus
     latency_map = defaultdict(list)
     for r in responses:
-     if r.latencies is not None:
-        try:
-            latency_map[r.stim.stimulus].append(float(r.latencies))
-        except ValueError:
-            continue
+        if r.avg_latency is not None:
+            latency_map[r.stim.stimulus].append(r.avg_latency)
 
     latency_rows_start = stat_sheet.max_row + 1
     for stim, latencies in latency_map.items():
-        if not latencies:
-            continue
-        avg = sum(latencies)/len(latencies)
-        stat_sheet.append([stim, avg])
+        avg_stim_latency = sum(latencies) / len(latencies)
+        stat_sheet.append([stim, round(avg_stim_latency, 2)])
 
     # Charts
 
-    # Pie Chart
+    # Pie Chart (Correct vs Incorrect)
     pie = PieChart()
-    labels = Reference(stat_sheet, min_col=1, min_row=7, max_row=8)
-    data = Reference(stat_sheet, min_col=2, min_row=7, max_row=8)
-    pie.add_data(data, titles_from_data=False)
-    pie.set_categories(labels)
+    pie_labels = Reference(stat_sheet, min_col=1, min_row=7, max_row=8)
+    pie_data = Reference(stat_sheet, min_col=2, min_row=7, max_row=8)
+    pie.add_data(pie_data, titles_from_data=False)
+    pie.set_categories(pie_labels)
     pie.title = "Correct vs Incorrect"
     pie.dataLabels = DataLabelList()
     pie.dataLabels.showVal = True
-    pie.dataLabels.showSerName = False  # Hide series names
+    pie.dataLabels.showSerName = False
     stat_sheet.add_chart(pie, "E2")
 
-    # Bar Chart
+    # Bar Chart (Latency per Stimulus)
     latency_chart = BarChart()
-    latency_chart.title = "Avg Latency per Stimulus"
+    latency_chart.title = "Average Latency per Stimulus"
     latency_chart.x_axis.title = "Stimulus"
     latency_chart.y_axis.title = "Latency (ms)"
-
 
     labels_start = latency_rows_start
     labels_end = stat_sheet.max_row
     labels = Reference(stat_sheet, min_col=1, min_row=labels_start, max_row=labels_end)
-    data = Reference(stat_sheet, min_col=2, min_row=labels_start-1, max_row=labels_end)
+    data = Reference(stat_sheet, min_col=2, min_row=labels_start - 1, max_row=labels_end)
 
     latency_chart.add_data(data, titles_from_data=True)
     latency_chart.set_categories(labels)
-
     latency_chart.dataLabels = DataLabelList()
-    latency_chart.dataLabels.showVal = True # Shows latency number
-    latency_chart.dataLabels.showCatName = False  # Hide category names
-    latency_chart.dataLabels.showLegendKey = False  # Hide legend keys if any
-    latency_chart.dataLabels.showSerName = False  # Hide series names
+    latency_chart.dataLabels.showVal = True
+    latency_chart.dataLabels.showCatName = False
+    latency_chart.dataLabels.showSerName = False
+    latency_chart.dataLabels.showLegendKey = False
+    latency_chart.dataLabels.showPercent = False
+
+    # Set chart size
+    latency_chart.width = 20
+    latency_chart.height = 12
+
+    # Move legend to bottom
     latency_chart.legend.position = 'b'
-
-    latency_chart.width = 30  # Width in Excel units (~ centimeters)
-    latency_chart.height = 15  # Height in Excel units (~ centimeters)
-
     stat_sheet.add_chart(latency_chart, "E20")
 
-    #Response
-
-    from io import BytesIO
+    # Output the Excel file
     output = BytesIO()
     wb.save(output)
     output.seek(0)
@@ -472,6 +467,7 @@ def export_test_data(request):
     response = HttpResponse(output, content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     response["Content-Disposition"] = f'attachment; filename="test_{test_id}_report.xlsx"'
     return response
+
 
 
 def aggregated_statistics(request):
