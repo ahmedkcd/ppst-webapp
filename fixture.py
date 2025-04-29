@@ -105,7 +105,6 @@ languages = ["en", "sp"]
 for i in range(100):
     doctor = doctors[i % len(doctors)]
     age = random.randint(30, 90)
-    duration = timedelta(minutes=random.randint(20, 60))
     date = random_date()
     test_uuid = str(uuid.uuid4())
     language = random.choice(languages)
@@ -120,12 +119,16 @@ for i in range(100):
         doctor=doctor,
         age=age,
         date=date,
-        duration=duration,
         test_id=test_uuid,
         stimuli_order=stimuli_order_str,
-        language=language
+        language=language,
+        state="complete"
     )
     test_sessions.append(session)
+
+    correct_count = 0
+    total_latency = 0
+    latency_count = 0
 
     # Create responses for each stimulus
     for stim in ordered_stimuli:
@@ -141,15 +144,33 @@ for i in range(100):
             if response_text == stim.correct_response:
                 response_text = ''.join(random.choices(chars, k=len(stim.correct_response)))
 
-        latency = round(random.uniform(1.5, 3.5), 2)
+        latencies = [round(random.uniform(100, 5000)) for _ in range(len(stim.correct_response))]
+        latencies_str = ",".join(map(str, latencies))  # Convert latencies to comma-separated string
+
+        latency = sum(latencies)
+        amount = len(latencies)
+        avg_latency = latency / amount
 
         Response.objects.create(
             test=session,
             stim=stim,
             response=response_text,
-            latencies=latency,
-            is_correct=is_correct
+            latencies=latencies_str,
+            is_correct=is_correct,
+            avg_latency=avg_latency
         )
+
+        if is_correct:
+            correct_count += 1
+        total_latency += sum(latencies)
+        latency_count += len(latencies)
+
+    if latency_count > 0:
+        session.avg_latency = total_latency / latency_count
+    if latency_count > 0:  # same as total responses
+        session.accuracy = correct_count / 12
+    session.duration = total_latency
+    session.save()
 
 print(f" Created {len(test_sessions)} test sessions with responses.")
 

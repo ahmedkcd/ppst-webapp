@@ -6,7 +6,7 @@ from .views import (
     get_practice_responses, practice_countdown, practice_transition, test_complete, doctor_dashboard,
     submit_all_responses,
     doctor_logout_view, doctor_newtest, doctor_results, doctor_statistics,
-    doctor_user_login, base, landing, test_results, export_test_data, test_statistics,
+    doctor_user_login, base, landing, export_test_data, test_statistics,
     test_intro_sp, test_instructions_sp, practice_test_sp, take_test_sp, practice_countdown_sp, practice_transition_sp,
     test_complete_sp, get_practice_responses_sp, aggregated_statistics
 )
@@ -38,7 +38,6 @@ urlpatterns = [
     path("", landing, name='landing'),
     path('doctor-logout', doctor_logout_view, name='doctor-logout'),
     path("logout/", logout_view, name="logout"),
-    path("test_results/", test_results, name="test_results"),
     path("export_test_data/", export_test_data, name="export_test_data"),
     path("test_statistics/<str:test_id>/", test_statistics, name="test_statistics"),
     path('aggregated-statistics/', aggregated_statistics, name='aggregated-statistics'),
