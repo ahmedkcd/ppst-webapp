@@ -252,9 +252,12 @@ def submit_all_responses(request):
             response.response = item["response"]
             response.latencies = item["latencies"]
             try:
-                latency = float(item["latencies"] )
-                amount = len(item["latencies"])
+                latencies = [float(latency) for latency in item["latencies"].split(",")]
+                latency = sum(latencies)
+                amount = len(latencies)
                 response.avg_latency = latency / amount
+                total_latency += latency
+                latency_count += 1
             except (ValueError, TypeError):
                 pass  # skip if invalid
 
@@ -262,14 +265,6 @@ def submit_all_responses(request):
             response.is_correct = (item["response"] == response.stim.correct_response)
             if response.is_correct:
                 correct_count += 1
-
-            # Handle latency (make sure it's a number)
-            try:
-                latency = float(item["latencies"])
-                total_latency += latency
-                latency_count += 1
-            except (ValueError, TypeError):
-                pass  # skip if invalid
 
             response.save()
 
@@ -387,7 +382,7 @@ def export_test_data(request):
     raw_sheet = wb.active
     raw_sheet.title = "Raw Data"
 
-    headers = ["Response ID", "Stimulus", "User Response", "Correct Response", "Is Correct", "Latencies (ms)", "Average Latency (ms)"]
+    headers = ["Response ID", "Stimulus", "User Response", "Correct Response", "Is Correct", "Latencies (ms)"]
     raw_sheet.append(headers)
 
     correct_count = 0
@@ -401,7 +396,6 @@ def export_test_data(request):
             resp.stim.correct_response,
             is_correct_str,
             resp.latencies,
-            resp.avg_latency if resp.avg_latency is not None else "",
         ])
         if resp.is_correct:
             correct_count += 1
@@ -429,15 +423,10 @@ def export_test_data(request):
     stat_sheet.append(["Stimulus", "Avg Latency (ms)"])
 
     # Average latency per stimulus
-    latency_map = defaultdict(list)
-    for r in responses:
-        if r.avg_latency is not None:
-            latency_map[r.stim.stimulus].append(r.avg_latency)
-
     latency_rows_start = stat_sheet.max_row + 1
-    for stim, latencies in latency_map.items():
-        avg_stim_latency = sum(latencies) / len(latencies)
-        stat_sheet.append([stim, round(avg_stim_latency, 2)])
+    for r in responses:
+        latency = r.avg_latency if r.avg_latency is not None else "N/A"
+        stat_sheet.append([r.stim.stimulus, latency])
 
     # Charts
 
@@ -513,7 +502,8 @@ def aggregated_statistics(request):
 
     for r in responses:
         try:
-            stim_sums[r.stim.stimulus].append(r.avg_latency)
+            if r.avg_latency is not None:
+                stim_sums[r.stim.stimulus].append(r.avg_latency)
         except (ValueError, AttributeError):
             continue
 
